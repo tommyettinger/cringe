@@ -36,15 +36,15 @@ import static com.badlogic.gdx.graphics.GL20.GL_POINTS;
  */
 public class CorrelationVisualizer extends ApplicationAdapter {
 
-    public static String title = "";
+    public String title = "";
     private ImmediateModeRenderer20 renderer;
     public static final int width = 256, height = 256;
-    private static final float[][] previousGrid = new float[width][height];
+    private final float[][] previousGrid = new float[width][height];
 
-    public static final GdxRandom[][][] randoms;
-    static {
+    public final GdxRandom[][][] randoms;
+    {
         GdxRandom[] rl = new GdxRandom[]{
-                new RandomAce320(1), new RandomDistinct64(1), new RandomXMX256(1)
+                new RandomAce320(1), new RandomDistinct64(1), new RandomXMX256(1), new RandomRandomXS128(1)
         };
         randoms = new GdxRandom[rl.length][][];
         for (int i = 0; i < randoms.length; i++) {
@@ -52,12 +52,12 @@ public class CorrelationVisualizer extends ApplicationAdapter {
         }
     }
     public int currentRandom = 0;
-    public static int randomCount = randoms.length;
+    public int randomCount = randoms.length;
     public int currentMode = 0;
-    public static int frame = 0;
-    public static int modeCount = 3;
+    public int frame = 0;
+    public int modeCount = 3;
 
-    public static GdxRandom[][] makeGrid(GdxRandom base, int width, int height){
+    public GdxRandom[][] makeGrid(GdxRandom base, int width, int height){
         GdxRandom[][] g = new GdxRandom[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -85,7 +85,7 @@ public class CorrelationVisualizer extends ApplicationAdapter {
         return g;
     }
 
-    public static void refreshGrid() {
+    public void refreshGrid() {
         for (int i = 0, n = randoms.length; i < n; i++) {
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
@@ -112,7 +112,7 @@ public class CorrelationVisualizer extends ApplicationAdapter {
         frame = 0;
     }
 
-    public static void seedGrid() {
+    public void seedGrid() {
         for (int i = 0, n = randoms.length; i < n; i++) {
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
@@ -256,8 +256,8 @@ public class CorrelationVisualizer extends ApplicationAdapter {
 
     public static void main(String[] arg) {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        config.useVsync(true);
-        config.setForegroundFPS(6);
+        config.useVsync(false);
+        config.setForegroundFPS(512);
         config.setResizable(false);
         config.setWindowedMode(width, height);
         config.disableAudio(true);

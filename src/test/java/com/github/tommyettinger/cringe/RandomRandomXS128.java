@@ -45,7 +45,8 @@ public class RandomRandomXS128 extends GdxRandom {
      */
     @Override
     public void setSeed(long seed) {
-        wrapped.setSeed(seed);
+        if(wrapped != null)
+            wrapped.setSeed(seed);
     }
 
     /**

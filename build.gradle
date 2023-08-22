@@ -13,10 +13,8 @@ buildscript {
 apply plugin: 'java-library'
 apply plugin: 'com.vanniktech.maven.publish'
 
-//Obviously, change the next line to match your project name.
-def projectName = 'libgdx-library-template'
+def projectName = 'cringe'
 
-//Change this to whatever Maven Central group you might publish to, which is probably not this one if you aren't Tommy Ettinger.
 group 'com.github.tommyettinger'
 
 version "$VERSION_NAME" // You can set the version in gradle.properties .
@@ -63,7 +61,6 @@ compileTestJava {
 }
 
 // JavaDocs will be published inside the docs/ folder, which you can easily put on GitHub Pages in your repo settings.
-// You may instead want to remove this line if frequent doc changes use up too much repo space.
 javadoc.destinationDir = file('docs/apidocs')
 
 jar {
@@ -74,8 +71,7 @@ jar {
 }
 
 repositories {
-    // You can uncomment mavenLocal() if you need self-built versions, but it can be a problem with GWT or other sources dependencies.
-    //mavenLocal()
+    mavenLocal()
     mavenCentral()
     maven { url 'https://s01.oss.sonatype.org' }
     google()
@@ -88,14 +84,8 @@ repositories {
 }
 
 dependencies {
-// Change gdxVersion in gradle.properties to update or downgrade.
-// Libraries that don't use libGDX directly can change the next line
-// from `api` to `testImplementation` .
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
     testImplementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
     testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     testImplementation "junit:junit:4.13.2"
-
-    // I don't know what conditions may require this to run tests.
-    //testRuntimeOnly "org.junit.vintage:junit-vintage-engine:5.9.0"
 }

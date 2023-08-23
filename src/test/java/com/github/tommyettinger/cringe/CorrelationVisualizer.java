@@ -44,7 +44,8 @@ public class CorrelationVisualizer extends ApplicationAdapter {
     public final GdxRandom[][][] randoms;
     {
         GdxRandom[] rl = new GdxRandom[]{
-                new RandomAce320(1), new RandomDistinct64(1), new RandomXMX256(1), new RandomRandomXS128(1)
+                new RandomAce320(1), new RandomDistinct64(1), new RandomXMX256(1),
+                new RandomRandomXS128(1), new RandomJava48(1)
         };
         randoms = new GdxRandom[rl.length][][];
         for (int i = 0; i < randoms.length; i++) {

@@ -45,9 +45,10 @@ public class RandomJava48 extends GdxRandom {
 	}
 
 	/**
-	 * Creates a new RandomJava48 with the given state; all {@code long} values are permitted.
+	 * Creates a new RandomJava48 with the given state; all {@code long} values are permitted, but only the low 48 bits
+	 * are actually used.
 	 *
-	 * @param state any {@code long} value
+	 * @param state any {@code long} value, though only the low 48 bits will be used
 	 */
 	public RandomJava48(long state) {
 		super(state);
@@ -89,14 +90,13 @@ public class RandomJava48 extends GdxRandom {
 
 	/**
 	 * Sets the only state, which can be given any long value; this seed value
-	 * will not be altered. Equivalent to {@link #setSelectedState(int, long)}
-	 * with any selection and {@code seed} passed as the {@code value}.
+	 * will be altered in a simple way. This is not equivalent to {@link #setSelectedState(int, long)}.
 	 *
-	 * @param seed the exact value to use for the state; all longs are valid
+	 * @param seed the value to use for the state; all longs are valid, and this will be altered
 	 */
 	@Override
 	public void setSeed (long seed) {
-		state = seed;
+		state = (seed ^ 0x5DEECE66DL) & 0xffffffffffffL;
 	}
 
 	/**

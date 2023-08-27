@@ -22,8 +22,11 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -37,6 +40,8 @@ import static com.badlogic.gdx.graphics.GL20.GL_POINTS;
 public class CorrelationVisualizer extends ApplicationAdapter {
 
     public String title = "";
+    public BitmapFont font;
+    public SpriteBatch fontBatch;
     private ImmediateModeRenderer20 renderer;
     public static final int width = 256, height = 256;
     private final float[][] previousGrid = new float[width][height];
@@ -129,6 +134,8 @@ public class CorrelationVisualizer extends ApplicationAdapter {
 
     @Override
     public void create() {
+        font = new BitmapFont();
+        fontBatch = new SpriteBatch();
         title = randoms[currentRandom][0][0].getClass().getSimpleName() + " on mode " + currentMode;
         System.out.println(title);
         renderer = new ImmediateModeRenderer20(width * height, false, true, 0);
@@ -233,6 +240,9 @@ public class CorrelationVisualizer extends ApplicationAdapter {
     public void render() {
         ScreenUtils.clear(Color.BLACK);
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS showing " + title);
+        fontBatch.begin();
+        font.draw(fontBatch, title, 0f, height + 19f, width, Align.center, false);
+        fontBatch.end();
         if (keepGoing) {
             putMap();
         }
@@ -257,10 +267,10 @@ public class CorrelationVisualizer extends ApplicationAdapter {
 
     public static void main(String[] arg) {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        config.useVsync(false);
-        config.setForegroundFPS(512);
+        config.useVsync(true);
+        config.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
         config.setResizable(false);
-        config.setWindowedMode(width, height);
+        config.setWindowedMode(width, height + 20);
         config.disableAudio(true);
         new Lwjgl3Application(new CorrelationVisualizer(), config);
     }

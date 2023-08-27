@@ -1803,6 +1803,33 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	}
 
 	/**
+	 * A bare-bones implementation that just returns the hashCode() of the String returned by {@link #getTag()}.
+	 * This allows GdxRandom subclasses to be distinguished from each other by their hashCode(), usually, but
+	 * not by their current state, because the state is expected to change often.
+	 *
+	 * @return a hash code value for this object (well, its {@link #getTag() tag})
+	 */
+	@Override
+	public int hashCode() {
+		return getTag().hashCode();
+	}
+
+
+	@Override
+	public boolean equals (Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+
+		GdxRandom that = (GdxRandom)o;
+
+		return areEqual(this, that);
+	}
+
+	// Serialization and deserialization to String
+
+	/**
 	 * Serializes the current state of this GdxRandom to a String that can be used by
 	 * {@link #stringDeserialize(String)} to load this state at another time.
 	 * This method does not typically need to be extended by subclasses.

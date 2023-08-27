@@ -79,16 +79,16 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T> {
      * iterate infinitely through mostly-random shuffles of the given collection. These shuffles are spaced so that a
      * single element should always have a large amount of "gap" in order between one appearance and the next. It helps
      * to keep the appearance of a gap if every item in items is unique, but that is not necessary and does not affect
-     * how this works. The random parameter will be copied if {@code shareRNG} is true, otherwise the reference will be
+     * how this works. The random parameter will be copied if {@code shareRandom} is true, otherwise the reference will be
      * shared (which could make the results of this GapShuffler depend on outside code, though it will always maintain a
      * gap between identical elements if the elements are unique).
      * @param items a Array of T that will not be modified
      * @param random aa GdxRandom; will be copied and not used directly
-     * @param shareRNG if false, {@code random} will be copied and no reference will be kept; if true, {@code random} will be shared with the outside code
+     * @param shareRandom if false, {@code random} will be copied and no reference will be kept; if true, {@code random} will be shared with the outside code
      */
-    public GapShuffler(Array<T> items, GdxRandom random, boolean shareRNG)
+    public GapShuffler(Array<T> items, GdxRandom random, boolean shareRandom)
     {
-        this.random = shareRNG ? random : random.copy();
+        this.random = shareRandom ? random : random.copy();
         elements = new Array<>(items);
         this.random.shuffle(elements);
         index = 0;
@@ -99,20 +99,20 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T> {
      * iterate infinitely through mostly-random shuffles of the given collection. These shuffles are spaced so that a
      * single element should always have a large amount of "gap" in order between one appearance and the next. It helps
      * to keep the appearance of a gap if every item in items is unique, but that is not necessary and does not affect
-     * how this works. The random parameter will be copied if {@code shareRNG} is true, otherwise the reference will be
+     * how this works. The random parameter will be copied if {@code shareRandom} is true, otherwise the reference will be
      * shared (which could make the results of this GapShuffler depend on outside code, though it will always maintain a
      * gap between identical elements if the elements are unique). This constructor takes an {@code index} to allow
      * duplicating an existing GapShuffler given the parts that are externally available (using {@link #random},
-     * {@link #fillInto(Array)}, and {@link #getIndex()}). To actually complete a (shallow) copy, {@code shareRNG}
+     * {@link #fillInto(Array)}, and {@link #getIndex()}). To actually complete a (shallow) copy, {@code shareRandom}
      * must be false; to do a deep copy, you need to deep-copy {@code items}.
      * @param items a Array of T that will not be modified
      * @param random a GdxRandom; will be copied and not used directly
      * @param index an index in the iteration, as obtained by {@link #getIndex()}
-     * @param shareRNG if false, {@code random} will be copied and no reference will be kept; if true, {@code random} will be shared with the outside code
+     * @param shareRandom if false, {@code random} will be copied and no reference will be kept; if true, {@code random} will be shared with the outside code
      */
-    public GapShuffler(Array<T> items, GdxRandom random, int index, boolean shareRNG)
+    public GapShuffler(Array<T> items, GdxRandom random, int index, boolean shareRandom)
     {
-        this.random = shareRNG ? random : random.copy();
+        this.random = shareRandom ? random : random.copy();
         elements = new Array<>(items);
         this.random.shuffle(elements);
         this.index = (index & 0x7FFFFFFF) % elements.size;
@@ -124,22 +124,22 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T> {
      * iterate infinitely through mostly-random shuffles of the given collection. These shuffles are spaced so that a
      * single element should always have a large amount of "gap" in order between one appearance and the next. It helps
      * to keep the appearance of a gap if every item in items is unique, but that is not necessary and does not affect
-     * how this works. The random parameter will be copied if {@code shareRNG} is true, otherwise the reference will be
+     * how this works. The random parameter will be copied if {@code shareRandom} is true, otherwise the reference will be
      * shared (which could make the results of this GapShuffler depend on outside code, though it will always maintain a
      * gap between identical elements if the elements are unique). This constructor takes an {@code index} to allow
      * duplicating an existing GapShuffler given the parts that are externally available (using {@link #random},
-     * {@link #fillInto(Array)}, and {@link #getIndex()}). To actually complete a (shallow) copy, {@code shareRNG}
+     * {@link #fillInto(Array)}, and {@link #getIndex()}). To actually complete a (shallow) copy, {@code shareRandom}
      * must be false; to do a deep copy, you need to deep-copy {@code items}. You can use {@code initialShuffle} to
      * copy items from another GapShuffler; most of the constructors here act like this does when {@code initialShuffle}
      * is true, but the copy constructor {@link #GapShuffler(GapShuffler)} does not (it uses this method).
      * @param items a Array of T that will not be modified
      * @param random a GdxRandom; will be copied and not used directly
      * @param index an index in the iteration, as obtained by {@link #getIndex()}
-     * @param shareRNG if false, {@code random} will be copied and no reference will be kept; if true, {@code random} will be shared with the outside code
+     * @param shareRandom if false, {@code random} will be copied and no reference will be kept; if true, {@code random} will be shared with the outside code
      * @param initialShuffle if true, this will shuffle its copy of {@code items}; if false, then items will be kept in the same order
      */
-    public GapShuffler(Array<T> items, GdxRandom random, int index, boolean shareRNG, boolean initialShuffle) {
-        this.random = shareRNG ? random : random.copy();
+    public GapShuffler(Array<T> items, GdxRandom random, int index, boolean shareRandom, boolean initialShuffle) {
+        this.random = shareRandom ? random : random.copy();
         elements = new Array<>(items);
         if(initialShuffle)
             this.random.shuffle(elements);
@@ -204,16 +204,16 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T> {
      * iterate infinitely through mostly-random shuffles of the given collection. These shuffles are spaced so that a
      * single element should always have at least one "gap" element between one appearance and the next. It helps to
      * keep the appearance of a gap if every item in items is unique, but that is not necessary and does not affect how
-     * this works. The random parameter will be copied if {@code shareRNG} is false, otherwise the reference will be
+     * this works. The random parameter will be copied if {@code shareRandom} is false, otherwise the reference will be
      * shared (which could make the results of this GapShuffler depend on outside code, though it will always maintain a
      * gap between identical elements if the elements are unique).
      * @param items an array of T that will not be modified
      * @param random a GdxRandom; will be copied and not used directly
-     * @param shareRNG if false, {@code random} will be copied and no reference will be kept; if true, {@code random} will be shared with the outside code
+     * @param shareRandom if false, {@code random} will be copied and no reference will be kept; if true, {@code random} will be shared with the outside code
      */
-    public GapShuffler(T[] items, GdxRandom random, boolean shareRNG)
+    public GapShuffler(T[] items, GdxRandom random, boolean shareRandom)
     {
-        this.random = shareRNG ? random : random.copy();
+        this.random = shareRandom ? random : random.copy();
         elements = Array.with(items);
         this.random.shuffle(elements);
         index = 0;
@@ -273,7 +273,7 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T> {
         return this;
     }
 
-    public GdxRandom getRNG() {
+    public GdxRandom getRandom() {
         return random;
     }
 
@@ -284,20 +284,20 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T> {
      * the sequence before and after like separate GapShuffler objects.
      * @param random a GdxRandom; always copied
      */
-    public void setRNG(GdxRandom random) {
-        setRNG(random, false);
+    public void setRandom(GdxRandom random) {
+        setRandom(random, false);
     }
 
     /**
      * Sets the GdxRandom this uses to shuffle the order of elements, optionally sharing a reference between
-     * outside code and the internal GdxRandom (when {@code shareRNG} is true). Always reshuffles the order, which
+     * outside code and the internal GdxRandom (when {@code shareRandom} is true). Always reshuffles the order, which
      * may eliminate a gap that should have been present, so treat the sequence before and after like separate
      * GapShuffler objects.
      * @param random a GdxRandom; optionally copied
-     * @param shareRNG if false, {@code random} will be copied and no reference will be kept; if true, {@code random} will be shared with the outside code
+     * @param shareRandom if false, {@code random} will be copied and no reference will be kept; if true, {@code random} will be shared with the outside code
      */
-    public void setRNG(GdxRandom random, boolean shareRNG) {
-        this.random = shareRNG ? random : random.copy();
+    public void setRandom(GdxRandom random, boolean shareRandom) {
+        this.random = shareRandom ? random : random.copy();
         this.random.shuffle(elements);
     }
 

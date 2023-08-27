@@ -21,14 +21,12 @@ import com.badlogic.gdx.utils.IntArray;
 import java.util.Arrays;
 
 /**
- * A different approach to the same task as a probability table, this stores indices into some external Array or other
- * ordered sequence and weights that determine how much to favor producing a given index. Allows positive floats for
- * weights but does not allow nested tables for simplicity.
+ * A form of probability table, this stores indices into some external Array or other ordered sequence and weights that
+ * determine how much to favor producing a given index. Uses positive floats for weights.
  * <br>
  * Uses <a href="http://www.keithschwarz.com/darts-dice-coins/">Vose's Alias Method</a>, and is based fairly-closely on
- * the code given by Keith Schwarz at that link. Because Vose's Alias Method is remarkably fast (it takes O(1) time to
- * get a random index, and takes O(n) time to construct a WeightedTable instance), this may be useful to consider if you
- * don't need all the features of ProbabilityTable or if you want deeper control over the random aspects of it.
+ * the code given by Keith Schwarz at that link. Vose's Alias Method is remarkably fast; it takes O(1) time to
+ * get a random index, and takes O(n) time to construct a WeightedTable instance.
  */
 public class WeightedTable {
     protected int[] mixed;
@@ -183,7 +181,7 @@ public class WeightedTable {
         return ((state >>> 33) <= mixed[column << 1]) ? column : mixed[column << 1 | 1];
     }
 
-    public String serializeToString()
+    public String stringSerialize()
     {
         StringBuilder sb = new StringBuilder(random.stringSerialize()).append(mixed.length);
         if(mixed.length == 0) return sb.toString();
@@ -193,7 +191,7 @@ public class WeightedTable {
         }
         return sb.toString();
     }
-    public WeightedTable deserializeFromString(String data)
+    public WeightedTable stringDeserialize(String data)
     {
         if(data == null || data.isEmpty())
             return null;

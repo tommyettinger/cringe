@@ -15,6 +15,33 @@ public final class MathSupport {
     private MathSupport() {}
 
     /**
+     * The {@code float} value that is closer than any other to
+     * <i>pi</i>, the ratio of the circumference of a circle to its
+     * diameter.
+     */
+    public static final float PI = (float) Math.PI;
+    /**
+     * 1.0f divided by {@link #PI}.
+     */
+    public static final float PI_INVERSE = (float) (1.0 / Math.PI);
+    /**
+     * 2f times {@link #PI}; the same as {@link #TAU}.
+     */
+    public static final float PI2 = PI * 2f;
+    /**
+     * 2f times {@link #PI}; the same as {@link #PI2}.
+     */
+    public static final float TAU = PI2;
+    /**
+     * {@link #PI} divided by 2f; the same as {@link #ETA}.
+     */
+    public static final float HALF_PI = PI * 0.5f;
+    /**
+     * {@link #PI} divided by 2f; the same as {@link #HALF_PI}.
+     */
+    public static final float ETA = HALF_PI;
+
+    /**
      * A way of taking a double in the (0.0, 1.0) range and mapping it to a Gaussian or normal distribution, so high
      * inputs correspond to high outputs, and similarly for the low range. This is centered on 0.0 and its standard
      * deviation seems to be 1.0 (the same as {@link Random#nextGaussian()}). If this is given an input of 0.0

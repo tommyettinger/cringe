@@ -1517,6 +1517,8 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		return arr.get(nextInt(arr.size));
 	}
 
+	// Shuffling arrays and Arrays.
+
 	/**
 	 * Shuffles the given array in-place pseudo-randomly, using this to determine how to shuffle.
 	 *
@@ -1840,29 +1842,23 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		shuffle(arr.items, 0, arr.size);
 	}
 
+	// Randomized geometry methods.
+
 	/**
-	 * A bare-bones implementation that just returns the hashCode() of the String returned by {@link #getTag()}.
-	 * This allows GdxRandom subclasses to be distinguished from each other by their hashCode(), usually, but
-	 * not by their current state, because the state is expected to change often.
-	 *
-	 * @return a hash code value for this object (well, its {@link #getTag() tag})
+	 * Gets a random value (usually an angle) between 0 and {@link MathSupport#TAU} (which is {@code Math.PI * 2f}),
+	 * inclusive on 0 and exclusive on tau.
+	 * @return a random float between 0 (inclusive) and {@link MathSupport#TAU} (exclusive)
 	 */
-	@Override
-	public int hashCode() {
-		return getTag().hashCode();
+	public float nextRadians() {
+		return nextFloat() * MathSupport.TAU;
 	}
 
-
-	@Override
-	public boolean equals (Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-
-		GdxRandom that = (GdxRandom)o;
-
-		return areEqual(this, that);
+	/**
+	 * Gets a random value (usually an angle) between 0 and 360, inclusive on 0 and exclusive on 360.
+	 * @return a random float between 0 (inclusive) and 360 (exclusive)
+	 */
+	public float nextDegrees() {
+		return nextFloat() * 360f;
 	}
 
 	// Serialization and deserialization to String
@@ -1934,5 +1930,32 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		stringDeserialize(jsonData.asString());
+	}
+
+	// Standard methods.
+
+	/**
+	 * A bare-bones implementation that just returns the hashCode() of the String returned by {@link #getTag()}.
+	 * This allows GdxRandom subclasses to be distinguished from each other by their hashCode(), usually, but
+	 * not by their current state, because the state is expected to change often.
+	 *
+	 * @return a hash code value for this object (well, its {@link #getTag() tag})
+	 */
+	@Override
+	public int hashCode() {
+		return getTag().hashCode();
+	}
+
+
+	@Override
+	public boolean equals (Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+
+		GdxRandom that = (GdxRandom)o;
+
+		return areEqual(this, that);
 	}
 }

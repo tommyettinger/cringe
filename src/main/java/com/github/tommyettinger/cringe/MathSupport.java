@@ -100,4 +100,38 @@ public final class MathSupport {
         return x;
     }
 
+    /**
+     * An approximation of the cube-root function for positive float inputs and outputs.
+     * This can be about twice as fast as {@link Math#cbrt(double)}. It
+     * only accepts positive inputs and only produces positive outputs. It should be
+     * a tiny hair faster than {@link #cbrt(float)}.
+     * <br>
+     * Has very low relative error (less than 1E-9) when inputs are uniformly
+     * distributed between -512 and 512, and absolute mean error of less than
+     * 1E-6 in the same scenario. Uses a bit-twiddling method similar to one
+     * presented in Hacker's Delight and also used in early 3D graphics (see
+     * <a href="https://en.wikipedia.org/wiki/Fast_inverse_square_root">Wikipedia</a> for more, but
+     * this code approximates cbrt(x) and not 1/sqrt(x)). This specific code
+     * was originally by Marc B. Reynolds, posted in his
+     * <a href="https://github.com/Marc-B-Reynolds/Stand-alone-junk/blob/7d8d1e19b2ab09743f46964f60244906e1023f6a/src/Posts/ballcube.c#L182-L197">"Stand-alone-junk" repo</a> .
+     * <br>
+     * This was adjusted very slightly so {@code cbrt(1f) == 1f}. While this corrects the behavior for one of the most
+     * commonly-expected inputs, it may change results for (very) large positive or negative inputs.
+     * <br>
+     * If you need to work with doubles, or need higher precision, use {@link Math#cbrt(double)}.
+     * @param x any finite float to find the cube root of
+     * @return the cube root of x, approximated
+     */
+    public static float cbrtPositive(float x) {
+        int ix = NumberUtils.floatToIntBits(x);
+        final float x0 = x;
+        ix = (ix >>> 2) + (ix >>> 4);
+        ix += ix >>> 4;
+        ix = ix + (ix >>> 8) + 0x2A5137A0;
+        x = NumberUtils.intBitsToFloat(ix);
+        x = 0.33333334f * (2f * x + x0 / (x * x));
+        x = 0.33333334f * (1.9999999f * x + x0 / (x * x));
+        return x;
+    }
+
 }

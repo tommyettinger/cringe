@@ -1197,8 +1197,58 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	public float nextTriangular (float min, float max, float mode) {
 		float u = nextFloat();
 		float d = max - min;
-		if (u <= (mode - min) / d) {return min + (float)Math.sqrt(u * d * (mode - min));}
+		if (u <= (mode - min) / d) return min + (float)Math.sqrt(u * d * (mode - min));
 		return max - (float)Math.sqrt((1 - u) * d * (max - mode));
+	}
+
+	/**
+	 * Returns something like a triangularly distributed random number between -1.0 (exclusive) and 1.0 (exclusive), where values around zero are
+	 * more likely. Advances the state twice.
+	 * <p>
+	 * This method is equivalent to {@link #nextTriangularCubic(float, float, float) nextTriangularCubic(-1f, 1f, 0f)}
+	 */
+	public float nextTriangularCubic () {
+		return nextTriangularCubic(-1f, 1f, 0f);
+	}
+
+	/**
+	 * Returns something like a triangularly distributed random number between {@code -max} (exclusive) and {@code max} (exclusive), where values
+	 * around zero are more likely. Advances the state twice.
+	 * <p>
+	 * This method is equivalent to {@link #nextTriangularCubic(float, float, float) nextTriangularCubic(-max, max, 0f)}
+	 *
+	 * @param max the upper limit
+	 */
+	public float nextTriangularCubic (float max) {
+		return nextTriangularCubic(-max, max, 0f);
+	}
+
+	/**
+	 * Returns something like a triangularly distributed random number between {@code min} (inclusive) and {@code max} (exclusive), where the
+	 * {@code mode} argument defaults to the midpoint between the bounds, giving a symmetric distribution. Advances the state once.
+	 * <p>
+	 * This method is equivalent to {@link #nextTriangularCubic(float, float, float) nextTriangularCubic(min, max, (min + max) * 0.5f)}
+	 *
+	 * @param min the lower limit
+	 * @param max the upper limit
+	 */
+	public float nextTriangularCubic (float min, float max) {
+		return nextTriangularCubic(min, max, (min + max) * 0.5f);
+	}
+
+	/**
+	 * Returns something like a triangularly distributed random number between {@code min} (inclusive) and {@code max}
+	 * (exclusive), where values around {@code mode} are more likely. Advances the state once.
+	 *
+	 * @param min  the lower limit
+	 * @param max  the upper limit
+	 * @param mode the point around which the values are more likely
+	 */
+	public float nextTriangularCubic (float min, float max, float mode) {
+		float u = nextFloat();
+		float d = max - min;
+		if (u <= (mode - min) / d) return min + MathSupport.cbrtPositive(u * d * (mode - min));
+		return max - MathSupport.cbrtPositive((1 - u) * d * (max - mode));
 	}
 
 	/**

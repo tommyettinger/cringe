@@ -19,6 +19,7 @@ package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BooleanArray;
 import com.badlogic.gdx.utils.ByteArray;
@@ -1915,6 +1916,60 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 */
 	public Vector2 nextVector2(float minLength, float maxLength) {
 		return nextVector2(nextFloat(minLength, maxLength));
+	}
+
+	/**
+	 * Fills the given Vector3 with a point that has a random angle and the specified length.
+	 * @param vec a Vector3 that will be modified in-place.
+	 * @param length the length that {@code vec} should have after changes
+	 * @return {@code vec}, after modifications
+	 */
+	public Vector3 nextVector3InPlace(Vector3 vec, float length) {
+		float azim = nextFloat() * MathSupport.TAU;
+		float polar = MathUtils.acos((nextFloat() - 0.5f) * 2f);
+		float cosAzim = MathUtils.cos(azim);
+		float sinAzim = MathUtils.sin(azim);
+		float cosPolar = MathUtils.cos(polar) * length;
+		float sinPolar = MathUtils.sin(polar) * length;
+		return vec.set(cosAzim * sinPolar, sinAzim * sinPolar, cosPolar);
+	}
+
+	/**
+	 * Fills the given Vector3 with a point that has a random angle and a length between {@code minLength}
+	 * (inclusive) and {@code maxLength} (exclusive).
+	 * @param vec a Vector3 that will be modified in-place.
+	 * @param minLength the minimum inclusive length that {@code vec} is permitted to have
+	 * @param maxLength the maximum exclusive length that {@code vec} is permitted to have
+	 * @return {@code vec}, after modifications
+	 */
+	public Vector3 nextVector3InPlace(Vector3 vec, float minLength, float maxLength) {
+		return nextVector3InPlace(vec, nextFloat(minLength, maxLength));
+	}
+
+	/**
+	 * Returns a new Vector3 that has a random angle and the specified length.
+	 * @param length the length that {@code vec} should have after changes
+	 * @return a new Vector3 with a random angle and the specified length
+	 */
+	public Vector3 nextVector3(float length) {
+		float azim = nextFloat() * MathSupport.TAU;
+		float polar = MathUtils.acos((nextFloat() - 0.5f) * 2f);
+		float cosAzim = MathUtils.cos(azim);
+		float sinAzim = MathUtils.sin(azim);
+		float cosPolar = MathUtils.cos(polar) * length;
+		float sinPolar = MathUtils.sin(polar) * length;
+		return new Vector3(cosAzim * sinPolar, sinAzim * sinPolar, cosPolar);
+	}
+
+	/**
+	 * Returns a Vector3 that has a random angle and a length between {@code minLength}
+	 * (inclusive) and {@code maxLength} (exclusive).
+	 * @param minLength the minimum inclusive length that {@code vec} is permitted to have
+	 * @param maxLength the maximum exclusive length that {@code vec} is permitted to have
+	 * @return a new Vector3 with a random angle and a random length in the given range
+	 */
+	public Vector3 nextVector3(float minLength, float maxLength) {
+		return nextVector3(nextFloat(minLength, maxLength));
 	}
 
 	// Serialization and deserialization to String

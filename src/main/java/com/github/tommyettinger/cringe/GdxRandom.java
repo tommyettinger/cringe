@@ -17,6 +17,7 @@
 
 package com.github.tommyettinger.cringe;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -1878,7 +1879,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * Fills the given Vector2 with a point that has a random angle and the specified length.
 	 * @param vec a Vector2 that will be modified in-place.
 	 * @param length the length that {@code vec} should have after changes
-	 * @return {@code vec}, after modifications
+	 * @return {@code vec}, after changes
 	 */
 	public Vector2 nextVector2InPlace(Vector2 vec, float length) {
 		float angle = nextFloat() * MathSupport.TAU;
@@ -1891,7 +1892,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param vec a Vector2 that will be modified in-place.
 	 * @param minLength the minimum inclusive length that {@code vec} is permitted to have
 	 * @param maxLength the maximum exclusive length that {@code vec} is permitted to have
-	 * @return {@code vec}, after modifications
+	 * @return {@code vec}, after changes
 	 */
 	public Vector2 nextVector2InPlace(Vector2 vec, float minLength, float maxLength) {
 		return nextVector2InPlace(vec, nextFloat(minLength, maxLength));
@@ -1908,7 +1909,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	}
 
 	/**
-	 * Returns a Vector2 that has a random angle and a length between {@code minLength}
+	 * Returns a new Vector2 that has a random angle and a length between {@code minLength}
 	 * (inclusive) and {@code maxLength} (exclusive).
 	 * @param minLength the minimum inclusive length that {@code vec} is permitted to have
 	 * @param maxLength the maximum exclusive length that {@code vec} is permitted to have
@@ -1922,7 +1923,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * Fills the given Vector3 with a point that has a random angle and the specified length.
 	 * @param vec a Vector3 that will be modified in-place.
 	 * @param length the length that {@code vec} should have after changes
-	 * @return {@code vec}, after modifications
+	 * @return {@code vec}, after changes
 	 */
 	public Vector3 nextVector3InPlace(Vector3 vec, float length) {
 		float azim = nextFloat() * MathSupport.TAU;
@@ -1940,7 +1941,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param vec a Vector3 that will be modified in-place.
 	 * @param minLength the minimum inclusive length that {@code vec} is permitted to have
 	 * @param maxLength the maximum exclusive length that {@code vec} is permitted to have
-	 * @return {@code vec}, after modifications
+	 * @return {@code vec}, after changes
 	 */
 	public Vector3 nextVector3InPlace(Vector3 vec, float minLength, float maxLength) {
 		return nextVector3InPlace(vec, nextFloat(minLength, maxLength));
@@ -1962,7 +1963,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	}
 
 	/**
-	 * Returns a Vector3 that has a random angle and a length between {@code minLength}
+	 * Returns a new Vector3 that has a random angle and a length between {@code minLength}
 	 * (inclusive) and {@code maxLength} (exclusive).
 	 * @param minLength the minimum inclusive length that {@code vec} is permitted to have
 	 * @param maxLength the maximum exclusive length that {@code vec} is permitted to have
@@ -1970,6 +1971,26 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 */
 	public Vector3 nextVector3(float minLength, float maxLength) {
 		return nextVector3(nextFloat(minLength, maxLength));
+	}
+
+	// Randomized color methods.
+
+	/**
+	 * Modifies the given Color in-place so that it holds a bright, fully-saturated color with a random hue.
+	 * Remember, <em>THIS MODIFIES THE GIVEN COLOR, SO DON'T PASS THIS A COLOR CONSTANT.</em>
+	 * @param color a Color that will be modified in-place.
+	 * @return {@code color}, after changes
+	 */
+	public Color nextBrightColorInPlace(Color color) {
+		return ColorSupport.hsb2rgb(color, nextFloat(), 1f, 1f, 1f);
+	}
+
+	/**
+	 * Returns a new bright, fully-saturated Color with a random hue.
+	 * @return a new Color object
+	 */
+	public Color nextBrightColor() {
+		return ColorSupport.hsb2rgb(new Color(), nextFloat(), 1f, 1f, 1f);
 	}
 
 	// Serialization and deserialization to String

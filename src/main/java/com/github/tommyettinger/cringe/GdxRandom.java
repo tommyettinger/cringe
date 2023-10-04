@@ -17,7 +17,19 @@
 
 package com.github.tommyettinger.cringe;
 
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.BooleanArray;
+import com.badlogic.gdx.utils.ByteArray;
+import com.badlogic.gdx.utils.CharArray;
+import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.LongArray;
+import com.badlogic.gdx.utils.NumberUtils;
+import com.badlogic.gdx.utils.ShortArray;
 
 import java.lang.StringBuilder;
 import java.util.List;
@@ -1859,6 +1871,50 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 */
 	public float nextDegrees() {
 		return nextFloat() * 360f;
+	}
+
+	/**
+	 * Fills the given Vector2 with a point that has a random angle and the specified length.
+	 * @param vec a Vector2 that will be modified in-place.
+	 * @param length the length that {@code vec} should have after changes
+	 * @return {@code vec}, after modifications
+	 */
+	public Vector2 nextVector2InPlace(Vector2 vec, float length) {
+		float angle = nextFloat() * MathSupport.TAU;
+		return vec.set(MathUtils.cos(angle) * length, MathUtils.sin(angle) * length);
+	}
+
+	/**
+	 * Fills the given Vector2 with a point that has a random angle and a length between {@code minLength}
+	 * (inclusive) and {@code maxLength} (exclusive).
+	 * @param vec a Vector2 that will be modified in-place.
+	 * @param minLength the minimum inclusive length that {@code vec} is permitted to have
+	 * @param maxLength the maximum exclusive length that {@code vec} is permitted to have
+	 * @return {@code vec}, after modifications
+	 */
+	public Vector2 nextVector2InPlace(Vector2 vec, float minLength, float maxLength) {
+		return nextVector2InPlace(vec, nextFloat(minLength, maxLength));
+	}
+
+	/**
+	 * Returns a new Vector2 that has a random angle and the specified length.
+	 * @param length the length that {@code vec} should have after changes
+	 * @return a new Vector2 with a random angle and the specified length
+	 */
+	public Vector2 nextVector2(float length) {
+		float angle = nextFloat() * MathSupport.TAU;
+		return new Vector2(MathUtils.cos(angle) * length, MathUtils.sin(angle) * length);
+	}
+
+	/**
+	 * Returns a Vector2 that has a random angle and a length between {@code minLength}
+	 * (inclusive) and {@code maxLength} (exclusive).
+	 * @param minLength the minimum inclusive length that {@code vec} is permitted to have
+	 * @param maxLength the maximum exclusive length that {@code vec} is permitted to have
+	 * @return a new Vector2 with a random angle and a random length in the given range
+	 */
+	public Vector2 nextVector2(float minLength, float maxLength) {
+		return nextVector2(nextFloat(minLength, maxLength));
 	}
 
 	// Serialization and deserialization to String

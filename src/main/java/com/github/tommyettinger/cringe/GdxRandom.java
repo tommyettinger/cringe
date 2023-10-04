@@ -1087,8 +1087,10 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * excluded from the inputs (if 0.0 is an input, the result is {@code -38.5}). A chief advantage of using this with
 	 * a random number generator is that it only requires one random double to obtain one Gaussian value;
 	 * {@link Random#nextGaussian()} generates at least two random doubles for each two Gaussian values, but
-	 * may rarely require much more random generation. Note that this method isn't used by default for
-	 * {@link #nextGaussian()}, because it uses a very different approximation that is faster but less precise.
+	 * may rarely require much more random generation.
+	 * <br>
+	 * This is used by {@link #nextGaussian()} here, though this could change in the future.
+	 * This method delegates to one with the same name in MathSupport.
 	 * <br>
 	 * This can be used both as an optimization for generating Gaussian random values, and as a way of generating
 	 * Gaussian values that match a pattern present in the inputs (which you could have by using a sub-random sequence
@@ -1099,21 +1101,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @return a normal-distributed double centered on 0.0; all results will be between -38.5 and 38.5, both inclusive
 	 */
 	public static double probit (final double d) {
-		if (d <= 0 || d >= 1) {
-			return Math.copySign(38.5, d - 0.5);
-		} else if (d < 0.02425) {
-			final double q = Math.sqrt(-2.0 * Math.log(d));
-			return (((((-7.784894002430293e-03 * q - 3.223964580411365e-01) * q - 2.400758277161838e+00) * q - 2.549732539343734e+00) * q + 4.374664141464968e+00) * q + 2.938163982698783e+00) / (
-					(((7.784695709041462e-03 * q + 3.224671290700398e-01) * q + 2.445134137142996e+00) * q + 3.754408661907416e+00) * q + 1.0);
-		} else if (0.97575 < d) {
-			final double q = Math.sqrt(-2.0 * Math.log(1 - d));
-			return -(((((-7.784894002430293e-03 * q - 3.223964580411365e-01) * q - 2.400758277161838e+00) * q - 2.549732539343734e+00) * q + 4.374664141464968e+00) * q + 2.938163982698783e+00) / (
-					(((7.784695709041462e-03 * q + 3.224671290700398e-01) * q + 2.445134137142996e+00) * q + 3.754408661907416e+00) * q + 1.0);
-		}
-		final double q = d - 0.5;
-		final double r = q * q;
-		return (((((-3.969683028665376e+01 * r + 2.209460984245205e+02) * r - 2.759285104469687e+02) * r + 1.383577518672690e+02) * r - 3.066479806614716e+01) * r + 2.506628277459239e+00) * q / (
-				((((-5.447609879822406e+01 * r + 1.615858368580409e+02) * r - 1.556989798598866e+02) * r + 6.680131188771972e+01) * r - 1.328068155288572e+01) * r + 1.0);
+		return MathSupport.probit(d);
 	}
 
 	/**

@@ -36,6 +36,7 @@ import com.badlogic.gdx.utils.ShortArray;
 import java.lang.StringBuilder;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * A superset of the functionality in {@link Random}, meant for random number generators
@@ -1790,6 +1791,33 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	}
 
 	/**
+	 * Shuffles the given List in-place pseudo-randomly, using this to determine how to shuffle.
+	 *
+	 * @param items a List of some type {@code T}; must be non-null but may contain null items
+	 */
+	public <T> void shuffle (List<T> items) {
+		shuffle(items, 0, items.size());
+	}
+
+	/**
+	 * Shuffles a section of the given List in-place pseudo-randomly, using this to determine how to shuffle.
+	 *
+	 * @param items  a List of some type {@code T}; must be non-null but may contain null items
+	 * @param offset the index of the first element of the array that can be shuffled
+	 * @param length the length of the section to shuffle
+	 */
+	public <T> void shuffle (List<T> items, int offset, int length) {
+		offset = Math.min(Math.max(0, offset), items.size());
+		length = Math.min(items.size() - offset, Math.max(0, length));
+		for (int i = offset + length - 1; i > offset; i--) {
+			int ii = nextInt(offset, i + 1);
+			T temp = items.get(i);
+			items.set(i, items.get(ii));
+			items.set(ii, temp);
+		}
+	}
+
+	/**
 	 * Shuffles the given IntArray in-place pseudo-randomly, using this to determine how to shuffle.
 	 * Unlike {@link IntArray#shuffle()}, this allows using a seeded GdxRandom.
 	 *
@@ -2024,6 +2052,28 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	public Color nextGrayColor() {
 		float light = nextInclusiveFloat();
 		return new Color(light, light, light, 1f);
+	}
+
+    // Randomized UUIDs.
+
+	/**
+	 * Obtains a random {@link UUID} and returns it.
+	 * This calls {@link #nextLong()} twice and modifies one byte of each long to fit the UUID format.
+	 * This does not require initializing a SecureRandom instance, which makes this different from
+	 * {@link UUID#randomUUID()}. This should be used primarily with {@link RandomDistinct64}, because
+	 * the other implementations here are (theoretically) capable of returning the same UUID if this is
+	 * called many times over the course of the generator's period, while RandomDistinct64 cannot return
+	 * the same UUID, making the UUIDs actually unique until all (2 to the 63) UUIDs that RandomDistinct64
+	 * can return are exhausted.
+	 * @return a new random {@link UUID}
+	 */
+	public UUID nextUUID() {
+		long msb = nextLong(), lsb = nextLong();
+		msb &= 0xFF0FFFFFFFFFFFFFL;
+		msb |= 0x0040000000000000L;
+		lsb &= 0xFFFFFFFFFFFFFF3FL;
+		lsb |= 0x0000000000000080L;
+		return new UUID(msb, lsb);
 	}
 
 	// Serialization and deserialization to String

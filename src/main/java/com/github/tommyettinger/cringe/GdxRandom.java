@@ -656,6 +656,19 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	}
 
 	/**
+	 * Returns a random {@code float} value between the vector's inclusive min (x) and exclusive max (y) values.
+	 * The values in vec are permitted to be positive or negative, and do not need any particular relationship
+	 * to each other (either could be the greater of the two). However, neither value in vec can be {@code NaN},
+	 * and vec itself cannot be null.
+	 *
+	 * @param vec a non-null Vector2 that contains the min value in its x and the max value in its y
+	 * @return a float between {@code vec.x} (inclusive) and {@code vec.y} (exclusive)
+	 */
+	public float nextFloat(Vector2 vec) {
+		return nextFloat(vec.x, vec.y);
+	}
+
+	/**
 	 * Returns the next pseudorandom, uniformly distributed
 	 * {@code double} value between {@code 0.0} (inclusive) and {@code 1.0}
 	 * (exclusive) from this random number generator's sequence.
@@ -1991,6 +2004,26 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 */
 	public Color nextBrightColor() {
 		return ColorSupport.hsb2rgb(new Color(), nextFloat(), 1f, 1f, 1f);
+	}
+
+	/**
+	 * Modifies the given Color in-place so that it holds an opaque grayscale color with a random lightness.
+	 * Remember, <em>THIS MODIFIES THE GIVEN COLOR, SO DON'T PASS THIS A COLOR CONSTANT.</em>
+	 * @param color a Color that will be modified in-place.
+	 * @return {@code color}, after changes
+	 */
+	public Color nextGrayColorInPlace(Color color) {
+		float light = nextInclusiveFloat();
+		return color.set(light, light, light, 1f);
+	}
+
+	/**
+	 * Returns a new opaque grayscale color with a random lightness.
+	 * @return a new Color object
+	 */
+	public Color nextGrayColor() {
+		float light = nextInclusiveFloat();
+		return new Color(light, light, light, 1f);
 	}
 
 	// Serialization and deserialization to String

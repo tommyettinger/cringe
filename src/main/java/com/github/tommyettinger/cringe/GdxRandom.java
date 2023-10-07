@@ -1533,6 +1533,53 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	public <T> T randomElement (Array<T> arr) {
 		return arr == null || arr.isEmpty() ? null : arr.get(nextInt(arr.size));
 	}
+
+	/**
+	 * Gets a randomly selected item from the given OrderedSet.
+	 * If {@code set} is null or empty, or if {@code set.orderedItems()} is
+	 * null or empty, this returns {@code null}.
+	 *
+	 * @param set    a non-empty OrderedSet
+	 * @param <K>    the type of items
+	 * @return a randomly-selected item from arr
+	 */
+	public <K> K randomElement (OrderedSet<K> set) {
+		return set == null ? null : randomElement(set.orderedItems());
+	}
+
+	/**
+	 * Gets a randomly selected key from the given OrderedMap.
+	 * If {@code map} is null or empty, or if {@code map.orderedKeys()} is
+	 * null or empty, this returns {@code null}.
+	 *
+	 * @param map    a non-empty OrderedMap
+	 * @param <K>    the type of keys
+	 * @return a randomly-selected key from arr
+	 */
+	public <K> K randomKey (OrderedMap<K, ?> map) {
+		return map == null ? null : randomElement(map.orderedKeys());
+	}
+
+	/**
+	 * Gets a randomly selected value from the given OrderedMap.
+	 * If {@code map} is null or empty, or if {@code map.orderedKeys()} is
+	 * null or empty, this returns {@code null}. This may also return null
+	 * if the Array returned by {@code map.orderedKeys()} was changed so
+	 * that it includes an item that isn't a key in {@code map}, if that
+	 * item is the one selected at random. Of course, if a value in
+	 * {@code map} is null, this can randomly select that value and return
+	 * it, as well.
+	 *
+	 * @param map    a non-empty OrderedMap
+	 * @param <K>    the type of keys
+	 * @param <V>    the type of values
+	 * @return a randomly-selected value from arr
+	 */
+	public <K, V> V randomValue (OrderedMap<K, V> map) {
+		if(map == null) return null;
+		K key = randomElement(map.orderedKeys());
+		if(key == null) return null;
+		return map.get(key);
 	}
 
 	// Shuffling arrays and Arrays.

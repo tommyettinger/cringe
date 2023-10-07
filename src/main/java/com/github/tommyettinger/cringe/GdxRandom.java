@@ -21,17 +21,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.BooleanArray;
-import com.badlogic.gdx.utils.ByteArray;
-import com.badlogic.gdx.utils.CharArray;
-import com.badlogic.gdx.utils.FloatArray;
-import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.LongArray;
-import com.badlogic.gdx.utils.NumberUtils;
-import com.badlogic.gdx.utils.ShortArray;
+import com.badlogic.gdx.utils.*;
 
 import java.lang.StringBuilder;
 import java.util.List;
@@ -1424,117 +1414,116 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	}
 
 	/**
-	 * Gets a randomly-selected item from the given array, which must be non-null and non-empty
+	 * Gets a randomly-selected item from the given array.
+	 * If the array is empty or null, this returns {@code null}.
 	 *
 	 * @param array a non-null, non-empty array of {@code T} items
 	 * @param <T>   any reference type
 	 * @return a random item from {@code array}
-	 * @throws NullPointerException      if array is null
-	 * @throws IndexOutOfBoundsException if array is empty
 	 */
 	public <T> T randomElement (T[] array) {
-		return array[nextInt(array.length)];
+		return array == null || array.length == 0 ? null : array[nextInt(array.length)];
 	}
 
 	/**
 	 * Gets a randomly selected item from the given List, such as an ArrayList.
-	 * If the List is empty, this throws an IndexOutOfBoundsException.
+	 * If the List is empty or null, this returns {@code null}.
 	 *
 	 * @param list    a non-empty implementation of List, such as ArrayList
 	 * @param <T>     the type of items
 	 * @return a randomly-selected item from list
 	 */
 	public <T> T randomElement (List<T> list) {
-		return list.get(nextInt(list.size()));
+		return list == null || list.isEmpty() ? null : list.get(nextInt(list.size()));
 	}
 
 	/**
 	 * Gets a randomly selected item from the given LongArray.
-	 * If {@code arr} is empty, this throws an IndexOutOfBoundsException.
+	 * If {@code arr} is null or empty, this returns {@code 0L}.
 	 * Unlike {@link LongArray#random()}, this allows using a seeded GdxRandom.
 	 *
 	 * @param arr    a non-empty LongArray
 	 * @return a randomly-selected item from arr
 	 */
 	public long randomElement (LongArray arr) {
-		return arr.get(nextInt(arr.size));
+		return arr == null || arr.isEmpty() ? 0L : arr.get(nextInt(arr.size));
 	}
 
 	/**
 	 * Gets a randomly selected item from the given IntArray.
-	 * If {@code arr} is empty, this throws an IndexOutOfBoundsException.
+	 * If {@code arr} is null or empty, this returns {@code 0}.
 	 * Unlike {@link IntArray#random()}, this allows using a seeded GdxRandom.
 	 *
 	 * @param arr    a non-empty IntArray
 	 * @return a randomly-selected item from arr
 	 */
 	public int randomElement (IntArray arr) {
-		return arr.get(nextInt(arr.size));
+		return arr == null || arr.isEmpty() ? 0 : arr.get(nextInt(arr.size));
 	}
 
 	/**
 	 * Gets a randomly selected item from the given ShortArray.
-	 * If {@code arr} is empty, this throws an IndexOutOfBoundsException.
+	 * If {@code arr} is null or empty, this returns {@code 0}.
 	 * Unlike {@link ShortArray#random()}, this allows using a seeded GdxRandom.
 	 *
 	 * @param arr    a non-empty ShortArray
 	 * @return a randomly-selected item from arr
 	 */
 	public short randomElement (ShortArray arr) {
-		return arr.get(nextInt(arr.size));
+		return arr == null || arr.isEmpty() ? 0 : arr.get(nextInt(arr.size));
 	}
 
 	/**
 	 * Gets a randomly selected item from the given ByteArray.
-	 * If {@code arr} is empty, this throws an IndexOutOfBoundsException.
+	 * If {@code arr} is null or empty, this returns {@code 0}.
 	 * Unlike {@link ByteArray#random()}, this allows using a seeded GdxRandom.
 	 *
 	 * @param arr    a non-empty ByteArray
 	 * @return a randomly-selected item from arr
 	 */
 	public byte randomElement (ByteArray arr) {
-		return arr.get(nextInt(arr.size));
+		return arr == null || arr.isEmpty() ? 0 : arr.get(nextInt(arr.size));
 	}
 	
 	/**
 	 * Gets a randomly selected item from the given FloatArray.
-	 * If {@code arr} is empty, this throws an IndexOutOfBoundsException.
+	 * If {@code arr} is null or empty, this returns {@code 0f}.
 	 * Unlike {@link FloatArray#random()}, this allows using a seeded GdxRandom.
 	 *
 	 * @param arr    a non-empty FloatArray
 	 * @return a randomly-selected item from arr
 	 */
 	public float randomElement (FloatArray arr) {
-		return arr.get(nextInt(arr.size));
+		return arr == null || arr.isEmpty() ? 0f : arr.get(nextInt(arr.size));
 	}
 
 	/**
 	 * Gets a randomly selected item from the given CharArray.
-	 * If {@code arr} is empty, this throws an IndexOutOfBoundsException.
+	 * If {@code arr} is null or empty, this returns {@code ((char)0)}.
 	 * Unlike {@link CharArray#random()}, this allows using a seeded GdxRandom.
 	 *
 	 * @param arr    a non-empty CharArray
 	 * @return a randomly-selected item from arr
 	 */
 	public char randomElement (CharArray arr) {
-		return arr.get(nextInt(arr.size));
+		return arr == null || arr.isEmpty() ? '\0' : arr.get(nextInt(arr.size));
 	}
 
 	/**
 	 * Gets a randomly selected item from the given BooleanArray.
-	 * If {@code arr} is empty, this throws an IndexOutOfBoundsException.
+	 * If {@code arr} is null or empty, this returns {@code false}.
 	 * Unlike {@link BooleanArray#random()}, this allows using a seeded GdxRandom.
 	 *
 	 * @param arr    a non-empty BooleanArray
 	 * @return a randomly-selected item from arr
 	 */
 	public boolean randomElement (BooleanArray arr) {
-		return arr.get(nextInt(arr.size));
+		return arr != null && !arr.isEmpty() && arr.get(nextInt(arr.size));
 	}
 
 	/**
 	 * Gets a randomly selected item from the given Array.
-	 * If {@code arr} is empty, this throws an IndexOutOfBoundsException.
+	 * If {@code arr} is null or empty, this returns {@code null}.
 	 * Unlike {@link Array#random()}, this allows using a seeded GdxRandom.
 	 *
 	 * @param arr    a non-empty Array
@@ -1542,7 +1531,8 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @return a randomly-selected item from arr
 	 */
 	public <T> T randomElement (Array<T> arr) {
-		return arr.get(nextInt(arr.size));
+		return arr == null || arr.isEmpty() ? null : arr.get(nextInt(arr.size));
+	}
 	}
 
 	// Shuffling arrays and Arrays.

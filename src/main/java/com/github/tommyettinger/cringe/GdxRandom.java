@@ -1535,13 +1535,34 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	}
 
 	/**
+	 * Gets a randomly selected item from the given ObjectSet.
+	 * If {@code set} is null or empty, this returns {@code null}.
+	 * <br>
+	 * Note that this method takes linear time, whereas {@link #randomElement(OrderedSet)}
+	 * takes approximately constant time.
+	 *
+	 * @param set    a non-empty ObjectSet
+	 * @param <K>    the type of items
+	 * @return a randomly-selected item from set
+	 */
+	public <K> K randomElement (ObjectSet<K> set) {
+		if(set == null || set.isEmpty()) return null;
+		int limit = nextInt(set.size);
+		ObjectSet.ObjectSetIterator<K> it = set.iterator();
+		for (int i = 0; i < limit && it.hasNext; i++) {
+			it.next();
+		}
+		return it.next();
+	}
+
+	/**
 	 * Gets a randomly selected item from the given OrderedSet.
 	 * If {@code set} is null or empty, or if {@code set.orderedItems()} is
 	 * null or empty, this returns {@code null}.
 	 *
 	 * @param set    a non-empty OrderedSet
 	 * @param <K>    the type of items
-	 * @return a randomly-selected item from arr
+	 * @return a randomly-selected item from set
 	 */
 	public <K> K randomElement (OrderedSet<K> set) {
 		return set == null ? null : randomElement(set.orderedItems());
@@ -1554,7 +1575,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 *
 	 * @param map    a non-empty OrderedMap
 	 * @param <K>    the type of keys
-	 * @return a randomly-selected key from arr
+	 * @return a randomly-selected key from map
 	 */
 	public <K> K randomKey (OrderedMap<K, ?> map) {
 		return map == null ? null : randomElement(map.orderedKeys());
@@ -1573,7 +1594,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param map    a non-empty OrderedMap
 	 * @param <K>    the type of keys
 	 * @param <V>    the type of values
-	 * @return a randomly-selected value from arr
+	 * @return a randomly-selected value from map
 	 */
 	public <K, V> V randomValue (OrderedMap<K, V> map) {
 		if(map == null) return null;

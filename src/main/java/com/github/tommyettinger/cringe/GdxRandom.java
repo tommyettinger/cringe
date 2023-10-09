@@ -1569,6 +1569,27 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	}
 
 	/**
+	 * Gets a randomly selected key from the given ObjectMap.
+	 * If {@code map} is null or empty, this returns {@code null}.
+	 * <br>
+	 * Note that this method takes linear time, whereas {@link #randomKey(OrderedMap)}
+	 * takes approximately constant time.
+	 *
+	 * @param map    a non-empty ObjectMap
+	 * @param <K>    the type of items
+	 * @return a randomly-selected key from map
+	 */
+	public <K> K randomKey (ObjectMap<K, ?> map) {
+		if(map == null || map.isEmpty()) return null;
+		int limit = nextInt(map.size);
+		ObjectMap.Keys<K> it = map.keys();
+		for (int i = 0; i < limit && it.hasNext; i++) {
+			it.next();
+		}
+		return it.next();
+	}
+
+	/**
 	 * Gets a randomly selected key from the given OrderedMap.
 	 * If {@code map} is null or empty, or if {@code map.orderedKeys()} is
 	 * null or empty, this returns {@code null}.
@@ -1579,6 +1600,29 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 */
 	public <K> K randomKey (OrderedMap<K, ?> map) {
 		return map == null ? null : randomElement(map.orderedKeys());
+	}
+
+	/**
+	 * Gets a randomly selected value from the given ObjectMap.
+	 * If {@code map} is null or empty, this returns {@code null}.
+	 * Of course, if a value in {@code map} is null, this can
+	 * randomly select that value and return it, as well.
+	 * <br>
+	 * Note that this method takes linear time, whereas {@link #randomValue(OrderedMap)}
+	 * takes approximately constant time.
+	 *
+	 * @param map    a non-empty ObjectMap
+	 * @param <V>    the type of items
+	 * @return a randomly-selected value from map
+	 */
+	public <V> V randomValue (ObjectMap<?, V> map) {
+		if(map == null || map.isEmpty()) return null;
+		int limit = nextInt(map.size);
+		ObjectMap.Values<V> it = map.values();
+		for (int i = 0; i < limit && it.hasNext; i++) {
+			it.next();
+		}
+		return it.next();
 	}
 
 	/**

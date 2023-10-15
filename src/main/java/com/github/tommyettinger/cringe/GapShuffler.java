@@ -17,6 +17,8 @@
 package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
 import java.util.Iterator;
 
@@ -28,7 +30,7 @@ import java.util.Iterator;
  * a size that can be checked, but Iterables can be infinite (and in this case, this one is).
  * @param <T> the type of items to iterate over; ideally, the items are unique
  */
-public class GapShuffler<T> implements Iterator<T>, Iterable<T> {
+public class GapShuffler<T> implements Iterator<T>, Iterable<T>, Json.Serializable {
     public GdxRandom random;
     protected Array<T> elements;
     protected int index;
@@ -343,5 +345,23 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T> {
         if (index != that.index) return false;
         if (!random.equals(that.random)) return false;
         return elements.equals(that.elements);
+    }
+
+    @Override
+    public void write(Json json) {
+        json.writeObjectStart();
+        json.writeValue("rng", random, null);
+        json.writeValue("items", elements, null);
+        json.writeValue("idx", getIndex());
+        json.writeObjectEnd();
+
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        elements.clear();
+        elements.addAll(json.readValue("items", Array.class, jsonData));
+        random = json.readValue("rng", GdxRandom.class, jsonData);
+        index = jsonData.get("idx").asInt();
     }
 }

@@ -23,6 +23,7 @@ public class SerializationTest {
             Assert.assertEquals("Failure with " + s, rl, dl);
         }
     }
+
     @Test
     public void testJsonRoundTrip() {
         Json json = new Json();
@@ -39,5 +40,23 @@ public class SerializationTest {
             long dl = de.nextLong();
             Assert.assertEquals("Failure with " + s, rl, dl);
         }
+    }
+
+    @Test
+    public void testGapShufflerRoundTrip() {
+        Json json = new Json();
+        GapShuffler<String> r = new GapShuffler<>(
+                new String[]{"IT'S", "PEANUT", "BUTTER", "JELLY", "TIME"}, new RandomAce320(123));
+        String s = json.toJson(r);
+        System.out.println(s);
+        r.next();
+        String rl = r.next();
+        GapShuffler<String> d = json.fromJson(GapShuffler.class, s);
+        System.out.println(s + "   " + json.toJson(d));
+        d.next();
+        String dl = d.next();
+        Assert.assertEquals("Failure with " + s, rl, dl);
+        System.out.println(r.next() + " " + r.next() + " " + r.next() + " " + r.next() + " " + r.next());
+        System.out.println(d.next() + " " + d.next() + " " + d.next() + " " + d.next() + " " + d.next());
     }
 }

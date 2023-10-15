@@ -349,7 +349,7 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T>, Json.Serializab
 
     @Override
     public void write(Json json) {
-        json.writeObjectStart();
+        json.writeObjectStart("gs");
         json.writeValue("rng", random, null);
         json.writeValue("items", elements, null);
         json.writeValue("idx", getIndex());
@@ -359,6 +359,7 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T>, Json.Serializab
 
     @Override
     public void read(Json json, JsonValue jsonData) {
+        jsonData = jsonData.get("gs");
         elements.clear();
         elements.addAll(json.readValue("items", Array.class, jsonData));
         random = json.readValue("rng", GdxRandom.class, jsonData);

@@ -1655,7 +1655,12 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param items an int array; must be non-null
 	 */
 	public void shuffle (int[] items) {
-		shuffle(items, 0, items.length);
+		for (int i = items.length - 1; i > 0; i--) {
+			int ii = nextInt(i + 1);
+			int temp = items[i];
+			items[i] = items[ii];
+			items[ii] = temp;
+		}
 	}
 
 	/**
@@ -1669,7 +1674,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		offset = Math.min(Math.max(0, offset), items.length);
 		length = Math.min(items.length - offset, Math.max(0, length));
 		for (int i = offset + length - 1; i > offset; i--) {
-			int ii = nextInt(offset, i + 1);
+			int ii = offset + nextInt(i + 1 - offset);
 			int temp = items[i];
 			items[i] = items[ii];
 			items[ii] = temp;
@@ -1682,7 +1687,12 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param items a long array; must be non-null
 	 */
 	public void shuffle (long[] items) {
-		shuffle(items, 0, items.length);
+		for (int i = items.length - 1; i > 0; i--) {
+			int ii = nextInt(i + 1);
+			long temp = items[i];
+			items[i] = items[ii];
+			items[ii] = temp;
+		}
 	}
 
 	/**
@@ -1696,7 +1706,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		offset = Math.min(Math.max(0, offset), items.length);
 		length = Math.min(items.length - offset, Math.max(0, length));
 		for (int i = offset + length - 1; i > offset; i--) {
-			int ii = nextInt(offset, i + 1);
+			int ii = offset + nextInt(i + 1 - offset);
 			long temp = items[i];
 			items[i] = items[ii];
 			items[ii] = temp;
@@ -1709,7 +1719,12 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param items a float array; must be non-null
 	 */
 	public void shuffle (float[] items) {
-		shuffle(items, 0, items.length);
+		for (int i = items.length - 1; i > 0; i--) {
+			int ii = nextInt(i + 1);
+			float temp = items[i];
+			items[i] = items[ii];
+			items[ii] = temp;
+		}
 	}
 
 	/**
@@ -1723,7 +1738,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		offset = Math.min(Math.max(0, offset), items.length);
 		length = Math.min(items.length - offset, Math.max(0, length));
 		for (int i = offset + length - 1; i > offset; i--) {
-			int ii = nextInt(offset, i + 1);
+			int ii = offset + nextInt(i + 1 - offset);
 			float temp = items[i];
 			items[i] = items[ii];
 			items[ii] = temp;
@@ -1736,7 +1751,12 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param items a char array; must be non-null
 	 */
 	public void shuffle (char[] items) {
-		shuffle(items, 0, items.length);
+		for (int i = items.length - 1; i > 0; i--) {
+			int ii = nextInt(i + 1);
+			char temp = items[i];
+			items[i] = items[ii];
+			items[ii] = temp;
+		}
 	}
 
 	/**
@@ -1750,7 +1770,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		offset = Math.min(Math.max(0, offset), items.length);
 		length = Math.min(items.length - offset, Math.max(0, length));
 		for (int i = offset + length - 1; i > offset; i--) {
-			int ii = nextInt(offset, i + 1);
+			int ii = offset + nextInt(i + 1 - offset);
 			char temp = items[i];
 			items[i] = items[ii];
 			items[ii] = temp;
@@ -1763,7 +1783,12 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param items a byte array; must be non-null
 	 */
 	public void shuffle (byte[] items) {
-		shuffle(items, 0, items.length);
+		for (int i = items.length - 1; i > 0; i--) {
+			int ii = nextInt(i + 1);
+			byte temp = items[i];
+			items[i] = items[ii];
+			items[ii] = temp;
+		}
 	}
 
 	/**
@@ -1777,7 +1802,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		offset = Math.min(Math.max(0, offset), items.length);
 		length = Math.min(items.length - offset, Math.max(0, length));
 		for (int i = offset + length - 1; i > offset; i--) {
-			int ii = nextInt(offset, i + 1);
+			int ii = offset + nextInt(i + 1 - offset);
 			byte temp = items[i];
 			items[i] = items[ii];
 			items[ii] = temp;
@@ -1790,7 +1815,12 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param items a double array; must be non-null
 	 */
 	public void shuffle (double[] items) {
-		shuffle(items, 0, items.length);
+		for (int i = items.length - 1; i > 0; i--) {
+			int ii = nextInt(i + 1);
+			double temp = items[i];
+			items[i] = items[ii];
+			items[ii] = temp;
+		}
 	}
 
 	/**
@@ -1804,7 +1834,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		offset = Math.min(Math.max(0, offset), items.length);
 		length = Math.min(items.length - offset, Math.max(0, length));
 		for (int i = offset + length - 1; i > offset; i--) {
-			int ii = nextInt(offset, i + 1);
+			int ii = offset + nextInt(i + 1 - offset);
 			double temp = items[i];
 			items[i] = items[ii];
 			items[ii] = temp;
@@ -1817,7 +1847,12 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param items a short array; must be non-null
 	 */
 	public void shuffle (short[] items) {
-		shuffle(items, 0, items.length);
+		for (int i = items.length - 1; i > 0; i--) {
+			int ii = nextInt(i + 1);
+			short temp = items[i];
+			items[i] = items[ii];
+			items[ii] = temp;
+		}
 	}
 
 	/**
@@ -1831,7 +1866,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		offset = Math.min(Math.max(0, offset), items.length);
 		length = Math.min(items.length - offset, Math.max(0, length));
 		for (int i = offset + length - 1; i > offset; i--) {
-			int ii = nextInt(offset, i + 1);
+			int ii = offset + nextInt(i + 1 - offset);
 			short temp = items[i];
 			items[i] = items[ii];
 			items[ii] = temp;
@@ -1844,7 +1879,12 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param items a boolean array; must be non-null
 	 */
 	public void shuffle (boolean[] items) {
-		shuffle(items, 0, items.length);
+		for (int i = items.length - 1; i > 0; i--) {
+			int ii = nextInt(i + 1);
+			boolean temp = items[i];
+			items[i] = items[ii];
+			items[ii] = temp;
+		}
 	}
 
 	/**
@@ -1858,7 +1898,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		offset = Math.min(Math.max(0, offset), items.length);
 		length = Math.min(items.length - offset, Math.max(0, length));
 		for (int i = offset + length - 1; i > offset; i--) {
-			int ii = nextInt(offset, i + 1);
+			int ii = offset + nextInt(i + 1 - offset);
 			boolean temp = items[i];
 			items[i] = items[ii];
 			items[ii] = temp;
@@ -1871,7 +1911,12 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param items an array of some reference type; must be non-null but may contain null items
 	 */
 	public <T> void shuffle (T[] items) {
-		shuffle(items, 0, items.length);
+		for (int i = items.length - 1; i > 0; i--) {
+			int ii = nextInt(i + 1);
+			T temp = items[i];
+			items[i] = items[ii];
+			items[ii] = temp;
+		}
 	}
 
 	/**
@@ -1885,7 +1930,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		offset = Math.min(Math.max(0, offset), items.length);
 		length = Math.min(items.length - offset, Math.max(0, length));
 		for (int i = offset + length - 1; i > offset; i--) {
-			int ii = nextInt(offset, i + 1);
+			int ii = offset + nextInt(i + 1 - offset);
 			T temp = items[i];
 			items[i] = items[ii];
 			items[ii] = temp;
@@ -1898,7 +1943,12 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param items a List of some type {@code T}; must be non-null but may contain null items
 	 */
 	public <T> void shuffle (List<T> items) {
-		shuffle(items, 0, items.size());
+		for (int i = items.size() - 1; i > 0; i--) {
+			int ii = nextInt(i + 1);
+			T temp = items.get(i);
+			items.set(i, items.get(ii));
+			items.set(ii, temp);
+		}
 	}
 
 	/**
@@ -1912,7 +1962,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		offset = Math.min(Math.max(0, offset), items.size());
 		length = Math.min(items.size() - offset, Math.max(0, length));
 		for (int i = offset + length - 1; i > offset; i--) {
-			int ii = nextInt(offset, i + 1);
+			int ii = offset + nextInt(i + 1 - offset);
 			T temp = items.get(i);
 			items.set(i, items.get(ii));
 			items.set(ii, temp);

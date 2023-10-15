@@ -2142,6 +2142,31 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	}
 
 	/**
+	 * Fills the given Vector2 with a point inside the axis-aligned box defined by the given low and high coordinates.
+	 * @param vec a Vector2 that will be modified in-place.
+	 * @param lowX the lowest x-coordinate of the box
+	 * @param lowY the lowest y-coordinate of the box
+	 * @param highX the highest x-coordinate of the box
+	 * @param highY the highest y-coordinate of the box
+	 * @return {@code vec}, after changes
+	 */
+	public Vector2 nextVector2InsideBoxInPlace(Vector2 vec, float lowX, float lowY, float highX, float highY){
+		return vec.set(nextFloat(lowX, highX), nextFloat(lowY, highY));
+	}
+
+	/**
+	 * Returns a new Vector2 with a point inside the axis-aligned box defined by the given low and high coordinates.
+	 * @param lowX the lowest x-coordinate of the box
+	 * @param lowY the lowest y-coordinate of the box
+	 * @param highX the highest x-coordinate of the box
+	 * @param highY the highest y-coordinate of the box
+	 * @return a new Vector2 inside the specified axis-aligned box
+	 */
+	public Vector2 nextVector2InsideBox(float lowX, float lowY, float highX, float highY){
+		return new Vector2(nextFloat(lowX, highX), nextFloat(lowY, highY));
+	}
+	
+	/**
 	 * Fills the given Vector3 with a point that has a random angle and the specified length.
 	 * @param vec a Vector3 that will be modified in-place.
 	 * @param length the length that {@code vec} should have after changes

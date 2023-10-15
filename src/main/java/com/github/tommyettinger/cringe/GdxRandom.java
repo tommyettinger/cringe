@@ -338,7 +338,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * <br>
 	 * Note that you can give this values for {@code bits} that are outside its expected range of 1 to 32,
 	 * but the value used, as long as bits is positive, will effectively be {@code bits % 32}. As stated
-	 * before, a value of 0 for bits is the same as a value of 32.<p>
+	 * before, a value of 0 for bits is the same as a value of 32.
 	 *
 	 * @param bits the amount of random bits to request, from 1 to 32
 	 * @return the next pseudorandom value from this random number
@@ -611,7 +611,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * ({@code 5.9604645E-8f} or {@code 0x1p-24f}). It tends to be fast if
 	 * nextLong() is fast, but alternative implementations could use 24 bits of
 	 * {@link #nextInt()} (or just {@link #next(int)}, giving it {@code 24})
-	 * if that generator doesn't efficiently generate 64-bit longs.<p>
+	 * if that generator doesn't efficiently generate 64-bit longs.
 	 *
 	 * @return the next pseudorandom, uniformly distributed {@code float}
 	 * value between {@code 0.0} and {@code 1.0} from this
@@ -1107,13 +1107,13 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * {@link Random#nextGaussian()} generates at least two random doubles for each two Gaussian values, but
 	 * may rarely require much more random generation.
 	 * <br>
-	 * This is used by {@link #nextGaussian()} here, though this could change in the future.
-	 * This method delegates to one with the same name in MathSupport.
-	 * <br>
 	 * This can be used both as an optimization for generating Gaussian random values, and as a way of generating
 	 * Gaussian values that match a pattern present in the inputs (which you could have by using a sub-random sequence
 	 * as the input, such as those produced by a van der Corput, Halton, Sobol or R2 sequence). Most methods of generating
 	 * Gaussian values (e.g. Box-Muller and Marsaglia polar) do not have any way to preserve a particular pattern.
+	 * <br>
+	 * This is used by {@link #nextGaussian()} here, though this could change in the future.
+	 * This method delegates to one with the same name in MathSupport.
 	 *
 	 * @param d should be between 0 and 1, exclusive, but other values are tolerated
 	 * @return a normal-distributed double centered on 0.0; all results will be between -38.5 and 38.5, both inclusive
@@ -1150,6 +1150,8 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		return true;
 	}
 
+	// Equivalency with MathUtils
+
 	/**
 	 * Returns true if a random value between 0 and 1 is less than the specified value.
 	 *
@@ -1172,8 +1174,9 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	/**
 	 * Returns a triangularly distributed random number between -1.0 (exclusive) and 1.0 (exclusive), where values around zero are
 	 * more likely. Advances the state twice.
-	 * <p>
+	 * <br>
 	 * This is an optimized version of {@link #nextTriangular(float, float, float) nextTriangular(-1, 1, 0)}
+	 * @return a float between -1.0 (exclusive) and 1.0 (exclusive)
 	 */
 	public float nextTriangular () {
 		return nextFloat() - nextFloat();
@@ -1182,92 +1185,116 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	/**
 	 * Returns a triangularly distributed random number between {@code -max} (exclusive) and {@code max} (exclusive), where values
 	 * around zero are more likely. Advances the state twice.
-	 * <p>
+	 * <br>
 	 * This is an optimized version of {@link #nextTriangular(float, float, float) nextTriangular(-max, max, 0)}
 	 *
 	 * @param max the upper limit
+	 * @return a float between -max (exclusive) and max (exclusive)
 	 */
 	public float nextTriangular (float max) {
 		return (nextFloat() - nextFloat()) * max;
 	}
 
 	/**
-	 * Returns a triangularly distributed random number between {@code min} (inclusive) and {@code max} (exclusive), where the
+	 * Returns a triangularly distributed random number between {@code min} (inclusive) and {@code max} (inclusive), where the
 	 * {@code mode} argument defaults to the midpoint between the bounds, giving a symmetric distribution. Advances the state once.
-	 * <p>
+	 * <br>
 	 * This method is equivalent to {@link #nextTriangular(float, float, float) nextTriangular(min, max, (min + max) * 0.5f)}
 	 *
 	 * @param min the lower limit
 	 * @param max the upper limit
+	 * @return a float between min (inclusive) and max (inclusive)
 	 */
 	public float nextTriangular (float min, float max) {
 		return nextTriangular(min, max, (min + max) * 0.5f);
 	}
 
 	/**
-	 * Returns a triangularly distributed random number between {@code min} (inclusive) and {@code max} (exclusive), where values
-	 * around {@code mode} are more likely. Advances the state once.
+	 * Returns a triangularly distributed random number between {@code min} (inclusive) and {@code max} (inclusive), where values
+	 * around {@code mode} are more likely. In the event that {@code mode} is not between the given boundaries, the
+	 * mode is clamped. Advances the state once.
 	 *
 	 * @param min  the lower limit
 	 * @param max  the upper limit
 	 * @param mode the point around which the values are more likely
+	 * @return a float between min (inclusive) and max (inclusive)
 	 */
 	public float nextTriangular (float min, float max, float mode) {
 		float u = nextFloat();
 		float d = max - min;
+		mode = Math.min(Math.max(mode, min), max);
 		if (u <= (mode - min) / d) return min + (float)Math.sqrt(u * d * (mode - min));
 		return max - (float)Math.sqrt((1 - u) * d * (max - mode));
 	}
 
+	// More-centrally-biased nextTriangular variants
+
 	/**
-	 * Returns something like a triangularly distributed random number between -1.0 (exclusive) and 1.0 (exclusive), where values around zero are
-	 * more likely. Advances the state twice.
-	 * <p>
+	 * Returns something like a triangularly distributed random number between -1.0 (inclusive) and 1.0 (inclusive), where values around zero are
+	 * more likely. Advances the state once.
+	 * <br>
 	 * This method is equivalent to {@link #nextTriangularCubic(float, float, float) nextTriangularCubic(-1f, 1f, 0f)}
+	 * The peak generated around 0 is steeper than with {@link #nextTriangular()}.
+	 *
+	 * @return a float between -1.0 (inclusive) and 1.0 (inclusive)
 	 */
 	public float nextTriangularCubic () {
 		return nextTriangularCubic(-1f, 1f, 0f);
 	}
 
 	/**
-	 * Returns something like a triangularly distributed random number between {@code -max} (exclusive) and {@code max} (exclusive), where values
-	 * around zero are more likely. Advances the state twice.
-	 * <p>
+	 * Returns something like a triangularly distributed random number between {@code -max} (inclusive) and {@code max} (inclusive), where values
+	 * around zero are more likely. Advances the state once.
+	 * <br>
 	 * This method is equivalent to {@link #nextTriangularCubic(float, float, float) nextTriangularCubic(-max, max, 0f)}
+	 * The peak generated around 0 is steeper than with {@link #nextTriangular(float)}.
 	 *
 	 * @param max the upper limit
+	 * @return a float between -max (inclusive) and max (inclusive)
 	 */
 	public float nextTriangularCubic (float max) {
 		return nextTriangularCubic(-max, max, 0f);
 	}
 
 	/**
-	 * Returns something like a triangularly distributed random number between {@code min} (inclusive) and {@code max} (exclusive), where the
+	 * Returns something like a triangularly distributed random number between {@code min} (inclusive) and {@code max} (inclusive), where the
 	 * {@code mode} argument defaults to the midpoint between the bounds, giving a symmetric distribution. Advances the state once.
-	 * <p>
+	 * <br>
 	 * This method is equivalent to {@link #nextTriangularCubic(float, float, float) nextTriangularCubic(min, max, (min + max) * 0.5f)}
+	 * The peak generated around the center of the range is steeper than with {@link #nextTriangular(float, float)}.
 	 *
 	 * @param min the lower limit
 	 * @param max the upper limit
+	 * @return a float between min (inclusive) and max (inclusive)
 	 */
 	public float nextTriangularCubic (float min, float max) {
 		return nextTriangularCubic(min, max, (min + max) * 0.5f);
 	}
 
 	/**
-	 * Returns something like a triangularly distributed random number between {@code min} (inclusive) and {@code max}
-	 * (exclusive), where values around {@code mode} are more likely. Advances the state once.
+	 * Returns a triangularly distributed random number between {@code min} (inclusive) and {@code max} (inclusive),
+	 * where values around {@code mode} are more likely.
+	 * In the event that {@code mode} is not between the given boundaries, the mode is clamped.
+	 * Advances the state once.
+	 * <br>
+	 * This function is almost identical to {@link #nextTriangular(float, float, float)}, but it uses a cube root
+	 * instead of square root, and the values around the mode are much more likely to appear. Or in other words, the
+	 * peak generated around "mode" is much steeper.
 	 *
 	 * @param min  the lower limit
 	 * @param max  the upper limit
 	 * @param mode the point around which the values are more likely
+	 * @return a float between min (inclusive) and max (inclusive)
 	 */
 	public float nextTriangularCubic (float min, float max, float mode) {
 		float u = nextFloat();
 		float d = max - min;
+		mode = Math.min(Math.max(mode, min), max);
 		if (u <= (mode - min) / d) return min + MathSupport.cbrtPositive(u * d * (mode - min));
 		return max - MathSupport.cbrtPositive((1 - u) * d * (max - mode));
 	}
+
+	// Minimum or maximum of multiple random results
 
 	/**
 	 * Returns the minimum result of {@code trials} calls to {@link #nextSignedInt(int, int)} using the given {@code innerBound}
@@ -1412,6 +1439,8 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		}
 		return v;
 	}
+
+	// Random selection from arrays and Collections
 
 	/**
 	 * Gets a randomly-selected item from the given array.

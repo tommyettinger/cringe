@@ -2165,7 +2165,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	public Vector2 nextVector2InsideBox(float lowX, float lowY, float highX, float highY){
 		return new Vector2(nextFloat(lowX, highX), nextFloat(lowY, highY));
 	}
-	
+
 	/**
 	 * Fills the given Vector3 with a point that has a random angle and the specified length.
 	 * @param vec a Vector3 that will be modified in-place.

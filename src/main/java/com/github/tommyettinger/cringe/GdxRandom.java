@@ -2345,12 +2345,12 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 
 	@Override
 	public void write(Json json) {
-		json.writeValue(stringSerialize());
+		json.writeValue("rng", stringSerialize());
 	}
 
 	@Override
 	public void read(Json json, JsonValue jsonData) {
-		stringDeserialize(jsonData.asString());
+		stringDeserialize(jsonData.getString("rng"));
 	}
 
 	/**

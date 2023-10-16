@@ -3,7 +3,7 @@ package com.github.tommyettinger.cringe;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
-public final class UniqueIdentifier implements Json.Serializable {
+public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Json.Serializable {
 
     private long hi;
     private long lo;
@@ -85,6 +85,12 @@ public final class UniqueIdentifier implements Json.Serializable {
 
     public static UniqueIdentifier next() {
         return GENERATOR.generate();
+    }
+
+    @Override
+    public int compareTo(UniqueIdentifier other) {
+        int c = Long.compare(hi, other.hi);
+        return c == 0 ? Long.compare(lo, other.lo) : c;
     }
 
     public static final class Generator implements Json.Serializable {

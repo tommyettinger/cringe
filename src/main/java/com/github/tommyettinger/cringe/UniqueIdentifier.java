@@ -3,15 +3,34 @@ package com.github.tommyettinger.cringe;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
+/**
+ * A substitute for the UUID class that isn't available on GWT. This can be serialized as JSON, and so can (and must)
+ * the {@link #GENERATOR} that produces new UniqueIdentifier instances and ensures they are unique. This is also
+ * Comparable, for some reason (UUID is, but since these should all be random, it doesn't mean much). UniqueIdentifier
+ * supports up to 2 to the 128 minus 1 unique instances, which should be far more than enough for centuries of
+ * generation.
+ */
 public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Json.Serializable {
 
     private long hi;
     private long lo;
 
+    /**
+     * Creates a new, invalid UniqueIdentifier. Both hi and lo will be 0.
+     */
     public UniqueIdentifier(){
         hi = 0L;
         lo = 0L;
     }
+
+    /**
+     * Creates a new UniqueIdentifier that may or may not actually be unique. This uses hi and lo verbatim.
+     * If both hi and lo are 0, this will be treated as an invalid identifier. Most usage should prefer
+     * {@link #next()} instead.
+     *
+     * @param hi the high 64 bits, as a long
+     * @param lo the low 64 bits, as a long
+     */
     public UniqueIdentifier(long hi, long lo){
         this.hi = hi;
         this.lo = lo;
@@ -25,6 +44,9 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
         return lo;
     }
 
+    /**
+     * @return false if this instance was produced by {@link #UniqueIdentifier()} and not modified; true otherwise
+     */
     public boolean isValid() {
         return ((hi | lo) != 0L);
     }
@@ -81,8 +103,21 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
         lo = jsonData.getLong("l");
     }
 
-    public static final Generator GENERATOR = new Generator();
+    /**
+     * The {@link Generator} that actually produces unique identifiers.
+     * If your application pauses and needs to be resumed later by loading serialized state,
+     * you must include this field in what you serialize, and load it before creating any
+     * additional UniqueIdentifier values with {@link #next()} or {@link Generator#generate()}.
+     * Failure to maintain the previous GENERATOR value can result in identifiers not being unique.
+     */
+    public static Generator GENERATOR = new Generator();
 
+    /**
+     * Generates a UniqueIdentifier that will actually be unique, assuming {@link #GENERATOR}
+     * is non-null and has had its state tracked with the rest of the program (see the docs
+     * for {@link #GENERATOR}).
+     * @return a new UniqueIdentifier that should be actually unique
+     */
     public static UniqueIdentifier next() {
         return GENERATOR.generate();
     }

@@ -38,10 +38,6 @@ import com.badlogic.gdx.utils.OrderedSet;
 import com.badlogic.gdx.utils.ShortArray;
 
 import java.lang.StringBuilder;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -2245,6 +2241,36 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		return nextVector3(nextFloat(minLength, maxLength));
 	}
 
+	/**
+	 * Fills the given Vector3 with a point inside the axis-aligned box defined by the given low and high coordinates.
+	 * @param vec a Vector3 that will be modified in-place.
+	 * @param lowX the lowest x-coordinate of the box
+	 * @param lowY the lowest y-coordinate of the box
+	 * @param lowZ the lowest z-coordinate of the box
+	 * @param highX the highest x-coordinate of the box
+	 * @param highY the highest y-coordinate of the box
+	 * @param highZ the highest z-coordinate of the box
+	 * @return {@code vec}, after changes
+	 */
+	public Vector3 nextVector3InsideBoxInPlace(Vector3 vec, float lowX, float lowY, float lowZ, float highX, float highY, float highZ) {
+		return vec.set(nextFloat(lowX, highX), nextFloat(lowY, highY), nextFloat(lowZ, highZ));
+	}
+
+	/**
+	 * Returns a new Vector3 with a point inside the axis-aligned box defined by the given low and high coordinates.
+	 * @param lowX the lowest x-coordinate of the box
+	 * @param lowY the lowest y-coordinate of the box
+	 * @param lowZ the lowest z-coordinate of the box
+	 * @param highX the highest x-coordinate of the box
+	 * @param highY the highest y-coordinate of the box
+	 * @param highZ the highest z-coordinate of the box
+	 * @return a new Vector3 inside the specified axis-aligned box
+	 */
+	public Vector3 nextVector3InsideBox(float lowX, float lowY, float lowZ, float highX, float highY, float highZ) {
+		return new Vector3(nextFloat(lowX, highX), nextFloat(lowY, highY), nextFloat(lowZ, highZ));
+	}
+
+
 	// Randomized color methods.
 
 	/**
@@ -2298,7 +2324,8 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * can return are exhausted.
 	 * <br>
 	 * You can also consider {@link UniqueIdentifier}, which is GWT-compatible and only supports random IDs.
-	 * 
+	 *
+	 * @see UniqueIdentifier
 	 * @return a new random {@link UUID}
 	 */
 	@GwtIncompatible
@@ -2450,14 +2477,4 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		return areEqual(this, that);
 	}
 
-	/**
-	 * An annotation for the GWT compiler that makes a piece of code ignored on GWT only.
-	 *
-	 * @author smelC
-	 */
-	@Retention(RetentionPolicy.CLASS)
-	@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.FIELD })
-	public @interface GwtIncompatible {
-
-	}
 }

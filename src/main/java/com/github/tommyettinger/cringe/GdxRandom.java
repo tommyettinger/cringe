@@ -21,7 +21,21 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.BooleanArray;
+import com.badlogic.gdx.utils.ByteArray;
+import com.badlogic.gdx.utils.CharArray;
+import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.LongArray;
+import com.badlogic.gdx.utils.NumberUtils;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.ObjectSet;
+import com.badlogic.gdx.utils.OrderedMap;
+import com.badlogic.gdx.utils.OrderedSet;
+import com.badlogic.gdx.utils.ShortArray;
 
 import java.lang.StringBuilder;
 import java.util.List;
@@ -32,13 +46,19 @@ import java.util.UUID;
  * A superset of the functionality in {@link Random}, meant for random number generators
  * that would be too bare-bones with just Random's methods.
  * <br>
- * This is extremely similar to
- * EnhancedRandom from the Juniper library, but depends only on libGDX (Juniper depends
- * on the digital library). The only differences between the behavior of this class and EnhancedRandom
- * are in {@link #nextGaussian()} and the serialized format, sometimes. You can make the serialized
- * format the same if you give Base.BASE10 to EnhancedRandom's (de)serialization methods. This class
- * also adds some methods to aid usage with libGDX, including implementing {@link Json.Serializable}
- * out of the box.
+ * This is extremely similar to EnhancedRandom from the Juniper library, but depends only on libGDX (Juniper
+ * depends on the digital library). The only differences between the behavior of this class and EnhancedRandom
+ * are in {@link #nextGaussian()} and the serialized format, though the format is similar. This class
+ * also adds quite a few methods to aid usage with libGDX, including implementing {@link Json.Serializable}
+ * out of the box. There are methods to get random vectors of a specified magnitude, such as
+ * {@link #nextVector3(float)}, and to assign existing vectors to random values with a specified magnitude.
+ * There are methods to get random items from libGDX {@link Array}, {@link IntArray}, {@link FloatArray},
+ * and other types like them, as well as to shuffle them. There are efficient methods to get random items
+ * from {@link #randomElement(OrderedSet) OrderedSet} and {@link #randomKey(OrderedMap) OrderedMap}, as well
+ * as less-efficient methods to get random items from {@link #randomElement(ObjectSet) ObjectSet} and
+ * {@link #randomKey(ObjectMap) ObjectMap}. There are methods for getting random colors
+ * ({@link #nextBrightColor() bright colors} or {@link #nextGrayColor()} grayscale colors), and even random
+ * {@link #nextUUID() UUID values}.
  */
 public abstract class GdxRandom extends Random implements Json.Serializable {
 

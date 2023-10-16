@@ -30,8 +30,7 @@ import java.util.Arrays;
  */
 public class WeightedTable {
     protected int[] mixed;
-    public int size;
-    public GdxRandom random;
+    protected GdxRandom random;
 
     /**
      * Constructs a useless WeightedTable that always returns the index 0.
@@ -50,10 +49,11 @@ public class WeightedTable {
      * @param probabilities an array or varargs of positive floats representing the weights for their own indices
      */
     public WeightedTable(GdxRandom random, float... probabilities) {
-        this.random = random == null ? new RandomAce320() : random;
+        int size = probabilities.length;
         /* Begin by doing basic structural checks on the inputs. */
-        if ((size = probabilities.length) == 0)
+        if (size == 0)
             throw new IllegalArgumentException("Array 'probabilities' given to WeightedTable must be nonempty.");
+        this.random = random == null ? new RandomAce320() : random;
 
         mixed = new int[size<<1];
 
@@ -117,9 +117,9 @@ public class WeightedTable {
             mixed[large.pop()<<1] = 0x7FFFFFFF;
     }
 
-    private WeightedTable(int[] mixed, boolean ignored)
+    private WeightedTable(GdxRandom random, int[] mixed, boolean ignored)
     {
-        size = mixed.length >> 1;
+        this.random = random.copy();
         this.mixed = mixed;
     }
 
@@ -128,7 +128,7 @@ public class WeightedTable {
      * @param other another WeightedTable to copy; no state will be shared
      */
     public WeightedTable(WeightedTable other){
-        this(Arrays.copyOf(other.mixed, other.mixed.length), true);
+        this(other.random, Arrays.copyOf(other.mixed, other.mixed.length), true);
     }
 
     /**
@@ -160,10 +160,10 @@ public class WeightedTable {
         // This uses the MX3 algorithm to generate a random long given sequential states
         state = Scramblers.scramble(state);
         // get a random int (using half the bits of our previously-calculated state) that is less than size
-        int column = (int)((size * (state & 0xFFFFFFFFL)) >>> 32);
+        int column = (int)((mixed.length * (state & 0xFFFFFFFFL)) >>> 32);
         // use the other half of the bits of state to get a 31-bit int, compare to probability and choose either the
         // current column or the alias for that column based on that probability
-        return ((state >>> 33) <= mixed[column << 1]) ? column : mixed[column << 1 | 1];
+        return ((state >>> 33) <= mixed[column & -2]) ? column : mixed[column | 1];
     }
     /**
      * Gets an index of one of the weights in this WeightedTable, with the choice determined by the random number
@@ -175,10 +175,27 @@ public class WeightedTable {
     {
         final long state = random.nextLong();
         // get a random int (using half the bits of our previously-calculated state) that is less than size
-        int column = (int)((size * (state & 0xFFFFFFFFL)) >> 32);
+        int column = (int)((mixed.length * (state & 0xFFFFFFFFL)) >> 32);
         // use the other half of the bits of state to get a 31-bit int, compare to probability and choose either the
         // current column or the alias for that column based on that probability
-        return ((state >>> 33) <= mixed[column << 1]) ? column : mixed[column << 1 | 1];
+        return ((state >>> 33) <= mixed[column & -2]) ? column : mixed[column | 1];
+    }
+
+    public int size() {
+        return mixed.length >>> 1;
+    }
+
+    public GdxRandom getRandom() {
+        return random;
+    }
+
+    /**
+     * This will only use the given {@link GdxRandom} if it isn't null.
+     * @param random a non-null GdxRandom
+     */
+    public void setRandom(GdxRandom random) {
+        if(random != null)
+            this.random = random;
     }
 
     public String stringSerialize()
@@ -191,6 +208,7 @@ public class WeightedTable {
         }
         return sb.toString();
     }
+
     public WeightedTable stringDeserialize(String data)
     {
         if(data == null || data.isEmpty())
@@ -207,19 +225,30 @@ public class WeightedTable {
         return this;
     }
 
+    /**
+     * Note that this does not check the {@link #getRandom() random} field for equality, and only checks the tables of
+     * weights and their indices. This effectively is the same as comparing a table in a rulebook with another table
+     * from another edition of the rulebook -- the next results selected from both tables at random could be different
+     * or the same, but what matters is that the set of probabilities for the same indices is the same.
+     * @param o some other Object, probably another WeightedTable
+     * @return true if {@code o} is a WeightedTable and its weights are identical to the weights here
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         WeightedTable that = (WeightedTable) o;
-
-        if (size != that.size) return false;
         return Arrays.equals(mixed, that.mixed);
     }
 
+    /**
+     * Only hashes the table of weights and their indices; does not consider the {@link #getRandom() random} field.
+     * For the rationale here, see {@link #equals(Object)}.
+     * @return a hash code of the weight table only
+     */
     @Override
     public int hashCode() {
-        return Arrays.hashCode(mixed) ^ random.getTag().hashCode();
+        return Arrays.hashCode(mixed);
     }
 }

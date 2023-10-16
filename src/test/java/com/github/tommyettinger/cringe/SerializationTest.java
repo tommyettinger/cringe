@@ -45,18 +45,36 @@ public class SerializationTest {
     @Test
     public void testGapShufflerRoundTrip() {
         Json json = new Json();
-        GapShuffler<String> r = new GapShuffler<>(
+        GapShuffler<String> orig = new GapShuffler<>(
                 new String[]{"IT'S", "PEANUT", "BUTTER", "JELLY", "TIME"}, new RandomAce320(123));
-        String s = json.toJson(r);
-        System.out.println(s);
-        r.next();
-        String rl = r.next();
-        GapShuffler<String> d = json.fromJson(GapShuffler.class, s);
-        System.out.println(s + "   " + json.toJson(d));
-        d.next();
-        String dl = d.next();
-        Assert.assertEquals("Failure with " + s, rl, dl);
-        System.out.println(r.next() + " " + r.next() + " " + r.next() + " " + r.next() + " " + r.next());
-        System.out.println(d.next() + " " + d.next() + " " + d.next() + " " + d.next() + " " + d.next());
+        String ser = json.toJson(orig);
+        System.out.println(ser);
+        orig.next();
+        String ores = orig.next();
+        GapShuffler<String> dser = json.fromJson(GapShuffler.class, ser);
+        System.out.println(ser + "   " + json.toJson(dser));
+        dser.next();
+        String dres = dser.next();
+        Assert.assertEquals("Failure with " + ser, ores, dres);
+        System.out.println(orig.next() + " " + orig.next() + " " + orig.next() + " " + orig.next() + " " + orig.next());
+        System.out.println(dser.next() + " " + dser.next() + " " + dser.next() + " " + dser.next() + " " + dser.next());
+    }
+
+    @Test
+    public void testWeightedTableRoundTrip() {
+        Json json = new Json();
+        WeightedTable orig = new WeightedTable(new RandomAce320(123), 1.1f, 2.2f, 3.3f, 4.4f, 5.5f);
+        String ser = json.toJson(orig);
+        System.out.println(ser);
+        orig.random();
+        int ores = orig.random();
+        WeightedTable dser = json.fromJson(WeightedTable.class, ser);
+        System.out.println(ser + "   " + json.toJson(dser));
+        dser.random();
+        int dres = dser.random();
+        Assert.assertEquals("Failure with " + ser, ores, dres);
+        System.out.println(orig.random() + " " + orig.random() + " " + orig.random() + " " + orig.random() + " " + orig.random());
+        System.out.println(dser.random() + " " + dser.random() + " " + dser.random() + " " + dser.random() + " " + dser.random());
+
     }
 }

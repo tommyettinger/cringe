@@ -1,11 +1,14 @@
 package com.github.tommyettinger.cringe;
 
-public final class UniqueIdentifier {
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
+
+public final class UniqueIdentifier implements Json.Serializable {
 
     private long hi;
     private long lo;
 
-    private UniqueIdentifier(){
+    public UniqueIdentifier(){
         hi = 0L;
         lo = 0L;
     }
@@ -20,6 +23,10 @@ public final class UniqueIdentifier {
 
     public long getLo() {
         return lo;
+    }
+
+    public boolean isValid() {
+        return ((hi | lo) != 0L);
     }
 
     @Override
@@ -48,13 +55,39 @@ public final class UniqueIdentifier {
                 '}';
     }
 
+    public String stringSerialize() {
+        return hi + "~" + lo;
+    }
+
+    public UniqueIdentifier stringDeserialize(String data) {
+        int mid = data.indexOf('~');
+        hi = Long.parseLong(data.substring(0, mid));
+        lo = Long.parseLong(data.substring(mid+1));
+        return this;
+    }
+
+    @Override
+    public void write(Json json) {
+        json.writeObjectStart("ui");
+        json.writeValue("h", hi);
+        json.writeValue("l", lo);
+        json.writeObjectEnd();
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        jsonData = jsonData.get("ui");
+        hi = jsonData.getLong("h");
+        lo = jsonData.getLong("l");
+    }
+
     public static final Generator GENERATOR = new Generator();
 
     public static UniqueIdentifier next() {
         return GENERATOR.generate();
     }
 
-    public static final class Generator {
+    public static final class Generator implements Json.Serializable {
         private long stateA;
         private long stateB;
         private Generator() {
@@ -79,6 +112,21 @@ public final class UniqueIdentifier {
             stateA = Long.parseLong(data.substring(0, mid));
             stateB = Long.parseLong(data.substring(mid+1));
             return this;
+        }
+
+        @Override
+        public void write(Json json) {
+            json.writeObjectStart("uig");
+            json.writeValue("a", stateA);
+            json.writeValue("b", stateB);
+            json.writeObjectEnd();
+        }
+
+        @Override
+        public void read(Json json, JsonValue jsonData) {
+            jsonData = jsonData.get("uig");
+            stateA = jsonData.getLong("a");
+            stateB = jsonData.getLong("b");
         }
     }
 }

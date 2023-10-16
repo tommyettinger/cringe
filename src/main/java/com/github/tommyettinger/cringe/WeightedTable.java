@@ -17,6 +17,8 @@
 package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.utils.IntArray;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
 import java.util.Arrays;
 
@@ -28,7 +30,7 @@ import java.util.Arrays;
  * the code given by Keith Schwarz at that link. Vose's Alias Method is remarkably fast; it takes O(1) time to
  * get a random index, and takes O(n) time to construct a WeightedTable instance.
  */
-public class WeightedTable {
+public class WeightedTable implements Json.Serializable {
     protected int[] mixed;
     protected GdxRandom random;
 
@@ -251,4 +253,38 @@ public class WeightedTable {
     public int hashCode() {
         return Arrays.hashCode(mixed);
     }
+
+    /**
+     * Gets a String representation of this WeightedTable. Because the way probabilities are stored is very
+     * challenging to read for humans, this returns six sample results, made by calling {@link #random(long)}
+     * on (in this order): -101, -102, -103, -201, -202, and -203 . The inputs were chosen in an attempt to
+     * avoid common patterns such as "1, 2, 3, 4, 5" since these could easily appear in user data and be
+     * confused with return values used by the program.
+     * @return a String representation of this WeightedTable
+     */
+    @Override
+    public String toString() {
+        return "WeightedTable{" +
+                "random=" + random.getTag() + ", samples=(" +
+                random(-101L) + ", " + random(-102L) + ", " + random(-103L) + ", " +
+                random(-201L) + ", " + random(-202L) + ", " + random(-203L) +
+                ")}";
+    }
+
+    @Override
+    public void write(Json json) {
+        json.writeObjectStart("wt");
+        json.writeValue("rng", random, null);
+        json.writeValue("items", mixed, int[].class);
+        json.writeObjectEnd();
+
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        jsonData = jsonData.get("wt");
+        random = json.readValue("rng", GdxRandom.class, jsonData);
+        mixed = jsonData.get("items").asIntArray();
+    }
+
 }

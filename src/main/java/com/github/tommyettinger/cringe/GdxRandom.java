@@ -38,6 +38,10 @@ import com.badlogic.gdx.utils.OrderedSet;
 import com.badlogic.gdx.utils.ShortArray;
 
 import java.lang.StringBuilder;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -2292,8 +2296,12 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * called many times over the course of the generator's period, while RandomDistinct64 cannot return
 	 * the same UUID, making the UUIDs actually unique until all (2 to the 63) UUIDs that RandomDistinct64
 	 * can return are exhausted.
+	 * <br>
+	 * You can also consider {@link UniqueIdentifier}, which is GWT-compatible and only supports random IDs.
+	 * 
 	 * @return a new random {@link UUID}
 	 */
+	@GwtIncompatible
 	public UUID nextUUID() {
 		long msb = nextLong(), lsb = nextLong();
 		msb &= 0xFF0FFFFFFFFFFFFFL;
@@ -2440,5 +2448,16 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 		GdxRandom that = (GdxRandom)o;
 
 		return areEqual(this, that);
+	}
+
+	/**
+	 * An annotation for the GWT compiler that makes a piece of code ignored on GWT only.
+	 *
+	 * @author smelC
+	 */
+	@Retention(RetentionPolicy.CLASS)
+	@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.CONSTRUCTOR, ElementType.FIELD })
+	public @interface GwtIncompatible {
+
 	}
 }

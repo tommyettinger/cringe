@@ -53,10 +53,11 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	// BEGIN SECTION: Methods that must be implemented
 
 	/**
-	 * Gets the tag used to identify this type of GdxRandom, as a String. This tag should be unique,
-	 * and for uniformity purposes, all tags used in this library are 4 characters long. User-defined tags
-	 * should have a different length.
-	 * @return a unique String identifier for this type of GdxRandom; usually 4 chars long.
+	 * Gets the tag used to identify this type of GdxRandom, as a String. This tag should be unique to
+	 * this class, and should usually just be the {@link Class#getSimpleName() simple class name}. To
+	 * avoid needing every implementation to be in GWT's reflection cache, this does not use reflection,
+	 * and is abstract so implementing classes can fill it in how they see fit.
+	 * @return a String identifier for this type of GdxRandom; usually {@link Class#getSimpleName()}
 	 */
 	abstract public String getTag();
 
@@ -2345,12 +2346,12 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 
 	@Override
 	public void write(Json json) {
-		json.writeValue("rng", stringSerialize());
+		json.writeValue("r", stringSerialize());
 	}
 
 	@Override
 	public void read(Json json, JsonValue jsonData) {
-		stringDeserialize(jsonData.getString("rng"));
+		stringDeserialize(jsonData.getString("r"));
 	}
 
 	/**

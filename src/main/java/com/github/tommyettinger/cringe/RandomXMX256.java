@@ -50,12 +50,12 @@ package com.github.tommyettinger.cringe;
  */
 public class RandomXMX256 extends GdxRandom {
 	/**
-	 * Returns the String {@code "XMXR"}, which is the tag here.
-	 * @return the String {@code "XMXR"}
+	 * Returns the String {@code "RandomXMX256"}, which is the tag here.
+	 * @return the String {@code "RandomXMX256"}
 	 */
 	@Override
 	public String getTag() {
-		return "XMXR";
+		return "RandomXMX256";
 	}
 
 	/**

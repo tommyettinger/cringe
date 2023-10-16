@@ -22,12 +22,12 @@ package com.github.tommyettinger.cringe;
  */
 public class RandomJava48 extends GdxRandom {
 	/**
-	 * Returns the String {@code "JURR"}, which is the tag here.
-	 * @return the String {@code "JURR"}
+	 * Returns the String {@code "RandomJava48"}, which is the tag here.
+	 * @return the String {@code "RandomJava48"}
 	 */
 	@Override
 	public String getTag() {
-		return "JURR";
+		return "RandomJava48";
 	}
 
 	/**

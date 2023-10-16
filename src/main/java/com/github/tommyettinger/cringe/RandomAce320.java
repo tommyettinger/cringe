@@ -48,12 +48,12 @@ package com.github.tommyettinger.cringe;
 public class RandomAce320 extends GdxRandom {
 
 	/**
-	 * Returns the String {@code "AceR"}, which is the tag here.
-	 * @return the String {@code "AceR"}
+	 * Returns the String {@code "RandomAce320"}, which is the tag here.
+	 * @return the String {@code "RandomAce320"}
 	 */
 	@Override
 	public String getTag() {
-		return "AceR";
+		return "RandomAce320";
 	}
 
 	/**

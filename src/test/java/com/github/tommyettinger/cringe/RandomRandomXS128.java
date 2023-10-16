@@ -18,15 +18,12 @@ public class RandomRandomXS128 extends GdxRandom {
     }
 
     /**
-     * Gets the tag used to identify this type of GdxRandom, as a String. This tag should be unique,
-     * and for uniformity purposes, all tags used in this library are 4 characters long. User-defined tags
-     * should have a different length.
-     *
-     * @return a unique String identifier for this type of GdxRandom; usually 4 chars long.
+     * Returns the String {@code "RandomRandomXS128"}, which is the tag here.
+     * @return the String {@code "RandomRandomXS128"}
      */
     @Override
     public String getTag() {
-        return "XS1R";
+        return "RandomRandomXS128";
     }
 
     /**

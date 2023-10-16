@@ -55,12 +55,12 @@ package com.github.tommyettinger.cringe;
  */
 public class RandomDistinct64 extends GdxRandom {
 	/**
-	 * Returns the String {@code "DisR"}, which is the tag here.
-	 * @return the String {@code "DisR"}
+	 * Returns the String {@code "RandomDistinct64"}, which is the tag here.
+	 * @return the String {@code "RandomDistinct64"}
 	 */
 	@Override
 	public String getTag() {
-		return "DisR";
+		return "RandomDistinct64";
 	}
 
 	/**

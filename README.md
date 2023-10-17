@@ -31,23 +31,73 @@ theres other cool stuff 2
 
 all the stuff from mathutils is here 2 but like instance methods on a gdxrandom
 
-`stringSerialize()` and `stringDeserialize()` store random stuff in a string and like load it later
+`stringSerialize()` and `stringDeserialize()` store random stuff in like a string and totes load it later
 
 `read()` and `write()` do that but like with json and the json stuff does it like auto
 
 u get the picture
 
+# o yeh
+
+theres this other stuff now
+
+u can make a `GapShuffler` out of a randommy thingy and like a lot of stuff u dont wanna repeat
+
+that one will go on like foreeeeeeverrrrrr so u gotta only get a lil bit k
+
+theres this like `WeightedTable` and it gets u ints but like each one has its own weight
+
+the big chonky ones get picked more. like my cat lol
+
+um theres like a new one called `UniqueIdentifier` and it just like makes unique things when u call `next()`
+
+its just like `UUID` but it works on GWT i guess and its like `Json.Serializable` which is p. cool
+
+o and theres `Scramblers` to take a number and make it like wiggly jiggly or smth
+
 # get
 
 The easiest way to use this library is to copy files from the source code.
-If you copy [GdxRandom](src/main/java/com/github/tommyettinger/cringe/GdxRandom.java)
+If you copy [GdxRandom](src/main/java/com/github/tommyettinger/cringe/GdxRandom.java) and
+[GwtIncompatible](src/main/java/com/github/tommyettinger/cringe/GwtIncompatible.java),
 and one of the three `Random` classes adjacent to it
 ([RandomAce320](src/main/java/com/github/tommyettinger/cringe/RandomAce320.java),
 [RandomDistinct64](src/main/java/com/github/tommyettinger/cringe/RandomDistinct64.java),
 or [RandomXMX256](src/main/java/com/github/tommyettinger/cringe/RandomXMX256.java)), you
 can use the `Random` class as a drop-in replacement for `java.util.Random` or an
-almost-identical replacement for libGDX's `RandomXS128`. There are also a few files that
-use random number generators in some way:
+almost-identical replacement for libGDX's `RandomXS128`.
+
+The different GdxRandom implementations differ in various properties. All are high-quality statistically, passing
+the PractRand battery of tests to 64TB of tested data. They each have different "periods," meaning the number of random
+results that can be produced before the sequence repeats. In practice, a game will probably never have to worry about
+exhausting an entire period and actually seeing the sequence repeat. However, far enough along through the actual period
+of a generator, it becomes possible for an adversary (typically a player) to notice and exploit patterns. The shortest
+I believe this could happen is in `RandomDistinct64`, after over 4 billion random numbers are generated (2 to the 32).
+For `RandomXMX256`, the earliest point should be 2 to the 128, which just means it isn't going to happen. `AceRandom320`
+has many different possible cycles, with the shortest possible one at least as long as `RandomDistinct64`'s period.
+
+`RandomAce320` is very fast. It uses very few types of instruction, and only performs one math instruction on each state
+to get a random result. It also can perform those 5 math instructions using instruction-level parallelism, which the JVM
+has been good at exploiting to improve performance since Java 16 or so. The minimum cycle length is 2 to the 64, and the
+maximum is over 2 to the 300 (but it's impractical to say exactly). Most random seeds will be in one of the largest
+cycles, and even in the minuscule chance that you randomly start in the shortest cycle, that's still almost always going
+to be good enough for any app, and effectively always enough for any game. It has five `long`s of state, each of which
+can have any value.
+
+`RandomDistinct64` produces each `long` from `nextLong()` exactly once, which makes it good for producing random UUIDs.
+It's also rather fast on most JVMs, and might be much faster on GraalVM (version 20 and later). I need to verify some
+unusual benchmarks using GraalVM 20, but they appear to show RandomDistinct64 producing over 4 billion long values per
+second, which is over twice as fast as RandomAce320. This could be the benchmark code eliminating the tested loop
+entirely, so take it with a large grain of salt. It has one `long` of state, which can have any value.
+
+`RandomXMX256` is a fortified version of `Xoshiro256**`, which is present in Java 17, but removes its `**` or StarStar
+"scrambler" and replaces it with the much more robust MX3 unary hash, which is also used in our `Scramblers` class.
+This generator produces each sequence of four numbers exactly once, except for `0, 0, 0, 0`, which never appears.
+RandomXMX256 is slower than the other two generators, but should be much more resilient against statistical quality
+issues, probably to the point of being overkill. It has 4 `long`s of state, each of which can have any value unless all
+states are 0 (which is not permitted).
+
+There are also a few files that use random number generators in some way:
 
   - [GapShuffler](src/main/java/com/github/tommyettinger/cringe/GapShuffler.java) is an infinite
     `Iterable` that will never produce the same item twice in a row, as long as more than one item
@@ -59,14 +109,18 @@ use random number generators in some way:
 
 You don't need any of these 3 files to use the library, but they may come in handy.
 
+[UniqueIdentifier](src/main/java/com/github/tommyettinger/cringe/UniqueIdentifier.java) is also here, and doesn't use
+any GdxRandom. Instead, it produces a sequence of UUID-like values that are guaranteed to be unique unless an impossibly
+large amount of identifiers have been produced (2 to the 128 minus 1).
+
 Alternatively, you can depend on the library as a whole, using it as a normal Gradle or Maven
 dependency.
 
-`implementation "com.github.tommyettinger:cringe:0.0.1"`
+`implementation "com.github.tommyettinger:cringe:0.0.2"`
 
 If you use GWT, then your GWT module needs to depend on:
 
-`implementation "com.github.tommyettinger:cringe:0.0.1:sources"`
+`implementation "com.github.tommyettinger:cringe:0.0.2:sources"`
 
 GWT also needs this `inherits` line added to your `GdxDefinition.gwt.xml` file, with the other inherits lines:
 
@@ -77,6 +131,8 @@ You don't need the `inherits` line if you just copy a few classes into your sour
 # license
 
 [apache 2.0](LICENSE)
+
+also thanks to rafa skoberg for like giving me a ton of work to do lololol jk
 
 # yeah
 

@@ -161,7 +161,7 @@ public final class Scramblers {
      * to 0.0 than to either of the extreme limits.
      * <br>
      * This uses the MX3 unary hash by Jon Maiga, but XORs the input with 0xABC98388FB8FAC03L before using MX3.
-     * It also uses {@link GdxRandom#probit(double)} to distribute the output, and internally uses
+     * It also uses {@link MathSupport#probit(double)} to distribute the output, and internally uses
      * {@link GdxRandom#nextExclusiveDouble()}'s small code to prepare an input for probit().
      * @param x any long
      * @return a Gaussian-distributed double between -9.155293773112453 and 8.209536145151493
@@ -175,7 +175,7 @@ public final class Scramblers {
         x ^= x >>> 32;
         x *= 0xBEA225F9EB34556DL;
         x ^= x >>> 29;
-        return GdxRandom.probit(NumberUtils.longBitsToDouble(1022L - Long.numberOfTrailingZeros(x) << 52 | x >>> 12));
+        return MathSupport.probit(NumberUtils.longBitsToDouble(1022L - Long.numberOfTrailingZeros(x) << 52 | x >>> 12));
 
     }
 }

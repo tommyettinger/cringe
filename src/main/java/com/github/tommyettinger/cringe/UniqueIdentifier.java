@@ -4,11 +4,16 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
 /**
- * A substitute for the UUID class that isn't available on GWT. This can be serialized as JSON, and so can (and must)
- * the {@link #GENERATOR} that produces new UniqueIdentifier instances and ensures they are unique. This is also
- * Comparable, for some reason (UUID is, but since these should all be random, it doesn't mean much). UniqueIdentifier
- * supports up to 2 to the 128 minus 1 unique instances, which should be far more than enough for centuries of
- * generation.
+ * A substitute for the UUID class that isn't available on GWT.
+ * The typical usage is to call {@link #next()} when you want a new UniqueIdentifier. If the app is closing down and
+ * needs to save its state to be resumed later, {@link #GENERATOR} must be serialized as well, and deserialized before
+ * calling {@link #next()} again after resuming. Without this last step, the generated identifiers are <em>likely</em>
+ * to be unique, but not <em>guaranteed</em> to be unique.
+ * <br>
+ * This can be serialized as JSON, and so can (and must) the {@link #GENERATOR} that produces new UniqueIdentifier
+ * instances and ensures they are unique. This is also Comparable, for some reason (UUID is, but since these should all
+ * be random, it doesn't mean much). UniqueIdentifier supports up to 2 to the 128 minus 1 unique instances, which should
+ * be far more than enough for centuries of generation.
  */
 public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Json.Serializable {
 

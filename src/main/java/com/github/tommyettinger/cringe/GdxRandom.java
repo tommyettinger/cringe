@@ -1005,8 +1005,8 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * normal distribution with mean {@code 0.0} and standard deviation
 	 * {@code 1.0}, is pseudorandomly generated and returned.
 	 * <p>
-	 * This uses {@link #probit(double)} to "reshape" a random double into the
-	 * normal distribution. This requests exactly one long from the generator's
+	 * This uses {@link MathSupport#probit(double)} to "reshape" a random double into
+	 * the normal distribution. This requests exactly one long from the generator's
 	 * sequence (using {@link #nextExclusiveDouble()}). This makes it different
 	 * from code like java.util.Random's nextGaussian() method, which can (rarely)
 	 * fetch a higher number of random doubles.
@@ -1014,15 +1014,15 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * The lowest value this can return is {@code -9.155293773112453}, while
 	 * the highest value this can return is {@code 8.209536145151493}. The
 	 * asymmetry is due to how IEEE 754 doubles work; doubles can be closer to
-	 * 0.0 than they can be to 1.0, and {@link #probit(double)} takes a double
-	 * between 0.0 and 1.0 .
+	 * 0.0 than they can be to 1.0, and {@link MathSupport#probit(double)} takes
+	 * a double between 0.0 and 1.0 .
 	 *
 	 * @return the next pseudorandom, Gaussian ("normally") distributed
 	 * {@code double} value with mean {@code 0.0} and standard deviation
 	 * {@code 1.0} from this random number generator's sequence
 	 */
 	public double nextGaussian () {
-		return probit(nextExclusiveDouble());
+		return MathSupport.probit(nextExclusiveDouble());
 	}
 
 	/**
@@ -1040,6 +1040,8 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	public double nextGaussian(double mean, double stddev) {
 		return mean + stddev * nextGaussian();
 	}
+
+	// Optional methods
 
 	/**
 	 * Optional; advances or rolls back the {@code GdxRandom}' state without actually generating each number.
@@ -1071,6 +1073,8 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	public long previousLong () {
 		return skip(-1L);
 	}
+
+	// Utilities for mixing GdxRandom types
 
 	/**
 	 * Similar to {@link #copy()}, but fills this GdxRandom with the state of another GdxRandom, usually
@@ -1104,6 +1108,36 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	}
 
 	/**
+	 * Given two GdxRandom objects that could have the same or different classes,
+	 * this returns true if they have the same class and same state, or false otherwise.
+	 * Both of the arguments should implement {@link #getSelectedState(int)}, or this
+	 * will throw an UnsupportedOperationException. This can be useful for comparing
+	 * GdxRandom classes that do not implement equals(), for whatever reason.
+	 * This returns true if both arguments are null, but false if only one is null.
+	 *
+	 * @param left  an GdxRandom to compare for equality
+	 * @param right another GdxRandom to compare for equality
+	 * @return true if the two GdxRandom objects have the same class and state, or false otherwise
+	 */
+	public static boolean areEqual (GdxRandom left, GdxRandom right) {
+		if (left == right)
+			return true;
+		if(left == null || right == null)
+			return false;
+		if (left.getClass() != right.getClass())
+			return false;
+
+		final int count = left.getStateCount();
+		for (int i = 0; i < count; i++) {
+			if (left.getSelectedState(i) != right.getSelectedState(i))
+				return false;
+		}
+		return true;
+	}
+
+	// Backwards compatibility code
+
+	/**
 	 * A way of taking a double in the (0.0, 1.0) range and mapping it to a Gaussian or normal distribution, so high
 	 * inputs correspond to high outputs, and similarly for the low range. This is centered on 0.0 and its standard
 	 * deviation seems to be 1.0 (the same as {@link Random#nextGaussian()}). If this is given an input of 0.0
@@ -1134,41 +1168,14 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * Gaussian values (e.g. Box-Muller and Marsaglia polar) do not have any way to preserve a particular pattern.
 	 * <br>
 	 * This is used by {@link #nextGaussian()} here, though this could change in the future.
-	 * This method delegates to one with the same name in MathSupport.
+	 * This method delegates to one with the same name in MathSupport. This is present for
+	 * backwards compatibility; new code should just call {@link MathSupport#probit(double)}.
 	 *
 	 * @param d should be between 0 and 1, exclusive, but other values are tolerated
 	 * @return a normal-distributed double centered on 0.0; all results will be between -38.5 and 38.5, both inclusive
 	 */
 	public static double probit (final double d) {
 		return MathSupport.probit(d);
-	}
-
-	/**
-	 * Given two GdxRandom objects that could have the same or different classes,
-	 * this returns true if they have the same class and same state, or false otherwise.
-	 * Both of the arguments should implement {@link #getSelectedState(int)}, or this
-	 * will throw an UnsupportedOperationException. This can be useful for comparing
-	 * GdxRandom classes that do not implement equals(), for whatever reason.
-	 * This returns true if both arguments are null, but false if only one is null.
-	 *
-	 * @param left  an GdxRandom to compare for equality
-	 * @param right another GdxRandom to compare for equality
-	 * @return true if the two GdxRandom objects have the same class and state, or false otherwise
-	 */
-	public static boolean areEqual (GdxRandom left, GdxRandom right) {
-		if (left == right)
-			return true;
-		if(left == null || right == null)
-			return false;
-		if (left.getClass() != right.getClass())
-			return false;
-
-		final int count = left.getStateCount();
-		for (int i = 0; i < count; i++) {
-			if (left.getSelectedState(i) != right.getSelectedState(i))
-				return false;
-		}
-		return true;
 	}
 
 	// Equivalency with MathUtils
@@ -2269,7 +2276,6 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	public Vector3 nextVector3InsideBox(float lowX, float lowY, float lowZ, float highX, float highY, float highZ) {
 		return new Vector3(nextFloat(lowX, highX), nextFloat(lowY, highY), nextFloat(lowZ, highZ));
 	}
-
 
 	// Randomized color methods.
 

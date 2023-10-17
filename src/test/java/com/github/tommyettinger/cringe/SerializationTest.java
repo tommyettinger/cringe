@@ -9,7 +9,7 @@ import java.util.List;
 
 public class SerializationTest {
     @Test
-    public void testRoundTrip() {
+    public void testGdxRandomString() {
         List<GdxRandom> all = Arrays.asList(new RandomDistinct64(-1L), new RandomXMX256(-1L), new RandomAce320(-1L));
         for (GdxRandom r : all) {
             String s = r.stringSerialize();
@@ -25,7 +25,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void testJsonRoundTrip() {
+    public void testGdxRandomJson() {
         Json json = new Json();
         List<GdxRandom> all = Arrays.asList(new RandomDistinct64(-1L), new RandomXMX256(-1L), new RandomAce320(-1L));
         for (GdxRandom r : all) {
@@ -43,7 +43,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void testGapShufflerRoundTrip() {
+    public void testGapShuffler() {
         Json json = new Json();
         GapShuffler<String> orig = new GapShuffler<>(
                 new String[]{"IT'S", "PEANUT", "BUTTER", "JELLY", "TIME"}, new RandomAce320(123));
@@ -61,7 +61,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void testWeightedTableRoundTrip() {
+    public void testWeightedTable() {
         Json json = new Json();
         WeightedTable orig = new WeightedTable(new RandomAce320(123), 1.1f, 2.2f, 3.3f, 4.4f, 5.5f);
         String ser = json.toJson(orig);
@@ -75,6 +75,24 @@ public class SerializationTest {
         Assert.assertEquals("Failure with " + ser, ores, dres);
         System.out.println(orig.random() + " " + orig.random() + " " + orig.random() + " " + orig.random() + " " + orig.random());
         System.out.println(dser.random() + " " + dser.random() + " " + dser.random() + " " + dser.random() + " " + dser.random());
+    }
 
+    @Test
+    public void testUniqueIdentifier() {
+        Json json = new Json();
+        UniqueIdentifier orig = UniqueIdentifier.next();
+        String ser = json.toJson(orig);
+        System.out.println(ser);
+        UniqueIdentifier dser = json.fromJson(UniqueIdentifier.class, ser);
+        System.out.println(ser + "   " + json.toJson(dser));
+        Assert.assertEquals("Failure with " + ser, orig, dser);
+        String serG = json.toJson(UniqueIdentifier.GENERATOR);
+        System.out.println(serG);
+        orig = UniqueIdentifier.next();
+        orig = UniqueIdentifier.next();
+        UniqueIdentifier.GENERATOR = json.fromJson(UniqueIdentifier.Generator.class, serG);
+        dser = UniqueIdentifier.next();
+        dser = UniqueIdentifier.next();
+        Assert.assertEquals(orig, dser);
     }
 }

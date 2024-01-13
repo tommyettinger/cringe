@@ -32,8 +32,11 @@ import com.badlogic.gdx.utils.NumberUtils;
  * the inputs is to reverse each operation in the specific scramble function and hope you have enough bits to detect any
  * bias present.
  * <br>
- * Each of these uses the MX3 unary hash by Jon Maiga, but XORs the input with 0xABC98388FB8FAC03L before using MX3.
- * <a href="https://github.com/jonmaiga/mx3">MX3 was provided here</a> and is public domain.
+ * Each of the scramble methods uses the MX3 unary hash by Jon Maiga, but XORs the input with 0xABC98388FB8FAC03L before
+ * using MX3. <a href="https://github.com/jonmaiga/mx3">MX3 was provided here</a> and is public domain. The hash64
+ * methods are based on an early version of wyhash,
+ * <a href="https://github.com/wangyi-fudan/wyhash/blob/version_1/wyhash.h">source here</a>,
+ * but have diverged significantly. The general style of wyhash has been very influential in the hash64 methods.
  */
 public final class Scramblers {
     /**
@@ -176,6 +179,107 @@ public final class Scramblers {
         x *= 0xBEA225F9EB34556DL;
         x ^= x >>> 29;
         return MathSupport.probit(NumberUtils.longBitsToDouble(1022L - Long.numberOfTrailingZeros(x) << 52 | x >>> 12));
-
     }
+
+    /**
+     * Big constant 0. Used by {@link #hash64(long, CharSequence)}, and taken from
+     * <a href="https://github.com/wangyi-fudan/wyhash>wyhash</a> (in an earlier version).
+     */
+    public static final long b0 = 0xA0761D6478BD642FL;
+    /**
+     * Big constant 1. Used by {@link #hash64(long, CharSequence)}, and taken from
+     * <a href="https://github.com/wangyi-fudan/wyhash>wyhash</a> (in an earlier version).
+     */
+    public static final long b1 = 0xE7037ED1A0B428DBL;
+    /**
+     * Big constant 2. Used by {@link #hash64(long, CharSequence)}, and taken from
+     * <a href="https://github.com/wangyi-fudan/wyhash>wyhash</a> (in an earlier version).
+     */
+    public static final long b2 = 0x8EBC6AF09C88C6E3L;
+    /**
+     * Big constant 3. Used by {@link #hash64(long, CharSequence)}, and taken from
+     * <a href="https://github.com/wangyi-fudan/wyhash>wyhash</a> (in an earlier version).
+     */
+    public static final long b3 = 0x589965CC75374CC3L;
+    /**
+     * Big constant 4. Used by {@link #hash64(long, CharSequence)}, and taken from
+     * <a href="https://github.com/wangyi-fudan/wyhash>wyhash</a> (in an earlier version).
+     */
+    public static final long b4 = 0x1D8E4E27C47D124FL;
+    /**
+     * Big constant 5. Used by {@link #hash64(long, CharSequence)}, and taken from
+     * <a href="https://github.com/wangyi-fudan/wyhash>wyhash</a> (in an earlier version).
+     */
+    public static final long b5 = 0xEB44ACCAB455D165L;
+
+    /**
+     * Takes two arguments that are technically longs, and should be very different, and uses them to get a result
+     * that is technically a long and mixes the bits of the inputs. The arguments and result are only technically
+     * longs because their lower 32 bits matter much more than their upper 32, and giving just any long won't work.
+     * <br>
+     * This is very similar to wyhash's mum function, but doesn't use 128-bit math because it expects that its
+     * arguments are only relevant in their lower 32 bits (allowing their product to fit in 64 bits). It also can't
+     * really use 128-bit math on the JVM, so there's that, too.
+     *
+     * @param a a long that should probably only hold an int's worth of data
+     * @param b a long that should probably only hold an int's worth of data
+     * @return a sort-of randomized output dependent on both inputs
+     */
+    public static long mum(final long a, final long b) {
+        final long n = a * b;
+        return n ^ (n >>> 30);
+    }
+
+    /**
+     * Gets a 64-bit hash code of the given CharSequence (such as a String) {@code data} in its entirety. The first
+     * argument, {@code seed}, allows changing what hashes are produced for the same CharSequence subranges, just by
+     * changing the seed.
+     *
+     * @param seed the seed to use for this hash, as a long
+     * @param data  the String or other CharSequence to hash
+     * @return a 64-bit hash of data
+     */
+    public static long hash64(long seed, final CharSequence data) {
+        if (data == null) return 0;
+        return hash64(seed, data, 0, data.length());
+    }
+
+    /**
+     * Gets a 64-bit hash code of a subrange of the given CharSequence (such as a String) {@code data} starting
+     * at {@code start} and extending for {@code length} chars. The first argument, {@code seed}, allows changing what
+     * hashes are produced for the same CharSequence subranges, just by changing the seed.
+     *
+     * @param seed the seed to use for this hash, as a long
+     * @param data  the String or other CharSequence to hash
+     * @param start the start index
+     * @param length how many items to hash (this will hash fewer if there aren't enough items in the array)
+     * @return a 64-bit hash of data
+     */
+    public static long hash64(long seed, final CharSequence data, final int start, final int length) {
+        if (data == null || start < 0 || length < 0 || start >= length)
+            return 0;
+        final int len = Math.min(length, data.length());
+        for (int i = start + 3; i < len; i += 4) {
+            seed = mum(
+                    mum(data.charAt(i - 3) ^ b1, data.charAt(i - 2) ^ b2) - seed,
+                    mum(data.charAt(i - 1) ^ b3, data.charAt(i) ^ b4));
+        }
+        switch (len & 3) {
+            case 0:
+                seed = mum(b1 - seed, b4 + seed);
+                break;
+            case 1:
+                seed = mum(b5 - seed, b3 ^ (data.charAt(start + len - 1)));
+                break;
+            case 2:
+                seed = mum(data.charAt(start + len - 2) - seed, b0 ^ data.charAt(start + len - 1));
+                break;
+            case 3:
+                seed = mum(data.charAt(start + len - 3) - seed, b2 ^ data.charAt(start + len - 2)) + mum(b5 ^ seed, b4 ^ (data.charAt(start + len - 1)));
+                break;
+        }
+        seed = (seed ^ len) * (seed << 16 ^ b0);
+        return (seed ^ (seed << 33 | seed >>> 31) ^ (seed << 19 | seed >>> 45));
+    }
+
 }

@@ -205,6 +205,61 @@ public final class MathSupport {
 
     /**
      * Reads in a CharSequence containing only decimal digits (only 0-9) with an optional sign at the start
+     * and returns the long they represent, reading at most 19 characters (20 if there is a sign) and returning the
+     * result if valid, or 0 if nothing could be read. The leading sign can be '+' or '-' if present. This can also
+     * represent negative numbers as they are printed as unsigned longs. This means "18446744073709551615" would
+     * return the long -1 when passed to this, though you could also simply use "-1" . If you use both '-' at the start
+     * and have the number as greater than {@link Long#MAX_VALUE}, such as with "-18446744073709551615", then both
+     * indicate a negative number, but the digits will be processed first (producing -1) and then the whole thing will
+     * be multiplied by -1 to flip the sign again (returning 1).
+     * <br>
+     * Should be fairly close to Java 8's Long.parseUnsignedLong method, which is an odd omission from earlier JDKs.
+     * This doesn't throw on invalid input, though, instead returning 0 if the first char is not a decimal digit, or
+     * stopping the parse process early if a non-0-9 char is read before end is reached. If the parse is stopped
+     * early, this behaves as you would expect for a number with fewer digits, and simply doesn't fill the larger places.
+     *
+     * @param cs    a CharSequence, such as a String, containing decimal digits with an optional sign
+     * @param start the (inclusive) first character position in cs to read
+     * @param end   the (exclusive) last character position in cs to read (this stops after 20 characters if end is too large)
+     * @return the long that cs represents
+     */
+    public static long longFromDec(final CharSequence cs, final int start, int end) {
+        int sign, h, lim, len;
+        if (cs == null || start < 0 || end <= 0 || end - start <= 0
+                || (len = cs.length()) - start <= 0 || end > len)
+            return 0;
+        char c = cs.charAt(start);
+        if (c == '-') {
+            sign = -1;
+            h = 0;
+            lim = 21;
+        } else if (c == '+') {
+            sign = 1;
+            h = 0;
+            lim = 21;
+        } else {
+            if (!(c >= '0' && c <= '9'))
+                return 0;
+            else {
+                sign = 1;
+                lim = 20;
+            }
+            h = (c - '0');
+        }
+        long data = h;
+        for (int i = start + 1; i < end && i < start + lim; i++) {
+            c = cs.charAt(i);
+            if (!(c >= '0' && c <= '9'))
+                return data * sign;
+            data *= 10;
+            data |= (c - '0');
+        }
+        return data * sign;
+    }
+
+
+    /**
+     * Reads in a CharSequence containing only decimal digits (only 0-9) with an optional sign at the start
      * and returns the int they represent, reading at most 10 characters (11 if there is a sign) and returning the
      * result if valid, or 0 if nothing could be read. The leading sign can be '+' or '-' if present. This can also
      * represent negative numbers as they are printed as unsigned integers. This means "4294967295" would return the int

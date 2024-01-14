@@ -15,7 +15,7 @@ import java.io.*;
  * {@link com.badlogic.gdx.graphics.Texture} objects with encryption. You can also use
  * {@link #writeString(String, boolean, String)} and {@link #readString(String)} to read and write Strings, but you must
  * be careful to avoid version control (such as Git) changing line endings in encrypted text files. For those, using a
- * file extension like {@code .dat} is a good idea to avoid your data being sometime changed irreversibly.
+ * file extension like {@code .dat} is a good idea to avoid your data being sometimes changed irreversibly.
  * <br>
  * You may want to use this class to encrypt or decrypt files on platforms that don't have the javax.crypto package,
  * such as GWT (this is probably compatible). That is probably the most valid usage of the class at this point.
@@ -28,9 +28,9 @@ import java.io.*;
  * <br>
  * Based off <a href="https://gist.github.com/MobiDevelop/6389767">a gist by MobiDevelop</a>.
  */
-public class EncryptedFileHandle extends FileHandle {
+public final class EncryptedFileHandle extends FileHandle {
 
-	private final FileHandle file;
+	private final transient FileHandle file;
 	private final transient long k1, k2, k3, k4, n0;
 	private final transient long[] key;
 

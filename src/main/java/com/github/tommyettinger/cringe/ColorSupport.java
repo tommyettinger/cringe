@@ -75,7 +75,9 @@ public final class ColorSupport {
     /**
      * An overly-permissive, but fast, way of looking up the numeric value of a hex digit provided as a char.
      * This does not use a table lookup. It will return garbage if not given a valid hex digit, but will not crash
-     * on any input.
+     * or throw an Exception on any input. If you know the given digit is between 0 and 9 inclusive, this can also be
+     * used to get the numeric value of that digit as decimal, rather than hexadecimal. You could instead use
+     * {@code (c & 15)} or just {@code (c - '0')} in that case, though.
      * @param c a char that should really be a valid hex digit (matching the regex {@code [0-9A-Fa-f]})
      * @return the numeric value of the given digit char
      */

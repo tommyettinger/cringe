@@ -1,0 +1,365 @@
+/*
+ * Copyright (c) 2022-2023 See AUTHORS file.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.github.tommyettinger.cringe;
+
+import com.badlogic.gdx.utils.ObjectMap;
+
+/**
+ * Defines the core operations to generate continuous noise with a specific algorithm, and declares what properties of
+ * noise are supported by that algorithm.
+ */
+public abstract class RawNoise {
+    /**
+     * Gets the minimum dimension supported by this generator, such as 2 for a generator that only is defined for flat
+     * surfaces, or 3 for one that is only defined for 3D or higher-dimensional spaces.
+     * @return the minimum supported dimension, from 2 to 6 inclusive
+     */
+    public abstract int getMinDimension();
+
+    /**
+     * Gets the maximum dimension supported by this generator, such as 2 for a generator that only is defined for flat
+     * surfaces, or 6 for one that is defined up to the highest dimension this interface knows about (6D).
+     * @return the maximum supported dimension, from 2 to 6 inclusive
+     */
+    public abstract int getMaxDimension();
+
+    /**
+     * Returns true if this generator can be seeded with {@link #setSeed(long)} (and if so, retrieved with
+     * {@link #getSeed()}).
+     * @return true if {@link #setSeed(long)} and {@link #getSeed()} are supported, false if either isn't supported
+     */
+    public abstract boolean canUseSeed();
+    /**
+     * Gets 2D noise with a default or pre-set seed.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     * @throws UnsupportedOperationException if 2D noise cannot be produced by this generator
+     */
+    public abstract float getNoise(float x, float y);
+
+    /**
+     * Gets 3D noise with a default or pre-set seed.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @param z z position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     * @throws UnsupportedOperationException if 3D noise cannot be produced by this generator
+     */
+    public abstract float getNoise(float x, float y, float z);
+
+    /**
+     * Gets 4D noise with a default or pre-set seed.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @param z z position; can be any finite float
+     * @param w w position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     * @throws UnsupportedOperationException if 4D noise cannot be produced by this generator
+     */
+    public abstract float getNoise(float x, float y, float z, float w);
+
+    /**
+     * Gets 5D noise with a default or pre-set seed.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @param z z position; can be any finite float
+     * @param w w position; can be any finite float
+     * @param u u position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     * @throws UnsupportedOperationException if 5D noise cannot be produced by this generator
+     */
+    public abstract float getNoise(float x, float y, float z, float w, float u);
+
+    /**
+     * Gets 6D noise with a default or pre-set seed.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @param z z position; can be any finite float
+     * @param w w position; can be any finite float
+     * @param u u position; can be any finite float
+     * @param v v position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     * @throws UnsupportedOperationException if 6D noise cannot be produced by this generator
+     */
+    public abstract float getNoise(float x, float y, float z, float w, float u, float v);
+
+    /**
+     * Sets the seed to the given long, if long seeds are supported, or {@code (int)seed} if only int seeds are
+     * supported. If {@link #canUseSeed()} returns true, this must be implemented and must set the seed given a long
+     * input. If this generator cannot be seeded, this is permitted to either do nothing or throw an
+     * {@link UnsupportedOperationException}. If this operation allocates or is time-intensive, then that performance
+     * cost will be passed along to {@link #getNoiseWithSeed}, since that calls this twice unless overridden. In the
+     * case where seeding is expensive to perform, setSeed() can still be implemented while {@link #canUseSeed()}
+     * returns false. This makes the {@link #getNoiseWithSeed} methods avoid reseeding, and instead move their inputs
+     * around in space.
+     * @param seed a long or int seed, with no restrictions unless otherwise documented
+     */
+    public abstract void setSeed(long seed);
+
+    /**
+     * Gets the current seed of the generator, as a long even if the seed is stored internally as an int.
+     * If {@link #canUseSeed()} returns true, this must be implemented, but if canUseSeed() returns false, this is
+     * permitted to either still be implemented (but typically only if it is time- or space-intensive to call getSeed())
+     * or to throw an {@link UnsupportedOperationException}.
+     * @return the current seed, as a long
+     */
+    public abstract long getSeed();
+
+    /**
+     * Returns a typically-four-character String constant that should uniquely identify this RawNoise as well as possible.
+     * If a duplicate tag is already registered and {@link Serializer#register(RawNoise)} attempts to register the same
+     * tag again, a message is printed to {@code System.err}. The default implementation returns the String
+     * {@code (NO)}, which is already registered in Serializer to a null value. Implementing this is required for any
+     * usage of Serializer.
+     * @return a short String constant that identifies this RawNoise type
+     */
+    public abstract String getTag();
+
+    /**
+     * Produces a String that describes everything needed to recreate this RawNoise in full. This String can be read back
+     * in by {@link #stringDeserialize(String)} to reassign the described state to another RawNoise. The syntax here
+     * should always start and end with the {@code `} character, which is used by
+     * {@link #stringDeserialize(String)} to identify the portion of a String that can be read back. The
+     * {@code `} character should not be otherwise used unless to serialize another RawNoise that this uses.
+     * <br>
+     * The default implementation throws an {@link UnsupportedOperationException} only. RawNoise classes do not have to
+     * implement any serialization methods, but they aren't serializable by the methods in this class or in
+     * {@link Serializer} unless they do implement this, {@link #getTag()}, {@link #stringDeserialize(String)}, and
+     * {@link #copy()}.
+     * @return a String that describes this RawNoise for serialization
+     */
+    public abstract String stringSerialize();
+
+    /**
+     * Given a serialized String produced by {@link #stringSerialize()}, reassigns this RawNoise to have the described
+     * state from the given String. The serialized String must have been produced by the same class as this object is.
+     * <br>
+     * The default implementation throws an {@link UnsupportedOperationException} only. RawNoise classes do not have to
+     * implement any serialization methods, but they aren't serializable by the methods in this class or in
+     * {@link Serializer} unless they do implement this, {@link #getTag()}, {@link #stringSerialize()}, and
+     * {@link #copy()}.
+     * @param data a serialized String, typically produced by {@link #stringSerialize()}
+     * @return this RawNoise, after being modified (if possible)
+     */
+    public abstract RawNoise stringDeserialize(String data);
+
+    /**
+     * Creates a copy of this RawNoise, which should be a deep copy for any mutable state but can be shallow for immutable
+     * types such as functions. This almost always just calls a copy constructor.
+     * <br>
+     * The default implementation throws an {@link UnsupportedOperationException} only. Implementors are strongly
+     * encouraged to implement this in general, and that is required to use an RawNoise class with {@link Serializer}.
+     * @return a copy of this RawNoise
+     */
+    public abstract RawNoise copy();
+
+    /**
+     * Gets 2D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
+     * {@link #getNoise}; you can check if this will happen with {@link #canUseSeed()}.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     * @throws UnsupportedOperationException if 2D noise cannot be produced by this generator
+     */
+    public float getNoiseWithSeed(float x, float y, long seed) {
+        if(!canUseSeed()) {
+            float s = seed * 0x1p-48f;
+            return getNoise(x + s, y + s);
+        }
+        final long s = getSeed();
+        setSeed(seed);
+        final float r = getNoise(x, y);
+        setSeed(s);
+        return r;
+    }
+
+    /**
+     * Gets 3D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
+     * {@link #getNoise}; you can check if this will happen with {@link #canUseSeed()}.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @param z z position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     * @throws UnsupportedOperationException if 3D noise cannot be produced by this generator
+     */
+    public float getNoiseWithSeed(float x, float y, float z, long seed) {
+        if(!canUseSeed()) {
+            float s = seed * 0x1p-48f;
+            return getNoise(x + s, y + s, z + s);
+        }
+        final long s = getSeed();
+        setSeed(seed);
+        final float r = getNoise(x, y, z);
+        setSeed(s);
+        return r;
+    }
+
+    /**
+     * Gets 4D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
+     * {@link #getNoise}; you can check if this will happen with {@link #canUseSeed()}.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @param z z position; can be any finite float
+     * @param w w position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     * @throws UnsupportedOperationException if 4D noise cannot be produced by this generator
+     */
+    public float getNoiseWithSeed(float x, float y, float z, float w, long seed) {
+        if(!canUseSeed()) {
+            float s = seed * 0x1p-48f;
+            return getNoise(x + s, y + s, z + s, w + s);
+        }
+        final long s = getSeed();
+        setSeed(seed);
+        final float r = getNoise(x, y, z, w);
+        setSeed(s);
+        return r;
+    }
+
+    /**
+     * Gets 5D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
+     * {@link #getNoise}; you can check if this will happen with {@link #canUseSeed()}.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @param z z position; can be any finite float
+     * @param w w position; can be any finite float
+     * @param u u position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     * @throws UnsupportedOperationException if 5D noise cannot be produced by this generator
+     */
+    public float getNoiseWithSeed(float x, float y, float z, float w, float u, long seed) {
+        if(!canUseSeed()) {
+            float s = seed * 0x1p-48f;
+            return getNoise(x + s, y + s, z + s, w + s, u + s);
+        }
+        final long s = getSeed();
+        setSeed(seed);
+        final float r = getNoise(x, y, z, w, u);
+        setSeed(s);
+        return r;
+    }
+
+    /**
+     * Gets 6D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
+     * {@link #getNoise}; you can check if this will happen with {@link #canUseSeed()}.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @param z z position; can be any finite float
+     * @param w w position; can be any finite float
+     * @param u u position; can be any finite float
+     * @param v v position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     * @throws UnsupportedOperationException if 6D noise cannot be produced by this generator
+     */
+    public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, long seed) {
+        if(!canUseSeed()) {
+            float s = seed * 0x1p-48f;
+            return getNoise(x + s, y + s, z + s, w + s, u + s, v + s);
+        }
+        final long s = getSeed();
+        setSeed(seed);
+        final float r = getNoise(x, y, z, w, u, v);
+        setSeed(s);
+        return r;
+    }
+
+    /**
+     * Allows serializing {@link RawNoise} objects with {@link #serialize(RawNoise)} and deserializing them with
+     * {@link #deserialize(String)}. This requires an instance of the class to be serialized or deserialized to be
+     * registered using {@link #register(RawNoise)} (typically once, though registering multiple times isn't a problem).
+     * This is a purely-static utility class.
+     */
+    public static class Serializer {
+        /**
+         * Not instantiable.
+         */
+        private Serializer() {
+        }
+
+        private static final ObjectMap<String, RawNoise> NOISE_BY_TAG = new ObjectMap<>(16);
+
+        /**
+         * Given a (typically freshly-constructed and never-reused) RawNoise, this registers that instance by its
+         * {@link RawNoise#getTag()} in a Map, so that this type of RawNoise can be deserialized correctly by
+         * {@link #deserialize(String)}. The RawNoise type must implement {@link RawNoise#getTag()},
+         * {@link RawNoise#stringSerialize()}, {@link RawNoise#stringDeserialize(String)}, and {@link RawNoise#copy()}.
+         *
+         * @param random a (typically freshly-constructed) RawNoise that should never be reused elsewhere
+         */
+        public static void register(RawNoise random) {
+            String tag = random.getTag();
+            if (!NOISE_BY_TAG.containsKey(tag))
+                NOISE_BY_TAG.put(tag, random);
+            else
+                System.err.println("When registering an RawNoise, a duplicate tag failed to register: " + tag);
+        }
+
+        static {
+            NOISE_BY_TAG.put("(NO)", null); // for classes that cannot be serialized
+            // TODO: register every type of raw noise generator here
+        }
+
+        /**
+         * Gets a copy of the RawNoise registered with the given tag, or null if this has nothing registered for the
+         * given tag.
+         *
+         * @param tag a non-null String that could be used as a tag for an RawNoise registered with this class
+         * @return a new copy of the corresponding RawNoise, or null if none was found
+         */
+        public static RawNoise get(String tag) {
+            RawNoise r = NOISE_BY_TAG.get(tag);
+            if (r == null) return null;
+            return r.copy();
+        }
+
+        /**
+         * Given an RawNoise that implements {@link #stringSerialize()} and {@link #getTag()}, this produces a
+         * serialized String that stores the exact state of the RawNoise. This serialized String can be read back in by
+         * {@link #deserialize(String)}.
+         *
+         * @param noise an RawNoise that implements {@link #stringSerialize()} and {@link #getTag()}
+         * @return a String that can be read back in by {@link #deserialize(String)}
+         */
+        public static String serialize(RawNoise noise) {
+            return noise.getTag() + noise.stringSerialize();
+        }
+
+        /**
+         * Given a String produced by calling {@link #serialize(RawNoise)} on any registered implementation
+         * (as with {@link #register(RawNoise)}), this reads in the deserialized data and returns a new RawNoise
+         * of the appropriate type. This relies on the {@link RawNoise#getTag() tag} of the type being registered at
+         * deserialization time, though it doesn't actually need to be registered at serialization time. This cannot
+         * read back the direct output of {@link RawNoise#stringSerialize()}; it needs the tag prepended by
+         * {@link #serialize(RawNoise)} to work.
+         *
+         * @param data serialized String data probably produced by {@link #serialize(RawNoise)}
+         * @return a new RawNoise with the appropriate type internally, using the state from data
+         */
+        public static RawNoise deserialize(String data) {
+            int idx = data.indexOf('`');
+            if (idx == -1)
+                throw new IllegalArgumentException("String given cannot represent a valid RawNoise.");
+            String tagData = data.substring(0, idx);
+            RawNoise root = NOISE_BY_TAG.get(tagData);
+            if (root == null)
+                throw new RuntimeException("Tag in given data is invalid or unknown.");
+            return root.copy().stringDeserialize(data.substring(idx));
+        }
+
+    }
+}

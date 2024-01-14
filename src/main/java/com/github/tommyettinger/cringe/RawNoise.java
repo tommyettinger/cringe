@@ -312,6 +312,9 @@ public abstract class RawNoise {
         static {
             NOISE_BY_TAG.put("(NO)", null); // for classes that cannot be serialized
             // TODO: register every type of raw noise generator here
+            register(new ValueNoise(1));
+
+            register(new ContinuousNoise(new ValueNoise(1)));
         }
 
         /**

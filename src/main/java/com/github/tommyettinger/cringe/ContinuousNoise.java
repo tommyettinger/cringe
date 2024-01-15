@@ -46,7 +46,7 @@ public class ContinuousNoise extends RawNoise {
      * <br>
      * Meant to be used with {@link #setMode(int)}.
      */
-    public static final int RIDGED_MULTI = 2;
+    public static final int RIDGED = 2;
     /**
      * Layered octaves of noise, where each octave has a different frequency and weight, and the results of
      * earlier octaves affect the inputs to later octave calculations. Tends to look cloudy but with swirling
@@ -58,27 +58,27 @@ public class ContinuousNoise extends RawNoise {
 
 
     public RawNoise wrapped;
-    protected long seed;
+    protected int seed;
     public float frequency;
     public int mode;
     protected int octaves;
 
     public ContinuousNoise() {
-        this(new ValueNoise(123), 123L, 0.03125f, FBM, 1, false);
+        this(new ValueNoise(123), 123, 0.03125f, FBM, 1, false);
 
     }
 
     public ContinuousNoise(RawNoise toWrap){
-        this(toWrap, toWrap.canUseSeed() ? toWrap.getSeed() : 123L, 0.03125f, FBM, 1, false);
+        this(toWrap, toWrap.canUseSeed() ? toWrap.getSeed() : 123, 0.03125f, FBM, 1, false);
     }
 
     public ContinuousNoise(RawNoise toWrap, float frequency, int mode, int octaves){
-        this(toWrap, toWrap.canUseSeed() ? toWrap.getSeed() : 123L, frequency, mode, octaves, false);
+        this(toWrap, toWrap.canUseSeed() ? toWrap.getSeed() : 123, frequency, mode, octaves, false);
     }
-    public ContinuousNoise(RawNoise toWrap, long seed, float frequency, int mode, int octaves){
+    public ContinuousNoise(RawNoise toWrap, int seed, float frequency, int mode, int octaves){
         this(toWrap, seed, frequency, mode, octaves, false);
     }
-    public ContinuousNoise(RawNoise toWrap, long seed, float frequency, int mode, int octaves, boolean fractalSpiral){
+    public ContinuousNoise(RawNoise toWrap, int seed, float frequency, int mode, int octaves, boolean fractalSpiral){
         wrapped = toWrap;
         setSeed(seed);
         this.frequency = frequency;
@@ -112,7 +112,7 @@ public class ContinuousNoise extends RawNoise {
 
     /**
      * Wraps {@link #getFractalType()}.
-     * @return an int between 0 and 3, corresponding to {@link #FBM}, {@link #BILLOW}, {@link #RIDGED_MULTI}, or {@link #WARP}
+     * @return an int between 0 and 3, corresponding to {@link #FBM}, {@link #BILLOW}, {@link #RIDGED}, or {@link #WARP}
      */
     public int getMode() {
         return getFractalType();
@@ -120,7 +120,7 @@ public class ContinuousNoise extends RawNoise {
 
     /**
      * Wraps {@link #setFractalType(int)}
-     * @param mode an int between 0 and 3, corresponding to {@link #FBM}, {@link #BILLOW}, {@link #RIDGED_MULTI}, or {@link #WARP}
+     * @param mode an int between 0 and 3, corresponding to {@link #FBM}, {@link #BILLOW}, {@link #RIDGED}, or {@link #WARP}
      */
     public void setMode(int mode) {
         setFractalType(mode);
@@ -131,7 +131,7 @@ public class ContinuousNoise extends RawNoise {
     }
 
     /**
-     * @param mode an int between 0 and 3, corresponding to {@link #FBM}, {@link #BILLOW}, {@link #RIDGED_MULTI}, or {@link #WARP}
+     * @param mode an int between 0 and 3, corresponding to {@link #FBM}, {@link #BILLOW}, {@link #RIDGED}, or {@link #WARP}
      */
     public void setFractalType(int mode) {
         this.mode = mode;
@@ -197,7 +197,7 @@ public class ContinuousNoise extends RawNoise {
     public ContinuousNoise stringDeserialize(String data) {
         int pos = data.indexOf('`', data.indexOf('`', 2) + 1)+1;
         setWrapped(Serializer.deserialize(data.substring(1, pos)));
-        setSeed(MathSupport.longFromDec(data, pos+1, pos = data.indexOf('~', pos+2)));
+        setSeed(MathSupport.intFromDec(data, pos+1, pos = data.indexOf('~', pos+2)));
         setFrequency(MathSupport.floatFromDec(data, pos+1, pos = data.indexOf('~', pos+2)));
         setMode(MathSupport.intFromDec(data, pos+1, pos = data.indexOf('~', pos+2)));
         setOctaves(MathSupport.intFromDec(data, pos+1, pos = data.indexOf('`', pos+2)));
@@ -302,19 +302,19 @@ public class ContinuousNoise extends RawNoise {
     }
 
     @Override
-    public void setSeed(long seed) {
+    public void setSeed(int seed) {
         this.seed = seed;
         if(wrapped.canUseSeed())
             wrapped.setSeed(seed);
     }
 
     @Override
-    public long getSeed() {
+    public int getSeed() {
         return seed;
     }
 
     @Override
-    public float getNoiseWithSeed(float x, float y, long seed) {
+    public float getNoiseWithSeed(float x, float y, int seed) {
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, seed);
@@ -325,7 +325,7 @@ public class ContinuousNoise extends RawNoise {
     }
 
     @Override
-    public float getNoiseWithSeed(float x, float y, float z, long seed) {
+    public float getNoiseWithSeed(float x, float y, float z, int seed) {
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, seed);
@@ -336,7 +336,7 @@ public class ContinuousNoise extends RawNoise {
     }
 
     @Override
-    public float getNoiseWithSeed(float x, float y, float z, float w, long seed) {
+    public float getNoiseWithSeed(float x, float y, float z, float w, int seed) {
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, seed);
@@ -347,7 +347,7 @@ public class ContinuousNoise extends RawNoise {
     }
 
     @Override
-    public float getNoiseWithSeed(float x, float y, float z, float w, float u, long seed) {
+    public float getNoiseWithSeed(float x, float y, float z, float w, float u, int seed) {
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
@@ -358,7 +358,7 @@ public class ContinuousNoise extends RawNoise {
     }
 
     @Override
-    public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, long seed) {
+    public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, v * frequency, seed);
@@ -370,7 +370,7 @@ public class ContinuousNoise extends RawNoise {
 
     // 2D
     
-    protected float fbm(float x, float y, long seed) {
+    protected float fbm(float x, float y, int seed) {
         float sum = wrapped.getNoiseWithSeed(x, y, seed);
         float amp = 1;
 
@@ -384,7 +384,7 @@ public class ContinuousNoise extends RawNoise {
 
         return sum / (amp * ((1 << octaves) - 1));
     }
-    protected float billow(float x, float y, long seed) {
+    protected float billow(float x, float y, int seed) {
         float sum = Math.abs(wrapped.getNoiseWithSeed(x, y, seed)) * 2 - 1;
         float amp = 1;
 
@@ -399,7 +399,7 @@ public class ContinuousNoise extends RawNoise {
         return sum / (amp * ((1 << octaves) - 1));
     }
 
-    protected float ridged(float x, float y, long seed) {
+    protected float ridged(float x, float y, int seed) {
         float sum = 0f, exp = 1f, correction = 0f, spike;
         for (int i = 0; i < octaves; i++) {
             spike = 1f - Math.abs(wrapped.getNoiseWithSeed(x, y, seed + i));
@@ -411,7 +411,7 @@ public class ContinuousNoise extends RawNoise {
         return sum / correction - 1f;
     }
 
-    protected float warp(float x, float y, long seed) {
+    protected float warp(float x, float y, int seed) {
         float latest = wrapped.getNoiseWithSeed(x, y, seed);
         float sum = latest;
         float amp = 1;
@@ -431,7 +431,7 @@ public class ContinuousNoise extends RawNoise {
 
     // 3D
     
-    protected float fbm(float x, float y, float z, long seed) {
+    protected float fbm(float x, float y, float z, int seed) {
         float sum = wrapped.getNoiseWithSeed(x, y, z, seed);
         float amp = 1;
 
@@ -446,7 +446,7 @@ public class ContinuousNoise extends RawNoise {
 
         return sum / (amp * ((1 << octaves) - 1));
     }
-    protected float billow(float x, float y, float z, long seed) {
+    protected float billow(float x, float y, float z, int seed) {
         float sum = Math.abs(wrapped.getNoiseWithSeed(x, y, z, seed)) * 2 - 1;
         float amp = 1;
 
@@ -462,7 +462,7 @@ public class ContinuousNoise extends RawNoise {
         return sum / (amp * ((1 << octaves) - 1));
     }
 
-    protected float ridged(float x, float y, float z, long seed) {
+    protected float ridged(float x, float y, float z, int seed) {
         float sum = 0f, exp = 1f, correction = 0f, spike;
         for (int i = 0; i < octaves; i++) {
             spike = 1f - Math.abs(wrapped.getNoiseWithSeed(x, y, z, seed + i));
@@ -475,7 +475,7 @@ public class ContinuousNoise extends RawNoise {
         return sum / correction - 1f;
     }
 
-    protected float warp(float x, float y, float z, long seed) {
+    protected float warp(float x, float y, float z, int seed) {
         float latest = wrapped.getNoiseWithSeed(x, y, z, seed);
         float sum = latest;
         float amp = 1;
@@ -499,7 +499,7 @@ public class ContinuousNoise extends RawNoise {
 
     // 4D
     
-    protected float fbm(float x, float y, float z, float w, long seed) {
+    protected float fbm(float x, float y, float z, float w, int seed) {
         float sum = wrapped.getNoiseWithSeed(x, y, z, w, seed);
         float amp = 1;
 
@@ -515,7 +515,7 @@ public class ContinuousNoise extends RawNoise {
 
         return sum / (amp * ((1 << octaves) - 1));
     }
-    protected float billow(float x, float y, float z, float w, long seed) {
+    protected float billow(float x, float y, float z, float w, int seed) {
         float sum = Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, seed)) * 2 - 1;
         float amp = 1;
 
@@ -532,7 +532,7 @@ public class ContinuousNoise extends RawNoise {
         return sum / (amp * ((1 << octaves) - 1));
     }
 
-    protected float ridged(float x, float y, float z, float w, long seed) {
+    protected float ridged(float x, float y, float z, float w, int seed) {
         float sum = 0f, exp = 1f, correction = 0f, spike;
         for (int i = 0; i < octaves; i++) {
             spike = 1f - Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, seed + i));
@@ -546,7 +546,7 @@ public class ContinuousNoise extends RawNoise {
         return sum / correction - 1f;
     }
 
-    protected float warp(float x, float y, float z, float w, long seed) {
+    protected float warp(float x, float y, float z, float w, int seed) {
         float latest = wrapped.getNoiseWithSeed(x, y, z, w, seed);
         float sum = latest;
         float amp = 1;
@@ -572,7 +572,7 @@ public class ContinuousNoise extends RawNoise {
 
     // 5D
 
-    protected float fbm(float x, float y, float z, float w, float u, long seed) {
+    protected float fbm(float x, float y, float z, float w, float u, int seed) {
         float sum = wrapped.getNoiseWithSeed(x, y, z, w, u, seed);
         float amp = 1;
 
@@ -589,7 +589,7 @@ public class ContinuousNoise extends RawNoise {
 
         return sum / (amp * ((1 << octaves) - 1));
     }
-    protected float billow(float x, float y, float z, float w, float u, long seed) {
+    protected float billow(float x, float y, float z, float w, float u, int seed) {
         float sum = Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, u, seed)) * 2 - 1;
         float amp = 1;
 
@@ -607,7 +607,7 @@ public class ContinuousNoise extends RawNoise {
         return sum / (amp * ((1 << octaves) - 1));
     }
 
-    protected float ridged(float x, float y, float z, float w, float u, long seed) {
+    protected float ridged(float x, float y, float z, float w, float u, int seed) {
         float sum = 0f, exp = 1f, correction = 0f, spike;
         for (int i = 0; i < octaves; i++) {
             spike = 1f - Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, u, seed + i));
@@ -622,7 +622,7 @@ public class ContinuousNoise extends RawNoise {
         return sum / correction - 1f;
     }
 
-    protected float warp(float x, float y, float z, float w, float u, long seed) {
+    protected float warp(float x, float y, float z, float w, float u, int seed) {
         float latest = wrapped.getNoiseWithSeed(x, y, z, w, u, seed);
         float sum = latest;
         float amp = 1;
@@ -650,7 +650,7 @@ public class ContinuousNoise extends RawNoise {
 
     // 5D
 
-    protected float fbm(float x, float y, float z, float w, float u, float v, long seed) {
+    protected float fbm(float x, float y, float z, float w, float u, float v, int seed) {
         float sum = wrapped.getNoiseWithSeed(x, y, z, w, u, v, seed);
         float amp = 1;
 
@@ -668,7 +668,7 @@ public class ContinuousNoise extends RawNoise {
 
         return sum / (amp * ((1 << octaves) - 1));
     }
-    protected float billow(float x, float y, float z, float w, float u, float v, long seed) {
+    protected float billow(float x, float y, float z, float w, float u, float v, int seed) {
         float sum = Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, u, v, seed)) * 2 - 1;
         float amp = 1;
 
@@ -687,7 +687,7 @@ public class ContinuousNoise extends RawNoise {
         return sum / (amp * ((1 << octaves) - 1));
     }
 
-    protected float ridged(float x, float y, float z, float w, float u, float v, long seed) {
+    protected float ridged(float x, float y, float z, float w, float u, float v, int seed) {
         float sum = 0f, exp = 1f, correction = 0f, spike;
         for (int i = 0; i < octaves; i++) {
             spike = 1f - Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, u, v, seed + i));
@@ -703,7 +703,7 @@ public class ContinuousNoise extends RawNoise {
         return sum / correction - 1f;
     }
 
-    protected float warp(float x, float y, float z, float w, float u, float v, long seed) {
+    protected float warp(float x, float y, float z, float w, float u, float v, int seed) {
         float latest = wrapped.getNoiseWithSeed(x, y, z, w, u, v, seed);
         float sum = latest;
         float amp = 1;

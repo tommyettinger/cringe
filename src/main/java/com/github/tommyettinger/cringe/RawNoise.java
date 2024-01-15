@@ -38,9 +38,9 @@ public abstract class RawNoise {
     public abstract int getMaxDimension();
 
     /**
-     * Returns true if this generator can be seeded with {@link #setSeed(long)} (and if so, retrieved with
+     * Returns true if this generator can be seeded with {@link #setSeed(int)} (and if so, retrieved with
      * {@link #getSeed()}).
-     * @return true if {@link #setSeed(long)} and {@link #getSeed()} are supported, false if either isn't supported
+     * @return true if {@link #setSeed(int)} and {@link #getSeed()} are supported, false if either isn't supported
      */
     public abstract boolean canUseSeed();
     /**
@@ -99,26 +99,26 @@ public abstract class RawNoise {
     public abstract float getNoise(float x, float y, float z, float w, float u, float v);
 
     /**
-     * Sets the seed to the given long, if long seeds are supported, or {@code (int)seed} if only int seeds are
-     * supported. If {@link #canUseSeed()} returns true, this must be implemented and must set the seed given a long
+     * Sets the seed to the given int, if int seeds are
+     * supported. If {@link #canUseSeed()} returns true, this must be implemented and must set the seed given an int
      * input. If this generator cannot be seeded, this is permitted to either do nothing or throw an
      * {@link UnsupportedOperationException}. If this operation allocates or is time-intensive, then that performance
      * cost will be passed along to {@link #getNoiseWithSeed}, since that calls this twice unless overridden. In the
      * case where seeding is expensive to perform, setSeed() can still be implemented while {@link #canUseSeed()}
      * returns false. This makes the {@link #getNoiseWithSeed} methods avoid reseeding, and instead move their inputs
      * around in space.
-     * @param seed a long or int seed, with no restrictions unless otherwise documented
+     * @param seed an int seed, with no restrictions unless otherwise documented
      */
-    public abstract void setSeed(long seed);
+    public abstract void setSeed(int seed);
 
     /**
-     * Gets the current seed of the generator, as a long even if the seed is stored internally as an int.
+     * Gets the current seed of the generator, as an int.
      * If {@link #canUseSeed()} returns true, this must be implemented, but if canUseSeed() returns false, this is
      * permitted to either still be implemented (but typically only if it is time- or space-intensive to call getSeed())
      * or to throw an {@link UnsupportedOperationException}.
-     * @return the current seed, as a long
+     * @return the current seed, as an int
      */
-    public abstract long getSeed();
+    public abstract int getSeed();
 
     /**
      * Returns a typically-four-character String constant that should uniquely identify this RawNoise as well as possible.
@@ -176,12 +176,12 @@ public abstract class RawNoise {
      * @return a noise value between -1.0f and 1.0f, both inclusive
      * @throws UnsupportedOperationException if 2D noise cannot be produced by this generator
      */
-    public float getNoiseWithSeed(float x, float y, long seed) {
+    public float getNoiseWithSeed(float x, float y, int seed) {
         if(!canUseSeed()) {
             float s = seed * 0x1p-48f;
             return getNoise(x + s, y + s);
         }
-        final long s = getSeed();
+        final int s = getSeed();
         setSeed(seed);
         final float r = getNoise(x, y);
         setSeed(s);
@@ -197,12 +197,12 @@ public abstract class RawNoise {
      * @return a noise value between -1.0f and 1.0f, both inclusive
      * @throws UnsupportedOperationException if 3D noise cannot be produced by this generator
      */
-    public float getNoiseWithSeed(float x, float y, float z, long seed) {
+    public float getNoiseWithSeed(float x, float y, float z, int seed) {
         if(!canUseSeed()) {
             float s = seed * 0x1p-48f;
             return getNoise(x + s, y + s, z + s);
         }
-        final long s = getSeed();
+        final int s = getSeed();
         setSeed(seed);
         final float r = getNoise(x, y, z);
         setSeed(s);
@@ -219,12 +219,12 @@ public abstract class RawNoise {
      * @return a noise value between -1.0f and 1.0f, both inclusive
      * @throws UnsupportedOperationException if 4D noise cannot be produced by this generator
      */
-    public float getNoiseWithSeed(float x, float y, float z, float w, long seed) {
+    public float getNoiseWithSeed(float x, float y, float z, float w, int seed) {
         if(!canUseSeed()) {
             float s = seed * 0x1p-48f;
             return getNoise(x + s, y + s, z + s, w + s);
         }
-        final long s = getSeed();
+        final int s = getSeed();
         setSeed(seed);
         final float r = getNoise(x, y, z, w);
         setSeed(s);
@@ -242,12 +242,12 @@ public abstract class RawNoise {
      * @return a noise value between -1.0f and 1.0f, both inclusive
      * @throws UnsupportedOperationException if 5D noise cannot be produced by this generator
      */
-    public float getNoiseWithSeed(float x, float y, float z, float w, float u, long seed) {
+    public float getNoiseWithSeed(float x, float y, float z, float w, float u, int seed) {
         if(!canUseSeed()) {
             float s = seed * 0x1p-48f;
             return getNoise(x + s, y + s, z + s, w + s, u + s);
         }
-        final long s = getSeed();
+        final int s = getSeed();
         setSeed(seed);
         final float r = getNoise(x, y, z, w, u);
         setSeed(s);
@@ -266,12 +266,12 @@ public abstract class RawNoise {
      * @return a noise value between -1.0f and 1.0f, both inclusive
      * @throws UnsupportedOperationException if 6D noise cannot be produced by this generator
      */
-    public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, long seed) {
+    public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
         if(!canUseSeed()) {
             float s = seed * 0x1p-48f;
             return getNoise(x + s, y + s, z + s, w + s, u + s, v + s);
         }
-        final long s = getSeed();
+        final int s = getSeed();
         setSeed(seed);
         final float r = getNoise(x, y, z, w, u, v);
         setSeed(s);

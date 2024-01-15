@@ -37,10 +37,6 @@ public class ValueNoise extends RawNoise {
         this.seed = seed;
     }
 
-    public ValueNoise(long seed) {
-        this.seed = (int) seed;
-    }
-
     @Override
     public String getTag() {
         return "ValN";
@@ -673,41 +669,41 @@ public class ValueNoise extends RawNoise {
     }
 
     @Override
-    public void setSeed(long seed) {
-        this.seed = (int)seed;
+    public void setSeed(int seed) {
+        this.seed = seed;
     }
 
     @Override
-    public long getSeed() {
+    public int getSeed() {
         return seed;
     }
 
     @Override
-    public float getNoiseWithSeed(float x, float y, long seed) {
-        return valueNoise(x, y, (int) seed);
+    public float getNoiseWithSeed(float x, float y, int seed) {
+        return valueNoise(x, y, seed);
     }
 
     @Override
-    public float getNoiseWithSeed(float x, float y, float z, long seed) {
-        return valueNoise(x, y, z, (int) seed);
+    public float getNoiseWithSeed(float x, float y, float z, int seed) {
+        return valueNoise(x, y, z, seed);
     }
 
     @Override
-    public float getNoiseWithSeed(float x, float y, float z, float w, long seed) {
-        return valueNoise(x, y, z, w, (int) seed);
+    public float getNoiseWithSeed(float x, float y, float z, float w, int seed) {
+        return valueNoise(x, y, z, w, seed);
     }
 
     @Override
-    public float getNoiseWithSeed(float x, float y, float z, float w, float u, long seed) {
-        return valueNoise(x, y, z, w, u, (int) seed);
+    public float getNoiseWithSeed(float x, float y, float z, float w, float u, int seed) {
+        return valueNoise(x, y, z, w, u, seed);
     }
 
     @Override
-    public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, long seed) {
-        return valueNoise(x, y, z, w, u, v, (int) seed);
+    public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
+        return valueNoise(x, y, z, w, u, v, seed);
     }
 
-    public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, float m, long seed) {
-        return valueNoise(x, y, z, w, u, v, m, (int) seed);
+    public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, float m, int seed) {
+        return valueNoise(x, y, z, w, u, v, m, seed);
     }
 }

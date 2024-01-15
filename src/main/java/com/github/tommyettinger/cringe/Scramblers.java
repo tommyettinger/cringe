@@ -41,8 +41,8 @@ import com.badlogic.gdx.utils.NumberUtils;
  * <br>
  * Most of the scramble methods uses the MX3 unary hash by Jon Maiga, and XOR the input with 0xABC98388FB8FAC03L before
  * using MX3. <a href="https://github.com/jonmaiga/mx3">MX3 was provided here</a> and is public domain.
- * The {@link #scrambleInt(int)} method uses the
- * <a href="https://github.com/skeeto/hash-prospector#three-round-functions">triple32 unary hash</a>, found by
+ * The {@link #scrambleInt(int)} method uses a
+ * <a href="https://github.com/skeeto/hash-prospector#three-round-functions">three-round unary hash</a>, found by
  * Christopher Wellons' hash-prospector tool. The hash64 methods are based on an early version of wyhash,
  * <a href="https://github.com/wangyi-fudan/wyhash/blob/version_1/wyhash.h">source here</a>,
  * but have diverged significantly. The general style of wyhash has been very influential in the hash64 methods.
@@ -83,20 +83,32 @@ public final class Scramblers {
      * It is currently unknown if this has any fixed-points (inputs that produce an identical output), but
      * a step is taken at the start of the function to eliminate one major known fixed-point at 0.
      * <br>
-     * This uses the <a href="https://github.com/skeeto/hash-prospector#three-round-functions">triple32 unary hash</a>,
-     * but XORs the input with 0xFB8FAC03L before using the hash.
-     * @param x any long, to be scrambled
-     * @return a scrambled long derived from {@code x}
+     * Care has been taken to make this return the same results on GWT as it does elsewhere
+     * <br>
+     * This uses the <a href="https://github.com/skeeto/hash-prospector#three-round-functions">third unary hash</a> in
+     * the three-round function table, but XORs the input with 0xFB8FAC03L before using the hash.
+     * @param x any int, to be scrambled
+     * @return a scrambled int derived from {@code x}
      */
     public static int scrambleInt(int x) {
         x ^= 0xFB8FAC03;
-        x ^= x >>> 17;
-        x *= 0xED5AD4BB;
-        x ^= x >>> 11;
-        x *= 0xAC4C1B51;
+        // This block could be used instead of the uncommented one if not targeting GWT.
+//        x ^= x >>> 16;
+//        x *= 0x236F7153;
+//        x ^= x >>> 12;
+//        x *= 0x33CD8663;
+//        x ^= x >>> 15;
+//        x *= 0x3E06B66B;
+//        x ^= x >>> 16;
+        // This block splits up the large multipliers into smaller factors. All but the last factor is composite.
+        // Because no factor is larger than 2 to the 20, none of the multiplications incur precision loss on GWT.
+        x ^= x >>> 16;
+        x = (x * 0x00003A3B | 0) * 0x00009BC9;
+        x ^= x >>> 12;
+        x = (x * 0x0000B86B | 0) * 0x000047E9;
         x ^= x >>> 15;
-        x *= 0x31848BAB;
-        x ^= x >>> 14;
+        x = (x * 0x00003597 | 0) * 0x0001284D;
+        x ^= x >>> 16;
         return x;
     }
 

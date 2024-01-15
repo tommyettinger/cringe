@@ -23,7 +23,8 @@ import com.badlogic.gdx.utils.NumberUtils;
  * Static methods that can take any {@code long} as input and produce a very different, but deterministically chosen,
  * number of some type. The simplest of these conceptually is {@link #scramble(long)}, which takes a long and returns
  * a different long (well, almost always different; there may be some value that makes scramble() return its input).
- * You can pass any long to scramble() and can get any long in return. There is also {@link #scrambleBounded(long, int)}
+ * You can pass any long to scramble() and can get any long in return. There is also {@link #scrambleInt(int)} when you
+ * have an int instead of a long as input, and want any int potentially returned, {@link #scrambleBounded(long, int)}
  * when you want an int outer bound (for this, the inner bound is always 0), {@link #scrambleLong(long, long, long)}
  * when you want a larger range of bounded values or need to specify arbitrary inner and outer bounds,
  * {@link #scrambleFloat(long)}/{@link #scrambleDouble(long)} to generate floating-point values between 0 and 1, and
@@ -32,9 +33,17 @@ import com.badlogic.gdx.utils.NumberUtils;
  * the inputs is to reverse each operation in the specific scramble function and hope you have enough bits to detect any
  * bias present.
  * <br>
- * Each of the scramble methods uses the MX3 unary hash by Jon Maiga, but XORs the input with 0xABC98388FB8FAC03L before
- * using MX3. <a href="https://github.com/jonmaiga/mx3">MX3 was provided here</a> and is public domain. The hash64
- * methods are based on an early version of wyhash,
+ * There are also a few non-cryptographic hashing methods here; these take any long seed and any CharSequence, and
+ * return a long. These methods should usually be faster than {@link String#hashCode()} for large String inputs, and are
+ * certainly more useful when you only have a {@link StringBuilder}, since it doesn't have any way to get a hash code by
+ * the value of its contents (only by its referential identity). They are expected to be much slower on GWT, because all
+ * math on long values is so much slower there.
+ * <br>
+ * Most of the scramble methods uses the MX3 unary hash by Jon Maiga, and XOR the input with 0xABC98388FB8FAC03L before
+ * using MX3. <a href="https://github.com/jonmaiga/mx3">MX3 was provided here</a> and is public domain.
+ * The {@link #scrambleInt(int)} method uses the
+ * <a href="https://github.com/skeeto/hash-prospector#three-round-functions">triple32 unary hash</a>, found by
+ * Christopher Wellons' hash-prospector tool. The hash64 methods are based on an early version of wyhash,
  * <a href="https://github.com/wangyi-fudan/wyhash/blob/version_1/wyhash.h">source here</a>,
  * but have diverged significantly. The general style of wyhash has been very influential in the hash64 methods.
  */
@@ -65,6 +74,30 @@ public final class Scramblers {
         x ^= x >>> 32;
         x *= 0xBEA225F9EB34556DL;
         return x ^ x >>> 29;
+    }
+
+    /**
+     * Given an int {@code x}, this randomly scrambles x, so it is (almost always) a very different int.
+     * This can take any int and can return any int.
+     * <br>
+     * It is currently unknown if this has any fixed-points (inputs that produce an identical output), but
+     * a step is taken at the start of the function to eliminate one major known fixed-point at 0.
+     * <br>
+     * This uses the <a href="https://github.com/skeeto/hash-prospector#three-round-functions">triple32 unary hash</a>,
+     * but XORs the input with 0xFB8FAC03L before using the hash.
+     * @param x any long, to be scrambled
+     * @return a scrambled long derived from {@code x}
+     */
+    public static int scrambleInt(int x) {
+        x ^= 0xFB8FAC03;
+        x ^= x >>> 17;
+        x *= 0xED5AD4BB;
+        x ^= x >>> 11;
+        x *= 0xAC4C1B51;
+        x ^= x >>> 15;
+        x *= 0x31848BAB;
+        x ^= x >>> 14;
+        return x;
     }
 
     /**

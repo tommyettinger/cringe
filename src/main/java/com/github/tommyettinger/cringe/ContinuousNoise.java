@@ -64,21 +64,18 @@ public class ContinuousNoise extends RawNoise {
     protected int octaves;
 
     public ContinuousNoise() {
-        this(new ValueNoise(123), 123, 0.03125f, FBM, 1, false);
+        this(new ValueNoise(123), 123, 0.03125f, FBM, 1);
 
     }
 
     public ContinuousNoise(RawNoise toWrap){
-        this(toWrap, toWrap.canUseSeed() ? toWrap.getSeed() : 123, 0.03125f, FBM, 1, false);
+        this(toWrap, toWrap.canUseSeed() ? toWrap.getSeed() : 123, 0.03125f, FBM, 1);
     }
 
     public ContinuousNoise(RawNoise toWrap, float frequency, int mode, int octaves){
-        this(toWrap, toWrap.canUseSeed() ? toWrap.getSeed() : 123, frequency, mode, octaves, false);
+        this(toWrap, toWrap.canUseSeed() ? toWrap.getSeed() : 123, frequency, mode, octaves);
     }
     public ContinuousNoise(RawNoise toWrap, int seed, float frequency, int mode, int octaves){
-        this(toWrap, seed, frequency, mode, octaves, false);
-    }
-    public ContinuousNoise(RawNoise toWrap, int seed, float frequency, int mode, int octaves, boolean fractalSpiral){
         wrapped = toWrap;
         setSeed(seed);
         this.frequency = frequency;

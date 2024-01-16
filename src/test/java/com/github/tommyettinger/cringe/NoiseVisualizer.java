@@ -60,7 +60,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
     private InputAdapter input;
     
     private Viewport view;
-    private int ctr = -256;
+    private float ctr = -256;
     private boolean keepGoing = true;
     
     private AnimatedGif gif;
@@ -165,7 +165,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     case P: //pause
                         keepGoing = !keepGoing;
                     case SPACE:
-                        ctr++;
+                        ctr += 1f/60f;
                         break;
                     case E: //earlier seed
                         noise.setSeed( noise.getSeed() - 1);
@@ -218,7 +218,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
 
     public void putMap() {
         renderer.begin(view.getCamera().combined, GL_POINTS);
-        float bright, c = ctr * 0.1f;
+        float bright, c = ctr * 16f;
         switch (dim) {
             case 0:
                 for (int x = 0; x < width; x++) {
@@ -286,7 +286,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             // standard clear the background routine for libGDX
             Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-            ctr++;
+            ctr += Gdx.graphics.getDeltaTime();
             putMap();
         }
     }

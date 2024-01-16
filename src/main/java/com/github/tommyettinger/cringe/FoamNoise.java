@@ -79,7 +79,7 @@ public class FoamNoise extends RawNoise {
         xin = p0;
         yin = p1;
         final float c = 0.5f * valueNoise(xin + b, yin, seed ^ 0xEDB6A8EF);
-        final float result = (a + b + c) * 0.3333333333333333f;
+        final float result = (a + b + c) * 0.3333333333333333f + 0.5f;
         // Barron spline
         final float sharp = 0.75f * 2.2f; // increase to sharpen, decrease to soften
         final float diff = 0.5f - result;
@@ -132,7 +132,7 @@ public class FoamNoise extends RawNoise {
         yin = p1;
         zin = p2;
         final float d = 0.5f * valueNoise(xin + c, yin, zin, seed ^ 0x51D00B65);
-        final float result = (a + b + c + d) * 0.25f;
+        final float result = (a + b + c + d) * 0.25f + 0.5f;
         // Barron spline
         final float sharp = 0.75f * 3.3f; // increase to sharpen, decrease to soften
         final float diff = 0.5f - result;
@@ -197,7 +197,7 @@ public class FoamNoise extends RawNoise {
         win = p3;
         final float e = 0.5f * valueNoise(xin + d, yin, zin, win, seed ^ 0x6F88983F);
 
-        final float result = (a + b + c + d + e) * 0.2f;
+        final float result = (a + b + c + d + e) * 0.2f + 0.5f;
         // Barron spline
         final float sharp = 0.75f * 4.4f; // increase to sharpen, decrease to soften
         final float diff = 0.5f - result;
@@ -279,7 +279,7 @@ public class FoamNoise extends RawNoise {
         uin = p4;
         final float f = 0.5f * valueNoise(xin + e, yin, zin, win, uin, seed ^ 0xB7D03F7B);
 
-        final float result = (a + b + c + d + e + f) * 0.16666666666666666f;
+        final float result = (a + b + c + d + e + f) * 0.16666666666666666f + 0.5f;
         final float sharp = 0.75f * 5.5f;
         final float diff = 0.5f - result;
         final int sign = NumberUtils.floatToRawIntBits(diff) >> 31, one = sign | 1;
@@ -374,7 +374,7 @@ public class FoamNoise extends RawNoise {
         uin = p4;
         vin = p0;
         final float g = 0.5f * valueNoise(xin + f, yin, zin, win, uin, vin, seed ^ 0x0B04AB1B);
-        final float result = (a + b + c + d + e + f + g) * 0.14285714285714285f;
+        final float result = (a + b + c + d + e + f + g) * 0.14285714285714285f + 0.5f;
         final float sharp = 0.75f * 6.6f;
         final float diff = 0.5f - result;
         final int sign = NumberUtils.floatToRawIntBits(diff) >> 31, one = sign | 1;

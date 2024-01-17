@@ -28,6 +28,8 @@ public class HoneyNoise extends RawNoise {
 
     public int seed = 0xBEEFD1CE;
 
+    private static final float MUL = 0.2f, ADD = (1f - MUL) * 2f;
+
     public HoneyNoise() {
     }
 
@@ -103,31 +105,31 @@ public class HoneyNoise extends RawNoise {
     @Override
     public float getNoise(float x, float y) {
         float n = (valueNoise(x, y, seed) + noise(x, y, seed));
-        return n / (0.6f * Math.abs(n) + 0.8f);
+        return n / (MUL * Math.abs(n) + ADD);
     }
 
     @Override
     public float getNoise(float x, float y, float z) {
         float n = (valueNoise(x, y, z, seed) + noise(x, y, z, seed));
-        return n / (0.6f * Math.abs(n) + 0.8f);
+        return n / (MUL * Math.abs(n) + ADD);
     }
 
     @Override
     public float getNoise(float x, float y, float z, float w) {
         float n = (valueNoise(x, y, z, w, seed) + noise(x, y, z, w, seed));
-        return n / (0.6f * Math.abs(n) + 0.8f);
+        return n / (MUL * Math.abs(n) + ADD);
     }
 
     @Override
     public float getNoise(float x, float y, float z, float w, float u) {
         float n = (valueNoise(x, y, z, w, u, seed) + noise(x, y, z, w, u, seed));
-        return n / (0.6f * Math.abs(n) + 0.8f);
+        return n / (MUL * Math.abs(n) + ADD);
     }
 
     @Override
     public float getNoise(float x, float y, float z, float w, float u, float v) {
         float n = (valueNoise(x, y, z, w, u, v, seed) + noise(x, y, z, w, u, v, seed));
-        return n / (0.6f * Math.abs(n) + 0.8f);
+        return n / (MUL * Math.abs(n) + ADD);
     }
 
     @Override
@@ -143,30 +145,30 @@ public class HoneyNoise extends RawNoise {
     @Override
     public float getNoiseWithSeed(float x, float y, int seed) {
         float n = (valueNoise(x, y, seed) + noise(x, y, seed));
-        return n / (0.6f * Math.abs(n) + 0.8f);
+        return n / (MUL * Math.abs(n) + ADD);
     }
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, int seed) {
         float n = (valueNoise(x, y, z, seed) + noise(x, y, z, seed));
-        return n / (0.6f * Math.abs(n) + 0.8f);
+        return n / (MUL * Math.abs(n) + ADD);
     }
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, int seed) {
         float n = (valueNoise(x, y, z, w, seed) + noise(x, y, z, w, seed));
-        return n / (0.6f * Math.abs(n) + 0.8f);
+        return n / (MUL * Math.abs(n) + ADD);
     }
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, int seed) {
         float n = (valueNoise(x, y, z, w, u, seed) + noise(x, y, z, w, u, seed));
-        return n / (0.6f * Math.abs(n) + 0.8f);
+        return n / (MUL * Math.abs(n) + ADD);
     }
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
         float n = (valueNoise(x, y, z, w, u, v, seed) + noise(x, y, z, w, u, v, seed));
-        return n / (0.6f * Math.abs(n) + 0.8f);
+        return n / (MUL * Math.abs(n) + ADD);
     }
 }

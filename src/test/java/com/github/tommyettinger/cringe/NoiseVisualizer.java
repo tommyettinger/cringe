@@ -47,8 +47,10 @@ public class NoiseVisualizer extends ApplicationAdapter {
             new PerlinNoise(1),
             new SimplexNoise(1),
             new HoneyNoise(1),
+            new CyclicNoise(1, 3),
+            new SorbetNoise(1, 3),
     };
-    int noiseIndex = 4;
+    int noiseIndex = 5;
     private int dim = 0; // this can be 0, 1, 2, 3, or 4; add 2 to get the actual dimensions
     private int octaves = 0;
     private float freq = 0x1p-4f;
@@ -104,7 +106,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                         for (int c = 0; c < 256; c++) {
                             int w = 256, h = 256;
                             float halfW = (w-1) * 0.5f, halfH = (h-1) * 0.5f, inv = 1f / w;
-                            float cDeg = c * (360f/256f), cSin = MathUtils.sinDeg(cDeg) * 24, cCos = MathUtils.cosDeg(cDeg) * 24;
+                            float cDeg = c * (360f/256f), cSin = MathUtils.sinDeg(cDeg) * 40, cCos = MathUtils.cosDeg(cDeg) * 40;
                             Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                             for (int x = 0; x < w; x++) {
                                 for (int y = 0; y < h; y++) {

@@ -339,4 +339,21 @@ public final class RotationSupport {
     public static float[] randomRotation7D(long seed, float[] rotation6D) {
         return rotateStep(seed, rotation6D, 7);
     }
+
+    /**
+     * Iteratively calculates a rotation matrix for the given {@code dimension}, randomly generating it with the given
+     * {@code seed}.
+     * @param seed any long; will be scrambled
+     * @param dimension will be clamped to at minimum 2, but there is technically no maximum
+     * @return a newly-allocated {@code dimension * dimension}-element float array, meant as effectively a
+     * {@code dimension}-D rotation matrix
+     */
+    public static float[] randomRotationArbitrary(long seed, int dimension) {
+        dimension = Math.max(2, dimension);
+        float[] base = randomRotation2D(seed);
+        for (int d = 3; d <= dimension; d++) {
+            base = rotateStep(seed += d, base, d);
+        }
+        return base;
+    }
 }

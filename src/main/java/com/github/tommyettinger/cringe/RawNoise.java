@@ -16,13 +16,15 @@
 
 package com.github.tommyettinger.cringe;
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
 
 /**
  * Defines the core operations to generate continuous noise with a specific algorithm, and declares what properties of
  * noise are supported by that algorithm.
  */
-public abstract class RawNoise {
+public abstract class RawNoise implements Json.Serializable{
     /**
      * Gets the minimum dimension supported by this generator, such as 2 for a generator that only is defined for flat
      * surfaces, or 3 for one that is only defined for 3D or higher-dimensional spaces.
@@ -278,6 +280,57 @@ public abstract class RawNoise {
         return r;
     }
 
+    @Override
+    public void write(Json json) {
+        json.writeValue("n", stringSerialize());
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        stringDeserialize(jsonData.getString("n"));
+    }
+
+    /**
+     * Writes the state of this GdxRandom instance into a String JsonValue. This overload does not write to a child
+     * of the given JsonValue, and instead {@link JsonValue#set(String) sets} the JsonValue directly.
+     * @param modifying the JsonValue that will have this added as a child using the given key name
+     */
+    public void writeToJsonValue(JsonValue modifying) {
+        modifying.set(stringSerialize());
+    }
+
+    /**
+     * Reads the state of this GdxRandom instance from a String JsonValue.
+     * @param value the JsonValue that this will look the given key name up in
+     */
+    public void readFromJsonValue(JsonValue value) {
+        String string = value.asString();
+        if(string != null) {
+            stringDeserialize(string);
+        }
+    }
+
+    /**
+     * Writes the state of this GdxRandom instance into a String child of the given JsonValue.
+     * @param parent the JsonValue that will have this added as a child using the given key name
+     * @param key the name to store the GdxRandom into
+     */
+    public void writeToJsonValue(JsonValue parent, String key) {
+        parent.addChild(key, new JsonValue(stringSerialize()));
+    }
+
+    /**
+     * Reads the state of this GdxRandom instance from a String child of the given JsonValue.
+     * @param parent the JsonValue that this will look the given key name up in
+     * @param key the name to read the GdxRandom data from
+     */
+    public void readFromJsonValue(JsonValue parent, String key) {
+        String string = parent.getString(key, null);
+        if(string != null) {
+            stringDeserialize(string);
+        }
+    }
+
     /**
      * Allows serializing {@link RawNoise} objects with {@link #serialize(RawNoise)} and deserializing them with
      * {@link #deserialize(String)}. This requires an instance of the class to be serialized or deserialized to be
@@ -363,6 +416,5 @@ public abstract class RawNoise {
                 throw new RuntimeException("Tag in given data is invalid or unknown.");
             return root.copy().stringDeserialize(data.substring(idx));
         }
-
     }
 }

@@ -17,10 +17,11 @@
 package com.github.tommyettinger.cringe;
 
 /**
- * A mix of {@link CyclicNoise} with Simplex noise; much less periodic than CyclicNoise alone. Largely based upon
+ * A mix of {@link CyclicNoise} with {@link SimplexNoise}; much less periodic than CyclicNoise alone. Largely based upon
  * <a href="https://www.shadertoy.com/view/3tcyD7">this ShaderToy by jeyko</a>, which in turn is based on
  * <a href="https://www.shadertoy.com/view/wl3czN">this ShaderToy by nimitz</a>. This uses cyclic noise with a
  * dimension one higher than requested, and uses a call to {@link SimplexNoise#noise} to fill that parameter.
+ * This is currently the slowest type of noise here, but it looks decent in 2D, unlike {@link CyclicNoise}.
  */
 public class SorbetNoise extends CyclicNoise {
 

@@ -180,7 +180,7 @@ public abstract class RawNoise implements Json.Serializable{
      */
     public float getNoiseWithSeed(float x, float y, int seed) {
         if(!canUseSeed()) {
-            float s = seed * 0x1p-48f;
+            float s = seed * 0x1p-16f;
             return getNoise(x + s, y + s);
         }
         final int s = getSeed();
@@ -201,7 +201,7 @@ public abstract class RawNoise implements Json.Serializable{
      */
     public float getNoiseWithSeed(float x, float y, float z, int seed) {
         if(!canUseSeed()) {
-            float s = seed * 0x1p-48f;
+            float s = seed * 0x1p-16f;
             return getNoise(x + s, y + s, z + s);
         }
         final int s = getSeed();
@@ -223,7 +223,7 @@ public abstract class RawNoise implements Json.Serializable{
      */
     public float getNoiseWithSeed(float x, float y, float z, float w, int seed) {
         if(!canUseSeed()) {
-            float s = seed * 0x1p-48f;
+            float s = seed * 0x1p-16f;
             return getNoise(x + s, y + s, z + s, w + s);
         }
         final int s = getSeed();
@@ -246,7 +246,7 @@ public abstract class RawNoise implements Json.Serializable{
      */
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, int seed) {
         if(!canUseSeed()) {
-            float s = seed * 0x1p-48f;
+            float s = seed * 0x1p-16f;
             return getNoise(x + s, y + s, z + s, w + s, u + s);
         }
         final int s = getSeed();
@@ -270,7 +270,7 @@ public abstract class RawNoise implements Json.Serializable{
      */
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
         if(!canUseSeed()) {
-            float s = seed * 0x1p-48f;
+            float s = seed * 0x1p-16f;
             return getNoise(x + s, y + s, z + s, w + s, u + s, v + s);
         }
         final int s = getSeed();

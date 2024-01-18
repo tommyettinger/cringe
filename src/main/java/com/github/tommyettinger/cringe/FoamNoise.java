@@ -25,6 +25,9 @@ import static com.github.tommyettinger.cringe.ValueNoise.valueNoise;
  * This is a very-smooth type of noise that can work well using fewer octaves than simplex noise or value noise.
  * It also tends to look similar in lower dimensions and higher dimensions, where some other kinds of noise (such as
  * SimplexNoise) change their appearance quite a bit in 2D vs. 6D.
+ * <br>
+ * This tends to be a fairly slow noise to generate, but isn't the slowest here. It also tends to look more like a
+ * natural "thing" than a geometric shape, even with just one octave.
  */
 public class FoamNoise extends RawNoise {
 

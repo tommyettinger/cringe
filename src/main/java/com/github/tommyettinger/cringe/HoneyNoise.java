@@ -20,7 +20,8 @@ import static com.github.tommyettinger.cringe.SimplexNoise.noise;
 import static com.github.tommyettinger.cringe.ValueNoise.valueNoise;
 
 /**
- * An INoise implementation that combines and accentuates {@link SimplexNoise} and {@link ValueNoise}.
+ * An INoise implementation that combines and accentuates {@link SimplexNoise} and {@link ValueNoise}. This tends to be
+ * faster than {@link FoamNoise} but slower than {@link SimplexNoise}, with quality a bit better than SimplexNoise.
  */
 public class HoneyNoise extends RawNoise {
 

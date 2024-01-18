@@ -26,8 +26,8 @@ import static com.badlogic.gdx.math.MathUtils.sin;
 /**
  * A periodic type of continuous noise that looks good when frequencies are low, and rather bad when frequencies are
  * high. From <a href="https://www.shadertoy.com/view/3tcyD7">this ShaderToy by jeyko</a>, based on
- * <a href="https://www.shadertoy.com/view/wl3czN">this ShaderToy by nimitz</a>. It's hard to tell, but it seems like
- * this might be rather fast, especially when more octaves or a higher dimension are needed.
+ * <a href="https://www.shadertoy.com/view/wl3czN">this ShaderToy by nimitz</a>. This is currently the second-slowest
+ * noise here; only {@link SorbetNoise}, which subclasses this, is slower.
  */
 public class CyclicNoise extends RawNoise {
     /* // Mostly the original GLSL code, with few changes, for comparison and archival purposes.

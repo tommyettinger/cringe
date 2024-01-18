@@ -19,7 +19,10 @@ package com.github.tommyettinger.cringe;
 import com.badlogic.gdx.math.MathUtils;
 
 /**
- * A RawNoise type that produces blocky noise from 1D to 7D.
+ * A RawNoise type that produces blocky noise from 1D to 7D. Value noise is really only meant to be used as a building
+ * block for better noise, be that with multiple octaves of value noise (and it takes more, typically, to get good
+ * results), or by doing what things like {@link HoneyNoise} and {@link FoamNoise} do, mixing value noise with a
+ * different algorithm or in a complex way. It is, however, quite fast, especially in low dimensions.
  */
 public class ValueNoise extends RawNoise {
 

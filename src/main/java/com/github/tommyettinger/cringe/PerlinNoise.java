@@ -37,6 +37,9 @@ import static com.github.tommyettinger.cringe.GradientVectors.*;
  * the somewhat-flawed gradient vectors used in earlier iterations of this PerlinNoise permitted a very different range
  * calculation, and so this class uses a carefully-crafted sigmoid function to move around the most frequent values to
  * roughly match earlier Perlin Noise results, but without risking going out-of-range.
+ * <br>
+ * Perlin noise is rather fast, especially in 2D and 3D, and keeps a decent quality in higher dimensions. It tends to
+ * look drastically better if you use it with 2 or more octaves than if you only use 1 octave.
  */
 public class PerlinNoise extends RawNoise {
     public static final PerlinNoise instance = new PerlinNoise();

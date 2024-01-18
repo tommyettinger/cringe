@@ -24,6 +24,9 @@ import static com.github.tommyettinger.cringe.PointHasher.hash32;
  * which isn't always guaranteed to produce a value in the -1 to 1 range for 4D, 5D, or 6D noise. Because this has to
  * scale by a rather small constant in 4D and up, the mostly-mid-range results for those dimensions are run through a
  * gain function that sharpens the result, making high and low values more common than they would otherwise be.
+ * <br>
+ * Simplex noise is very fast, especially in 2D and 3D, but loses quality somewhat in higher dimensions. It tends to
+ * look drastically better if you use it with 2 or more octaves than if you only use 1 octave.
  */
 public class SimplexNoise extends RawNoise {
 

@@ -50,11 +50,11 @@ public class NoiseVisualizer extends ApplicationAdapter {
             new CyclicNoise(1, 3),
             new SorbetNoise(1, 3),
     };
-    int noiseIndex = 5;
-    private int dim = 0; // this can be 0, 1, 2, 3, or 4; add 2 to get the actual dimensions
-    private int octaves = 0;
+    int noiseIndex = 6;
+    private int dim = 1; // this can be 0, 1, 2, 3, or 4; add 2 to get the actual dimensions
+    private int octaves = 2; // starts at 1
     private float freq = 0x1p-4f;
-    private ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, 0, 1);
+    private ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, 0, octaves);
     private ImmediateModeRenderer20 renderer;
 
     private static final int width = 256, height = 256;
@@ -105,7 +105,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     case W:
                         for (int c = 0; c < 256; c++) {
                             int w = 256, h = 256;
-                            float halfW = (w-1) * 0.5f, halfH = (h-1) * 0.5f, inv = 1f / w;
+//                            float halfW = (w-1) * 0.5f, halfH = (h-1) * 0.5f, inv = 1f / w;
                             float cDeg = c * (360f/256f), cSin = MathUtils.sinDeg(cDeg) * 40, cCos = MathUtils.cosDeg(cDeg) * 40;
                             Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                             for (int x = 0; x < w; x++) {

@@ -59,14 +59,14 @@ public class SorbetNoise extends CyclicNoise {
     public float getNoise(float x, float y) {
         float xx = x * 0.25f;
         float yy = y * 0.25f;
-        return super.getNoise(x, y, 4f/2.00f * SimplexNoise.noise(xx, yy, seed));
+        return super.getNoise(x, y, 2.00f * SimplexNoise.noise(xx, yy, seed));
     }
 
     public float getNoise(float x, float y, float z) {
         float xx = x * 0.25f;
         float yy = y * 0.25f;
         float zz = z * 0.25f;
-        return super.getNoise(x, y, z, 4f/3.00f * SimplexNoise.noise(xx, yy, zz, seed));
+        return super.getNoise(x, y, z, 2.00f * SimplexNoise.noise(xx, yy, zz, seed));
     }
 
     public float getNoise(float x, float y, float z, float w) {
@@ -74,7 +74,7 @@ public class SorbetNoise extends CyclicNoise {
         float yy = y * 0.25f;
         float zz = z * 0.25f;
         float ww = w * 0.25f;
-        return super.getNoise(x, y, z, w, 4f/4.00f * SimplexNoise.noise(xx, yy, zz, ww, seed));
+        return super.getNoise(x, y, z, w, 2.00f * SimplexNoise.noise(xx, yy, zz, ww, seed));
     }
 
     public float getNoise(float x, float y, float z, float w, float u) {
@@ -83,7 +83,7 @@ public class SorbetNoise extends CyclicNoise {
         float zz = z * 0.25f;
         float ww = w * 0.25f;
         float uu = u * 0.25f;
-        return super.getNoise(x, y, z, w, u, 4f/5.00f * SimplexNoise.noise(xx, yy, zz, ww, uu, seed));
+        return super.getNoise(x, y, z, w, u, 2.00f * SimplexNoise.noise(xx, yy, zz, ww, uu, seed));
     }
 
     public float getNoise(float x, float y, float z, float w, float u, float v) {
@@ -93,7 +93,7 @@ public class SorbetNoise extends CyclicNoise {
         float ww = w * 0.25f;
         float uu = u * 0.25f;
         float vv = v * 0.25f;
-        return super.getNoise(x, y, z, w, u, v, 4f/6.00f * SimplexNoise.noise(xx, yy, zz, ww, uu, vv, seed));
+        return super.getNoise(x, y, z, w, u, v, 2.00f * SimplexNoise.noise(xx, yy, zz, ww, uu, vv, seed));
     }
 
     @Override

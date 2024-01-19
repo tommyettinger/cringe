@@ -246,9 +246,8 @@ public final class MathSupport {
      * @return the long that cs represents
      */
     public static long longFromDec(final CharSequence cs, final int start, int end) {
-        int sign, h, lim, len;
-        if (cs == null || start < 0 || end <= 0 || end - start <= 0
-                || (len = cs.length()) - start <= 0 || end > len)
+        int sign, h, lim;
+        if (cs == null || start < 0 || end <= 0 || (end = Math.min(end, cs.length())) - start <= 0)
             return 0;
         char c = cs.charAt(start);
         if (c == '-') {
@@ -301,9 +300,8 @@ public final class MathSupport {
      * @return the int that cs represents
      */
     public static int intFromDec(final CharSequence cs, final int start, int end) {
-        int sign, h, lim, len;
-        if (cs == null || start < 0 || end <= 0 || end - start <= 0
-                || (len = cs.length()) - start <= 0 || end > len)
+        int sign, h, lim;
+        if (cs == null || start < 0 || end <= 0 || (end = Math.min(end, cs.length())) - start <= 0)
             return 0;
         char c = cs.charAt(start);
         if (c == '-') {
@@ -357,9 +355,8 @@ public final class MathSupport {
      * @return the int that cs represents
      */
     public static int intFromHex(final CharSequence cs, final int start, int end) {
-        int sign, h, lim, len;
-        if (cs == null || start < 0 || end <= 0 || end - start <= 0
-                || (len = cs.length()) - start <= 0 || end > len)
+        int sign, h, lim;
+        if (cs == null || start < 0 || end <= 0 || (end = Math.min(end, cs.length())) - start <= 0)
             return 0;
         char c = cs.charAt(start);
         if (c == '-') {
@@ -392,9 +389,9 @@ public final class MathSupport {
 
     /**
      * Reads a float in from the String {@code str}, using only the range from {@code start} (inclusive) to {@code end}
-     * (exclusive). This effectively returns {@code Float.parseFloat(str.substring(start, end))} .
-     * Unlike the other number-reading methods here, this doesn't do much to validate its input, so the end must be
-     * after the full float number. If the parse fails, this returns 0f.
+     * (exclusive). This effectively returns {@code Float.parseFloat(str.substring(start, Math.min(str.length(), end)))}
+     * . Unlike the other number-reading methods here, this doesn't do much to validate its input, so the end of the end
+     * of the String must be after the full float number. If the parse fails, this returns 0f.
      * @param str a String containing a valid float in the specified range
      * @param start the start index (inclusive) to read from
      * @param end the end index (exclusive) to stop reading before
@@ -402,7 +399,7 @@ public final class MathSupport {
      */
     public static float floatFromDec(final String str, final int start, int end) {
         try {
-            return Float.parseFloat(str.substring(start, end));
+            return Float.parseFloat(str.substring(start, Math.min(str.length(), end)));
         } catch (NumberFormatException ignored) {
             return 0f;
         }

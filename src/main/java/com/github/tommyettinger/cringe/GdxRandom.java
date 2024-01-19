@@ -2396,9 +2396,9 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 			int idx = data.indexOf('`');
 
 			for (int i = 0; i < getStateCount() - 1; i++)
-				setSelectedState(i, Long.parseLong(data.substring(idx + 1, (idx = data.indexOf('~', idx + 1)))));
+				setSelectedState(i, MathSupport.longFromDec(data, idx + 1, (idx = data.indexOf('~', idx + 1))));
 
-			setSelectedState(getStateCount() - 1, Long.parseLong(data.substring(idx + 1, data.indexOf('`', idx + 1))));
+			setSelectedState(getStateCount() - 1, MathSupport.longFromDec(data, idx + 1, data.indexOf('`', idx + 1)));
 		}
 		return this;
 	}

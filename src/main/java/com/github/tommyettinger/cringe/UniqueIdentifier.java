@@ -83,13 +83,14 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
     }
 
     public String stringSerialize() {
-        return hi + "~" + lo;
+        return "`" + hi + "~" + lo + "`";
     }
 
     public UniqueIdentifier stringDeserialize(String data) {
         int mid = data.indexOf('~');
-        hi = Long.parseLong(data.substring(0, mid));
-        lo = Long.parseLong(data.substring(mid+1));
+        hi = MathSupport.longFromDec(data, 1, mid);
+        lo = MathSupport.longFromDec(data, mid+1, Integer.MAX_VALUE);
+
         return this;
     }
 
@@ -143,20 +144,19 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
         public UniqueIdentifier generate(){
             // xoroshiro algorithm
             final long s0 = stateA;
-            long s1 = stateB;
-            s1 ^= s0;
+            final long s1 = stateB ^ s0;
             stateA = (s0 << 24 | s0 >>> 40) ^ s1 ^ (s1 << 16);
             stateB = (s1 << 37 | s1 >>> 27);
             return new UniqueIdentifier(stateA, stateB);
         }
         public String stringSerialize() {
-            return stateA + "~" + stateB;
+            return "`" + stateA + "~" + stateB + "`";
         }
 
         public Generator stringDeserialize(String data) {
             int mid = data.indexOf('~');
-            stateA = Long.parseLong(data.substring(0, mid));
-            stateB = Long.parseLong(data.substring(mid+1));
+            stateA = MathSupport.longFromDec(data, 1, mid);
+            stateB = MathSupport.longFromDec(data, mid+1, Integer.MAX_VALUE);
             return this;
         }
 

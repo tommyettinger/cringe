@@ -217,12 +217,12 @@ public class WeightedTable implements Json.Serializable {
             return null;
         int pos = data.lastIndexOf('`');
         random.stringDeserialize(data);
-        int count = Integer.parseInt(data.substring(pos+1, pos = data.indexOf(',', pos+1)));
+        int count = MathSupport.intFromDec(data, pos+1, pos = data.indexOf(',', pos+1));
         mixed = new int[count];
         for (int i = 0; i < count; i++) {
             int next = data.indexOf(',', pos+1);
             if(next == -1) next = data.length();
-            mixed[i] = Integer.parseInt(data.substring(pos+1, pos = next));
+            mixed[i] = MathSupport.intFromDec(data, pos+1, pos = next);
         }
         return this;
     }

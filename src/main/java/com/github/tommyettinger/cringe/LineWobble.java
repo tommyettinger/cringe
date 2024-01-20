@@ -20,18 +20,31 @@ package com.github.tommyettinger.cringe;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 
+import static com.badlogic.gdx.math.MathUtils.PI2;
+
 /**
  * Provides 1D noise methods that can be queried at any point on a line to get a continuous random value.
  * These each use some form of low-quality, high-speed unary hash on the floor and ceiling of a float or double value,
  * then interpolate between the hash results. Some of these work on angles (so they wrap like a line around a circle)
  * instead of normal lines.
  * <br>
- * Some methods here were named... hastily, but the names stuck.
+ * The wobble methods that take a seed and a distance along a line as a value are:
  * <ul>
  *     <li>{@link #wobble(int, float)} is straightforward; it uses a hermite spline to interpolate two points.</li>
  *     <li>{@link #bicubicWobble(long, float)} uses bicubic interpolation on 4 points, and tends to be smooth.</li>
  *     <li>{@link #splineWobble(int, float)} can be much more sharp or smooth, varying randomly over its length.</li>
+ *     <li>splineWobble() also can take a long seed.</li>
  *     <li>{@link #trigWobble(int, float)} is a trigonometric wobble, using sine to smoothly transition.</li>
+ * </ul>
+ * There are also some methods to get a wobbling angle, smoothly wrapping around the angle 0:
+ * <ul>
+ *     <li>{@link #wobbleAngle(int, float)} is a simple wobble with output in radians.</li>
+ *     <li>{@link #wobbleAngleDeg(int, float)} is a simple wobble with output in degrees.</li>
+ *     <li>{@link #wobbleAngleTurns(int, float)} is a simple wobble with output in turns (1 turn == 360 degrees).</li>
+ *     <li>{@link #splineWobbleAngle(int, float)} is a more-random wobble with output in radians.</li>
+ *     <li>{@link #splineWobbleAngleDeg(int, float)} is a more-random wobble with output in degrees.</li>
+ *     <li>{@link #splineWobbleAngleTurns(int, float)} is a more-random wobble with output in turns (1 turn == 360 degrees).</li>
+ *     <li>Each of the splineWobbleAngle() methods also can take a long seed.</li>
  * </ul>
  */
 public class LineWobble {
@@ -237,6 +250,102 @@ public class LineWobble {
         // makes the changes smoother by slowing down near start or end.
         value *= value * (3f - 2f * value);
         // like lerpAngle code, but in turns
+        end = end - start + 1.5f;
+        end -= (int)end + 0.5f;
+        start += end * value + 1;
+        return (start - (int)start);
+    }
+
+    /**
+     * Like {@link #splineWobble(int, float)}, this is a 1D wobble that can become more sharp or more gradual at different
+     * points on its length, but this produces a (wrapping) angle measured in radians.
+     * @param seed an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @return a pseudo-random float between 0.0f and 6.283185307179586f (both inclusive), smoothly changing with value and wrapping
+     */
+    public static float splineWobbleAngle(int seed, float value) {
+        return splineWobbleAngleTurns(seed, value) * PI2;
+    }
+
+    /**
+     * Like {@link #splineWobble(int, float)}, this is a 1D wobble that can become more sharp or more gradual at different
+     * points on its length, but this produces a (wrapping) angle measured in degrees.
+     * @param seed an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @return a pseudo-random float between 0.0f and 360.0f (both inclusive), smoothly changing with value and wrapping
+     */
+    public static float splineWobbleAngleDeg(int seed, float value) {
+        return splineWobbleAngleTurns(seed, value) * 360;
+    }
+
+    /**
+     * Like {@link #splineWobble(int, float)}, this is a 1D wobble that can become more sharp or more gradual at different
+     * points on its length, but this produces a (wrapping) angle measured in turns.
+     * @param seed an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @return a pseudo-random float between 0.0f and 1.0f (both inclusive), smoothly changing with value and wrapping
+     */
+    public static float splineWobbleAngleTurns(int seed, float value)
+    {
+        final int floor = ((int)(value + 16384.0) - 16384);
+        final int z = seed + (floor * 0x22179 | 0) * 0x4A41; // this is the same as: seed + floor * 0x9E3779B9
+        final int startBits = ((z ^ 0xD1B54A35) * 0x923EF | 0) * 0x100D | 0; // the same as: (z ^ 0xD1B54A35) * 0x92B5C323
+        final int endBits   = ((z + 0x9E3779B9 ^ 0xD1B54A35) * 0x923EF | 0) * 0x100D | 0; // also * 0x92B5C323
+        final int mixBits = startBits + endBits;
+        value -= floor;
+        value = MathSupport.barronSpline(value,
+                (mixBits & 0xFFFF) * 6.1035156E-5f + 1f, // 6.1035156E-5f == 0x1p-14f
+                (mixBits >>> 16) * 1.1444092E-5f + 0.125f); // 1.1444092E-5f == 0x1.8p-17f
+        value *= value * (3f - 2f * value);
+        float start = (startBits >>> 1) * 4.6566126E-10f; // 4.6566126E-10f == 0x0.ffffffp-31f
+        float end   = (endBits   >>> 1) * 4.6566126E-10f; // 4.6566126E-10f == 0x0.ffffffp-31f
+        end = end - start + 1.5f;
+        end -= (int)end + 0.5f;
+        start += end * value + 1;
+        return (start - (int)start);
+    }
+
+    /**
+     * Like {@link #splineWobble(long, float)}, this is a 1D wobble that can become more sharp or more gradual at different
+     * points on its length, but this produces a (wrapping) angle measured in radians.
+     * @param seed a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @return a pseudo-random float between 0.0f and 6.283185307179586f (both inclusive), smoothly changing with value and wrapping
+     */
+    public static float splineWobbleAngle(long seed, float value) {
+        return splineWobbleAngleTurns(seed, value) * PI2;
+    }
+
+    /**
+     * Like {@link #splineWobble(long, float)}, this is a 1D wobble that can become more sharp or more gradual at different
+     * points on its length, but this produces a (wrapping) angle measured in degrees.
+     * @param seed a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @return a pseudo-random float between 0.0f and 360.0f (both inclusive), smoothly changing with value and wrapping
+     */
+    public static float splineWobbleAngleDeg(long seed, float value) {
+        return splineWobbleAngleTurns(seed, value) * 360;
+    }
+
+    /**
+     * Like {@link #splineWobble(long, float)}, this is a 1D wobble that can become more sharp or more gradual at different
+     * points on its length, but this produces a (wrapping) angle measured in turns.
+     * @param seed a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @return a pseudo-random float between 0.0f and 1.0f (both inclusive), smoothly changing with value and wrapping
+     */
+    public static float splineWobbleAngleTurns(long seed, float value)
+    {
+        final long floor = ((long)(value + 0x1p14) - 0x4000);
+        final long z = seed + floor * 0x6C8E9CF570932BD5L;
+        final long startBits = ((z ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L ^ 0x9E3779B97F4A7C15L),
+                endBits = ((z + 0x6C8E9CF570932BD5L ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L ^ 0x9E3779B97F4A7C15L),
+                mixBits = startBits + endBits;
+        value -= floor;
+        value = MathSupport.barronSpline(value, (mixBits & 0xFFFFFFFFL) * 0x1p-30f + 1f, (mixBits & 0xFFFFL) * 0x1.8p-17f + 0.125f);
+        value *= value * (3f - 2f * value);
+        float start = (startBits >>> 1) * 0x0.ffffffp-63f;
+        float end   = (endBits   >>> 1) * 0x0.ffffffp-63f;
         end = end - start + 1.5f;
         end -= (int)end + 0.5f;
         start += end * value + 1;

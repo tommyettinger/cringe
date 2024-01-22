@@ -22,13 +22,14 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tommyettinger.anim8.AnimatedGif;
@@ -37,6 +38,7 @@ import com.github.tommyettinger.anim8.PaletteReducer;
 
 import static com.badlogic.gdx.Input.Keys.*;
 import static com.badlogic.gdx.graphics.GL20.GL_POINTS;
+import static com.github.tommyettinger.cringe.ColorSupport.*;
 import static com.github.tommyettinger.cringe.ContinuousNoise.*;
 
 /**
@@ -65,6 +67,9 @@ public class NoiseVisualizer extends ApplicationAdapter {
     private Viewport view;
     private float ctr = -256;
     private boolean keepGoing = true;
+
+    private Color color = new Color(Color.LIME);
+    private float hue = hue(color), sat = saturation(color), lit = lightness(color);
     
     private AnimatedGif gif;
     private final Array<Pixmap> frames = new Array<>(256);
@@ -231,6 +236,35 @@ public class NoiseVisualizer extends ApplicationAdapter {
     }
 
     public void putMap() {
+        if(Gdx.input.isKeyPressed(LEFT)) {
+            hue -= Gdx.graphics.getDeltaTime() * 0.25f;
+            hue -= MathUtils.floor(hue);
+            ColorSupport.hsl2rgb(color, hue, sat, lit, 1f);
+        }
+        else if(Gdx.input.isKeyPressed(RIGHT)) {
+            hue += Gdx.graphics.getDeltaTime() * 0.25f;
+            hue -= MathUtils.floor(hue);
+            ColorSupport.hsl2rgb(color, hue, sat, lit, 1f);
+        }
+        else if(Gdx.input.isKeyPressed(DOWN)) {
+            lit = Math.max(0f, lit - Gdx.graphics.getDeltaTime() * 0.25f);
+            ColorSupport.hsl2rgb(color, hue, sat, lit, 1f);
+        }
+        else if(Gdx.input.isKeyPressed(UP)) {
+            lit = Math.min(1f, lit + Gdx.graphics.getDeltaTime() * 0.25f);
+            ColorSupport.hsl2rgb(color, hue, sat, lit, 1f);
+        }
+        else if(Gdx.input.isKeyPressed(LEFT_BRACKET)) {
+            sat = Math.max(0f, sat - Gdx.graphics.getDeltaTime() * 0.25f);
+            ColorSupport.hsl2rgb(color, hue, sat, lit, 1f);
+        }
+        else if(Gdx.input.isKeyPressed(RIGHT_BRACKET)) {
+            sat = Math.min(1f, sat + Gdx.graphics.getDeltaTime() * 0.25f);
+            ColorSupport.hsl2rgb(color, hue, sat, lit, 1f);
+        }
+
+
+
         renderer.begin(view.getCamera().combined, GL_POINTS);
         float bright, c = ctr * 16f;
         switch (dim) {
@@ -238,7 +272,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
                         bright = basicPrepare(noise.getNoise(Vector2.dst(x, y, width * 0.5f, height * 0.5f) - c));
-                        renderer.color(bright, bright, bright, 1f);
+                        renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
                 }
@@ -247,7 +281,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
                         bright = basicPrepare(noise.getNoise(x + c, y + c));
-                        renderer.color(bright, bright, bright, 1f);
+                        renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
                 }
@@ -256,7 +290,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
                         bright = basicPrepare(noise.getNoise(x, y, c));
-                        renderer.color(bright, bright, bright, 1f);
+                        renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
                 }
@@ -267,7 +301,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     for (int y = 0; y < height; y++) {
                         float yc = MathUtils.cosDeg(360 * y * iHeight) * 64 + c, ys = MathUtils.sinDeg(360 * y * iHeight) * 64 + c;
                         bright = basicPrepare(noise.getNoise(xc, yc, xs, ys));
-                        renderer.color(bright, bright, bright, 1f);
+                        renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
                 }
@@ -278,7 +312,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     for (int y = 0; y < height; y++) {
                         float yc = MathUtils.cosDeg(360 * y * iHeight) * 64, ys = MathUtils.sinDeg(360 * y * iHeight) * 64;
                         bright = basicPrepare(noise.getNoise(xc, yc, xs, ys, c));
-                        renderer.color(bright, bright, bright, 1f);
+                        renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
                 }
@@ -291,7 +325,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                         float yc = MathUtils.cosDeg(360 * y * iHeight) * 64 + c, ys = MathUtils.sinDeg(360 * y * iHeight) * 64 + c,
                                 zc = MathUtils.cosDeg(360 * (x - y) * 0.5f * iWidth) * 64 - c, zs = MathUtils.sinDeg(360 * (x - y) * 0.5f * iWidth) * 64 - c;
                         bright = basicPrepare(noise.getNoise(xc, yc, zc, xs, ys, zs));
-                        renderer.color(bright, bright, bright, 1f);
+                        renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
                 }
@@ -306,9 +340,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
     public void render() {
         Gdx.graphics.setTitle(String.valueOf(Gdx.graphics.getFramesPerSecond()));
         if (keepGoing) {
-            // standard clear the background routine for libGDX
-            Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            ScreenUtils.clear(Color.BLACK);
             ctr += Gdx.graphics.getDeltaTime();
             putMap();
         }

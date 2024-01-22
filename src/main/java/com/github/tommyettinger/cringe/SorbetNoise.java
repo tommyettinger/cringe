@@ -56,6 +56,10 @@ public class SorbetNoise extends CyclicNoise {
         return new SorbetNoise(seed, octaves, freq);
     }
 
+    public float getNoise(float x) {
+        return LineWobble.bicubicWobble(x, seed);
+    }
+
     public float getNoise(float x, float y) {
         float xx = x * 0.25f;
         float yy = y * 0.25f;

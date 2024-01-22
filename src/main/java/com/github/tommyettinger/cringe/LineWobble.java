@@ -30,20 +30,20 @@ import static com.badlogic.gdx.math.MathUtils.PI2;
  * <br>
  * The wobble methods that take a seed and a distance along a line as a value are:
  * <ul>
- *     <li>{@link #wobble(int, float)} is straightforward; it uses a hermite spline to interpolate two points.</li>
- *     <li>{@link #bicubicWobble(long, float)} uses bicubic interpolation on 4 points, and tends to be smooth.</li>
- *     <li>{@link #splineWobble(int, float)} can be much more sharp or smooth, varying randomly over its length.</li>
+ *     <li>{@link #wobble(float, int)} is straightforward; it uses a hermite spline to interpolate two points.</li>
+ *     <li>{@link #bicubicWobble(float, long)} uses bicubic interpolation on 4 points, and tends to be smooth.</li>
+ *     <li>{@link #splineWobble(float, int)} can be much more sharp or smooth, varying randomly over its length.</li>
  *     <li>splineWobble() also can take a long seed.</li>
- *     <li>{@link #trigWobble(int, float)} is a trigonometric wobble, using sine to smoothly transition.</li>
+ *     <li>{@link #trigWobble(float, int)} is a trigonometric wobble, using sine to smoothly transition.</li>
  * </ul>
  * There are also some methods to get a wobbling angle, smoothly wrapping around the angle 0:
  * <ul>
- *     <li>{@link #wobbleAngle(int, float)} is a simple wobble with output in radians.</li>
- *     <li>{@link #wobbleAngleDeg(int, float)} is a simple wobble with output in degrees.</li>
- *     <li>{@link #wobbleAngleTurns(int, float)} is a simple wobble with output in turns (1 turn == 360 degrees).</li>
- *     <li>{@link #splineWobbleAngle(int, float)} is a more-random wobble with output in radians.</li>
- *     <li>{@link #splineWobbleAngleDeg(int, float)} is a more-random wobble with output in degrees.</li>
- *     <li>{@link #splineWobbleAngleTurns(int, float)} is a more-random wobble with output in turns (1 turn == 360 degrees).</li>
+ *     <li>{@link #wobbleAngle(float, int)} is a simple wobble with output in radians.</li>
+ *     <li>{@link #wobbleAngleDeg(float, int)} is a simple wobble with output in degrees.</li>
+ *     <li>{@link #wobbleAngleTurns(float, int)} is a simple wobble with output in turns (1 turn == 360 degrees).</li>
+ *     <li>{@link #splineWobbleAngle(float, int)} is a more-random wobble with output in radians.</li>
+ *     <li>{@link #splineWobbleAngleDeg(float, int)} is a more-random wobble with output in degrees.</li>
+ *     <li>{@link #splineWobbleAngleTurns(float, int)} is a more-random wobble with output in turns (1 turn == 360 degrees).</li>
  *     <li>Each of the splineWobbleAngle() methods also can take a long seed.</li>
  * </ul>
  */
@@ -51,11 +51,12 @@ public class LineWobble {
     /**
      * A type of 1D noise that takes an int seed and is optimized for usage on GWT. This uses cubic interpolation
      * between random peak or valley points.
-     * @param seed an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     *
      * @param value a float that typically changes slowly, by less than 1.0, with direction changes at integer inputs
+     * @param seed  an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between -1f and 1f (both exclusive), smoothly changing with value
      */
-    public static float wobble(int seed, float value)
+    public static float wobble(float value, int seed)
     {
         final int floor = MathUtils.floor(value);
         // the three lines below break up multiplications into component parts to avoid precision loss on GWT.
@@ -71,11 +72,12 @@ public class LineWobble {
      * Sway smoothly using bicubic interpolation between 4 points (the two integers before t and the two after).
      * This pretty much never produces steep changes between peaks and valleys; this may make it more useful for things
      * like generating terrain that can be walked across in a side-scrolling game.
+     *
+     * @param t    a distance traveled; should change by less than 1 between calls, and should be less than about 10000
      * @param seed any long
-     * @param t a distance traveled; should change by less than 1 between calls, and should be less than about 10000
      * @return a smoothly-interpolated swaying value between -1 and 1, both exclusive
      */
-    public static float bicubicWobble(long seed, float t)
+    public static float bicubicWobble(float t, long seed)
     {
         final long floor = (long) Math.floor(t);
         // what we add here ensures that at the very least, the upper half will have some non-zero bits.
@@ -105,15 +107,16 @@ public class LineWobble {
     }
 
     /**
-     * A variant on {@link #wobble(int, float)} that uses {@link MathSupport#barronSpline(float, float, float)} to
+     * A variant on {@link #wobble(float, int)} that uses {@link MathSupport#barronSpline(float, float, float)} to
      * interpolate between peaks/valleys, with the shape and turning point determined like the other values.
      * This can be useful when you want a curve to seem more "natural," without the similarity between every peak or
-     * every valley in {@link #wobble(int, float)}. This can produce both fairly sharp turns and very gradual curves.
-     * @param seed an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     * every valley in {@link #wobble(float, int)}. This can produce both fairly sharp turns and very gradual curves.
+     *
      * @param value a float that typically changes slowly, by less than 2.0, with direction changes at integer inputs
+     * @param seed  an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between -1f and 1f (both exclusive), smoothly changing with value
      */
-    public static float splineWobble(int seed, float value)
+    public static float splineWobble(float value, int seed)
     {
         // int fast floor, from libGDX; 16384 is 2 to the 14, or 0x1p14, or 0x4000
         final int floor = ((int)(value + 16384.0) - 16384);
@@ -131,15 +134,16 @@ public class LineWobble {
     }
 
     /**
-     * A variant on {@link #wobble(int, float)} that uses {@link MathSupport#barronSpline(float, float, float)} to
+     * A variant on {@link #wobble(float, int)} that uses {@link MathSupport#barronSpline(float, float, float)} to
      * interpolate between peaks/valleys, with the shape and turning point determined like the other values.
      * This can be useful when you want a curve to seem more "natural," without the similarity between every peak or
-     * every valley in {@link #wobble(int, float)}. This can produce both fairly sharp turns and very gradual curves.
-     * @param seed a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     * every valley in {@link #wobble(float, int)}. This can produce both fairly sharp turns and very gradual curves.
+     *
      * @param value a float that typically changes slowly, by less than 2.0, with direction changes at integer inputs
+     * @param seed  a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between -1f and 1f (both exclusive), smoothly changing with value
      */
-    public static float splineWobble(long seed, float value)
+    public static float splineWobble(float value, long seed)
     {
         final long floor = ((long)(value + 0x1p14) - 0x4000);
         final long z = seed + floor * 0x6C8E9CF570932BD5L;
@@ -154,11 +158,12 @@ public class LineWobble {
 
     /**
      * Trigonometric wobble. Domain for {@code value} is effectively [-16384, 16384]. Range is (-1, 1).
-     * @param seed a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     *
      * @param value a float that typically changes slowly, by less than 2.0, with direction changes at integer inputs
+     * @param seed  a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between -1f and 1f (both exclusive), smoothly changing with value
      */
-    public static float trigWobble(long seed, float value)
+    public static float trigWobble(float value, long seed)
     {
         final long floor = ((int)(value + 16384.0) - 16384);
         final long z = seed + floor * 0x6C8E9CF570932BD5L;
@@ -171,11 +176,12 @@ public class LineWobble {
 
     /**
      * Trigonometric wobble. Domain for {@code value} is effectively [-16384, 16384]. Range is (-1, 1).
-     * @param seed an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     *
      * @param value a float that typically changes slowly, by less than 2.0, with direction changes at integer inputs
+     * @param seed  an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between -1f and 1f (both exclusive), smoothly changing with value
      */
-    public static float trigWobble(int seed, float value)
+    public static float trigWobble(float value, int seed)
     {
         final int floor = MathUtils.floor(value);
         // the three lines below break up multiplications into component parts to avoid precision loss on GWT.
@@ -195,13 +201,14 @@ public class LineWobble {
      * than an angle, like time. Uses a simple method of cubic interpolation between random values, where a random value
      * is used without modification when given an integer for {@code value}. Note that this uses a different type of
      * interpolation than a sine wave would, and the shape here uses cubic interpolation.
-     * @param seed an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     *
      * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @param seed  an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between 0f and 6.283185307179586f (both inclusive), smoothly changing with value and wrapping
      */
-    public static float wobbleAngle(int seed, float value)
+    public static float wobbleAngle(float value, int seed)
     {
-        return wobbleAngleTurns(seed, value) * 6.283185307179586f;
+        return wobbleAngleTurns(value, seed) * 6.283185307179586f;
     }
 
     /**
@@ -212,13 +219,14 @@ public class LineWobble {
      * than an angle, like time. Uses a simple method of cubic interpolation between random values, where a random value
      * is used without modification when given an integer for {@code value}. Note that this uses a different type of
      * interpolation than a sine wave would, and the shape here uses cubic interpolation.
-     * @param seed an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     *
      * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @param seed  an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between 0f and 360.0f (both inclusive), smoothly changing with value and wrapping
      */
-    public static float wobbleAngleDeg(int seed, float value)
+    public static float wobbleAngleDeg(float value, int seed)
     {
-        return wobbleAngleTurns(seed, value) * 360.0f;
+        return wobbleAngleTurns(value, seed) * 360.0f;
     }
 
     /**
@@ -233,11 +241,12 @@ public class LineWobble {
      * Turns are a way of measuring angles, like radians or degrees, but where a full rotation is 360 in degrees or
      * {@link MathUtils#PI2} in radians, it is 1.0 in turns. This proves handy for things like hue calculations in
      * {@link ColorSupport#hsl2rgb(Color, float, float, float, float)}.
-     * @param seed an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     *
      * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @param seed  an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between 0.0f and 1.0f (both inclusive), smoothly changing with value and wrapping
      */
-    public static float wobbleAngleTurns(int seed, float value)
+    public static float wobbleAngleTurns(float value, int seed)
     {
         // int fast floor, from libGDX
         final int floor = MathUtils.floor(value);
@@ -257,35 +266,38 @@ public class LineWobble {
     }
 
     /**
-     * Like {@link #splineWobble(int, float)}, this is a 1D wobble that can become more sharp or more gradual at different
+     * Like {@link #splineWobble(float, int)}, this is a 1D wobble that can become more sharp or more gradual at different
      * points on its length, but this produces a (wrapping) angle measured in radians.
-     * @param seed an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     *
      * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @param seed  an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between 0.0f and 6.283185307179586f (both inclusive), smoothly changing with value and wrapping
      */
-    public static float splineWobbleAngle(int seed, float value) {
-        return splineWobbleAngleTurns(seed, value) * PI2;
+    public static float splineWobbleAngle(float value, int seed) {
+        return splineWobbleAngleTurns(value, seed) * PI2;
     }
 
     /**
-     * Like {@link #splineWobble(int, float)}, this is a 1D wobble that can become more sharp or more gradual at different
+     * Like {@link #splineWobble(float, int)}, this is a 1D wobble that can become more sharp or more gradual at different
      * points on its length, but this produces a (wrapping) angle measured in degrees.
-     * @param seed an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     *
      * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @param seed  an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between 0.0f and 360.0f (both inclusive), smoothly changing with value and wrapping
      */
-    public static float splineWobbleAngleDeg(int seed, float value) {
-        return splineWobbleAngleTurns(seed, value) * 360;
+    public static float splineWobbleAngleDeg(float value, int seed) {
+        return splineWobbleAngleTurns(value, seed) * 360;
     }
 
     /**
-     * Like {@link #splineWobble(int, float)}, this is a 1D wobble that can become more sharp or more gradual at different
+     * Like {@link #splineWobble(float, int)}, this is a 1D wobble that can become more sharp or more gradual at different
      * points on its length, but this produces a (wrapping) angle measured in turns.
-     * @param seed an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     *
      * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @param seed  an int seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between 0.0f and 1.0f (both inclusive), smoothly changing with value and wrapping
      */
-    public static float splineWobbleAngleTurns(int seed, float value)
+    public static float splineWobbleAngleTurns(float value, int seed)
     {
         final int floor = ((int)(value + 16384.0) - 16384);
         final int z = seed + (floor * 0x22179 | 0) * 0x4A41; // this is the same as: seed + floor * 0x9E3779B9
@@ -306,35 +318,38 @@ public class LineWobble {
     }
 
     /**
-     * Like {@link #splineWobble(long, float)}, this is a 1D wobble that can become more sharp or more gradual at different
+     * Like {@link #splineWobble(float, long)}, this is a 1D wobble that can become more sharp or more gradual at different
      * points on its length, but this produces a (wrapping) angle measured in radians.
-     * @param seed a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     *
      * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @param seed  a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between 0.0f and 6.283185307179586f (both inclusive), smoothly changing with value and wrapping
      */
-    public static float splineWobbleAngle(long seed, float value) {
-        return splineWobbleAngleTurns(seed, value) * PI2;
+    public static float splineWobbleAngle(float value, long seed) {
+        return splineWobbleAngleTurns(value, seed) * PI2;
     }
 
     /**
-     * Like {@link #splineWobble(long, float)}, this is a 1D wobble that can become more sharp or more gradual at different
+     * Like {@link #splineWobble(float, long)}, this is a 1D wobble that can become more sharp or more gradual at different
      * points on its length, but this produces a (wrapping) angle measured in degrees.
-     * @param seed a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     *
      * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @param seed  a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between 0.0f and 360.0f (both inclusive), smoothly changing with value and wrapping
      */
-    public static float splineWobbleAngleDeg(long seed, float value) {
-        return splineWobbleAngleTurns(seed, value) * 360;
+    public static float splineWobbleAngleDeg(float value, long seed) {
+        return splineWobbleAngleTurns(value, seed) * 360;
     }
 
     /**
-     * Like {@link #splineWobble(long, float)}, this is a 1D wobble that can become more sharp or more gradual at different
+     * Like {@link #splineWobble(float, long)}, this is a 1D wobble that can become more sharp or more gradual at different
      * points on its length, but this produces a (wrapping) angle measured in turns.
-     * @param seed a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     *
      * @param value a float that typically changes slowly, by less than 1.0, with possible direction changes at integer inputs
+     * @param seed  a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
      * @return a pseudo-random float between 0.0f and 1.0f (both inclusive), smoothly changing with value and wrapping
      */
-    public static float splineWobbleAngleTurns(long seed, float value)
+    public static float splineWobbleAngleTurns(float value, long seed)
     {
         final long floor = ((long)(value + 0x1p14) - 0x4000);
         final long z = seed + floor * 0x6C8E9CF570932BD5L;

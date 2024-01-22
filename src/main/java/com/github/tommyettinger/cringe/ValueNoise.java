@@ -643,6 +643,11 @@ public class ValueNoise extends RawNoise {
     }
 
     @Override
+    public float getNoise(float x) {
+        return valueNoise(x, seed);
+    }
+
+    @Override
     public float getNoise(float x, float y) {
         return valueNoise(x, y, seed);
     }
@@ -679,6 +684,11 @@ public class ValueNoise extends RawNoise {
     @Override
     public int getSeed() {
         return seed;
+    }
+
+    @Override
+    public float getNoiseWithSeed(float x, int seed) {
+        return valueNoise(x, seed);
     }
 
     @Override

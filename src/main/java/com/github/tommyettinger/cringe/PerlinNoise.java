@@ -233,6 +233,30 @@ public class PerlinNoise extends RawNoise {
         return x * mul / (float) Math.sqrt(x * x + add);
     }
 
+    /**
+     * Gets 1D noise with using this generator's {@link #getSeed() seed}.
+     * Delegates to {@link LineWobble#trigWobble(float, int)}.
+     *
+     * @param x x position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     */
+    @Override
+    public float getNoise(float x) {
+        return LineWobble.trigWobble(x, seed);
+    }
+
+    /**
+     * Gets 1D noise with using a specific seed.
+     * Delegates to {@link LineWobble#trigWobble(float, int)}.
+     *
+     * @param x x position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     */
+    @Override
+    public float getNoiseWithSeed(float x, int seed) {
+        return LineWobble.trigWobble(x, seed);
+    }
+
     @Override
     public float getNoise(final float x, final float y) {
         return getNoiseWithSeed(x, y, seed);

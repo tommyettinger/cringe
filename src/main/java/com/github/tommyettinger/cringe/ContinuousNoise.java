@@ -234,7 +234,7 @@ public class ContinuousNoise extends RawNoise {
     @Override
     public int hashCode() {
         int result = wrapped.hashCode();
-        result = 31 * result + (int) (seed ^ (seed >>> 32));
+        result = 31 * result + seed;
         result = 31 * result + (frequency != +0.0f ? Float.floatToIntBits(frequency) : 0);
         result = 31 * result + mode;
         result = 31 * result + octaves;
@@ -242,6 +242,17 @@ public class ContinuousNoise extends RawNoise {
     }
 
     // The big part.
+
+    @Override
+    public float getNoise(float x) {
+        switch (mode) {
+            default:
+            case 0: return fbm(x * frequency, seed);
+            case 1: return billow(x * frequency, seed);
+            case 2: return ridged(x * frequency, seed);
+            case 3: return warp(x * frequency, seed);
+        }
+    }
 
     @Override
     public float getNoise(float x, float y) {
@@ -365,8 +376,64 @@ public class ContinuousNoise extends RawNoise {
         }
     }
 
-    // 2D
+    // 1D
     
+    protected float fbm(float x, int seed) {
+        float sum = wrapped.getNoiseWithSeed(x, seed);
+        float amp = 1;
+
+        for (int i = 1; i < octaves; i++) {
+            x *= 2f;
+
+            amp *= 0.5f;
+            sum += wrapped.getNoiseWithSeed(x, seed + i) * amp;
+        }
+
+        return sum / (amp * ((1 << octaves) - 1));
+    }
+    protected float billow(float x, int seed) {
+        float sum = Math.abs(wrapped.getNoiseWithSeed(x, seed)) * 2 - 1;
+        float amp = 1;
+
+        for (int i = 1; i < octaves; i++) {
+            x *= 2f;
+
+            amp *= 0.5f;
+            sum += (Math.abs(wrapped.getNoiseWithSeed(x, seed + i)) * 2 - 1) * amp;
+        }
+
+        return sum / (amp * ((1 << octaves) - 1));
+    }
+
+    protected float ridged(float x, int seed) {
+        float sum = 0f, exp = 1f, correction = 0f, spike;
+        for (int i = 0; i < octaves; i++) {
+            spike = 1f - Math.abs(wrapped.getNoiseWithSeed(x, seed + i));
+            sum += spike * exp;
+            correction += (exp *= 0.5f);
+            x *= 2f;
+        }
+        return sum / correction - 1f;
+    }
+
+    protected float warp(float x, int seed) {
+        float latest = wrapped.getNoiseWithSeed(x, seed);
+        float sum = latest;
+        float amp = 1;
+
+        for (int i = 1; i < octaves; i++) {
+            x = x * 2f;
+            final float idx = latest * 180;
+            float a = MathUtils.sinDeg(idx);
+            amp *= 0.5f;
+            sum += (latest = wrapped.getNoiseWithSeed(x + a, seed + i)) * amp;
+        }
+
+        return sum / (amp * ((1 << octaves) - 1));
+    }
+
+    // 2D
+
     protected float fbm(float x, float y, int seed) {
         float sum = wrapped.getNoiseWithSeed(x, y, seed);
         float amp = 1;

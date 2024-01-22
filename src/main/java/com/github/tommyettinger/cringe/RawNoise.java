@@ -45,6 +45,16 @@ public abstract class RawNoise implements Json.Serializable{
      * @return true if {@link #setSeed(int)} and {@link #getSeed()} are supported, false if either isn't supported
      */
     public abstract boolean canUseSeed();
+
+    /**
+     * Gets 1D noise with a default or pre-set seed. Most noise algorithms don't behave as well in 1D, so a common
+     * approach for implementations is to delegate to one of the LineWobble methods.
+     * @param x x position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     * @throws UnsupportedOperationException if 1D noise cannot be produced by this generator
+     */
+    public abstract float getNoise(float x);
+
     /**
      * Gets 2D noise with a default or pre-set seed.
      * @param x x position; can be any finite float
@@ -171,10 +181,32 @@ public abstract class RawNoise implements Json.Serializable{
     public abstract RawNoise copy();
 
     /**
+     * Gets 1D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
+     * {@link #getNoise}; you can check if this will happen with {@link #canUseSeed()}. Most noise algorithms don't
+     * behave as well in 1D, so a common approach for implementations is to delegate to one of the LineWobble methods.
+     * @param x x position; can be any finite float
+     * @param seed any int; must be the same between calls for the noise to be continuous
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     * @throws UnsupportedOperationException if 1D noise cannot be produced by this generator
+     */
+    public float getNoiseWithSeed(float x, int seed){
+        if(!canUseSeed()) {
+            float s = seed * 0x1.9E3779B9p-16f;
+            return getNoise(x + s);
+        }
+        final int s = getSeed();
+        setSeed(seed);
+        final float r = getNoise(x);
+        setSeed(s);
+        return r;
+    }
+
+    /**
      * Gets 2D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
      * {@link #getNoise}; you can check if this will happen with {@link #canUseSeed()}.
      * @param x x position; can be any finite float
      * @param y y position; can be any finite float
+     * @param seed any int; must be the same between calls for the noise to be continuous
      * @return a noise value between -1.0f and 1.0f, both inclusive
      * @throws UnsupportedOperationException if 2D noise cannot be produced by this generator
      */
@@ -196,6 +228,7 @@ public abstract class RawNoise implements Json.Serializable{
      * @param x x position; can be any finite float
      * @param y y position; can be any finite float
      * @param z z position; can be any finite float
+     * @param seed any int; must be the same between calls for the noise to be continuous
      * @return a noise value between -1.0f and 1.0f, both inclusive
      * @throws UnsupportedOperationException if 3D noise cannot be produced by this generator
      */
@@ -218,6 +251,7 @@ public abstract class RawNoise implements Json.Serializable{
      * @param y y position; can be any finite float
      * @param z z position; can be any finite float
      * @param w w position; can be any finite float
+     * @param seed any int; must be the same between calls for the noise to be continuous
      * @return a noise value between -1.0f and 1.0f, both inclusive
      * @throws UnsupportedOperationException if 4D noise cannot be produced by this generator
      */
@@ -241,6 +275,7 @@ public abstract class RawNoise implements Json.Serializable{
      * @param z z position; can be any finite float
      * @param w w position; can be any finite float
      * @param u u position; can be any finite float
+     * @param seed any int; must be the same between calls for the noise to be continuous
      * @return a noise value between -1.0f and 1.0f, both inclusive
      * @throws UnsupportedOperationException if 5D noise cannot be produced by this generator
      */
@@ -265,6 +300,7 @@ public abstract class RawNoise implements Json.Serializable{
      * @param w w position; can be any finite float
      * @param u u position; can be any finite float
      * @param v v position; can be any finite float
+     * @param seed any int; must be the same between calls for the noise to be continuous
      * @return a noise value between -1.0f and 1.0f, both inclusive
      * @throws UnsupportedOperationException if 6D noise cannot be produced by this generator
      */

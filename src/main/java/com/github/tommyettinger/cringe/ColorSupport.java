@@ -44,6 +44,145 @@ public final class ColorSupport {
     }
 
     /**
+     * Gets the hue of the given RGBA color, from 0.0f to 1.0f, both inclusive.
+     *
+     * @param r red, from 0.0 to 1.0
+     * @param g green, from 0.0 to 1.0
+     * @param b blue, from 0.0 to 1.0
+     * @param a alpha, from 0.0 to 1.0 (ignored)
+     * @return the hue as a float from 0 to 1, both inclusive
+     */
+    public static float hue(final float r, final float g, final float b, final float a) {
+        float x, y, z, w;
+        if (g < b) {
+            x = b;
+            y = g;
+            z = -1f;
+            w = 2f / 3f;
+        } else {
+            x = g;
+            y = b;
+            z = 0f;
+            w = -1f / 3f;
+        }
+        if (r < x) {
+            z = w;
+            w = r;
+        } else {
+            w = x;
+            x = r;
+        }
+        float d = x - Math.min(w, y);
+        return Math.abs(z + (w - y) / (6f * d + 1e-10f));
+    }
+
+    /**
+     * Gets the hue of the given RGBA color, from 0.0f to 1.0f, both inclusive.
+     *
+     * @param r red, from 0.0 to 1.0
+     * @param g green, from 0.0 to 1.0
+     * @param b blue, from 0.0 to 1.0
+     * @param a alpha, from 0.0 to 1.0 (ignored)
+     * @return the hue as a float from 0 to 1, both inclusive
+     */
+    public static float saturation(final float r, final float g, final float b, final float a) {
+        float x, y, w;
+        if (g < b) {
+            x = b;
+            y = g;
+        } else {
+            x = g;
+            y = b;
+        }
+        if (r < x) {
+            w = r;
+        } else {
+            w = x;
+            x = r;
+        }
+        float d = x - Math.min(w, y);
+        float l = x * (1f - 0.5f * d / (x + 1e-10f));
+        return (x - l) / (Math.min(l, 1f - l) + 1e-10f);
+    }
+
+    /**
+     * Gets the lightness (as per HSL) of the given RGBA color, from 0.0f to 1.0f, both inclusive.
+     *
+     * @param r red, from 0.0 to 1.0
+     * @param g green, from 0.0 to 1.0
+     * @param b blue, from 0.0 to 1.0
+     * @param a alpha, from 0.0 to 1.0 (ignored)
+     * @return the lightness as a float from 0 to 1, both inclusive
+     */
+    public static float lightness(final float r, final float g, final float b, final float a) {
+        float x, y, w;
+        if (g < b) {
+            x = b;
+            y = g;
+        } else {
+            x = g;
+            y = b;
+        }
+        if (r < x) {
+            w = r;
+        } else {
+            w = x;
+            x = r;
+        }
+        float d = x - Math.min(w, y);
+        return x * (1f - 0.5f * d / (x + 1e-10f));
+    }
+
+    /**
+     * Gets the brightness (as per HSB, also called value) of the given RGBA color, from 0.0f to 1.0f, both inclusive.
+     *
+     * @param r red, from 0.0 to 1.0
+     * @param g green, from 0.0 to 1.0
+     * @param b blue, from 0.0 to 1.0
+     * @param a alpha, from 0.0 to 1.0 (ignored)
+     * @return the brightness as a float from 0 to 1, both inclusive
+     */
+    public static float brightness(final float r, final float g, final float b, final float a) {
+        return Math.max(Math.max(r, g), b);
+    }
+
+    /**
+     * Just calls {@link #hue(float, float, float, float)} with the RGBA channels of the given Color.
+     * @param color a Color that will not be modified
+     * @return the hue of the given Color
+     */
+    public static float hue(Color color) {
+        return hue(color.r, color.g, color.b, color.a);
+    }
+
+    /**
+     * Just calls {@link #saturation(float, float, float, float)} with the RGBA channels of the given Color.
+     * @param color a Color that will not be modified
+     * @return the saturation of the given Color
+     */
+    public static float saturation(Color color) {
+        return saturation(color.r, color.g, color.b, color.a);
+    }
+
+    /**
+     * Just calls {@link #lightness(float, float, float, float)} with the RGBA channels of the given Color.
+     * @param color a Color that will not be modified
+     * @return the lightness of the given Color
+     */
+    public static float lightness(Color color) {
+        return lightness(color.r, color.g, color.b, color.a);
+    }
+
+    /**
+     * Just calls {@link #brightness(float, float, float, float)} with the RGBA channels of the given Color.
+     * @param color a Color that will not be modified
+     * @return the brightness of the given Color
+     */
+    public static float brightness(Color color) {
+        return brightness(color.r, color.g, color.b, color.a);
+    }
+
+    /**
      * Converts the four HSBA or HSVA components, each in the 0.0 to 1.0 range, to the RGBA values in {@code color},
      * modifying {@code color} in-place. <em>YES, IT MODIFIES THE GIVEN COLOR, SO DON'T PASS THIS A COLOR CONSTANT.</em>
      * I brought this over from colorful-gdx's FloatColors class. I can't recall where I got the original HSB(A) code

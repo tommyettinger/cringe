@@ -21,10 +21,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
@@ -37,6 +37,7 @@ import com.github.tommyettinger.anim8.PaletteReducer;
 
 import static com.badlogic.gdx.Input.Keys.*;
 import static com.badlogic.gdx.graphics.GL20.GL_POINTS;
+import static com.github.tommyettinger.cringe.ContinuousNoise.*;
 
 /**
  */
@@ -55,20 +56,18 @@ public class NoiseVisualizer extends ApplicationAdapter {
     private int dim = 0; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
     private int octaves = 2; // starts at 1
     private float freq = 0x1p-4f;
-    private ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, 0, octaves);
+    private final ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, 0, octaves);
     private ImmediateModeRenderer20 renderer;
 
     private static final int width = 256, height = 256;
     private static final float iWidth = 1f/width, iHeight = 1f/height;
 
-    private InputAdapter input;
-    
     private Viewport view;
     private float ctr = -256;
     private boolean keepGoing = true;
     
     private AnimatedGif gif;
-    private Array<Pixmap> frames = new Array<>(256);
+    private final Array<Pixmap> frames = new Array<>(256);
 
     public static float basicPrepare(float n)
     {
@@ -76,17 +75,11 @@ public class NoiseVisualizer extends ApplicationAdapter {
         return n * 0.5f + 0.5f;
     }
 
-    public static float circleInPrepare(float n)
-    {
-//        return Math.max(0f, n);
-        return Interpolation.circleIn.apply(n * 0.5f + 0.5f);
-    }
-
     @Override
     public void create() {
         renderer = new ImmediateModeRenderer20(width * height, false, true, 0);
         view = new ScreenViewport();
-        noise.setFractalType(ContinuousNoise.FBM);
+        noise.setFractalType(FBM);
         int[] gray256 = new int[256];
         for (int i = 0; i < 256; i++) {
             gray256[i] = i * 0x01010100 + 0xFF;
@@ -96,18 +89,43 @@ public class NoiseVisualizer extends ApplicationAdapter {
         gif.setDitherAlgorithm(Dithered.DitherAlgorithm.WREN);
         gif.setDitherStrength(0.2f);
         gif.palette = new PaletteReducer(gray256);
-        input = new InputAdapter(){
+        // copy out
+        // paste in
+        //                            float halfW = (w-1) * 0.5f, halfH = (h-1) * 0.5f, inv = 1f / w;
+        // fisheye-like effect:
+        //                                    float color = basicPrepare(noise.getNoise(x, y, c - inv * ((x - halfW) * (x - halfW) + (y - halfH) * (y - halfH))));
+        //pause
+        //earlier seed
+        //seed
+        // noise type
+        //dimension
+        // frequency
+        //                        noise.setFrequency(NumberTools.sin(freq += 0.125f) * 0.25f + 0.25f + 0x1p-7f);
+        //                        noise.setFrequency((float) Math.exp((System.currentTimeMillis() >>> 9 & 7) - 5));
+        // fRactal type/mode
+        // higher octaves
+        // lower octaves
+        // sKip
+        InputAdapter input = new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
                 switch (keycode) {
-                    case BACKSLASH:
-                        noise.stringDeserialize(Gdx.app.getClipboard().getContents());
+                    case C: // copy out
+                        String seri = noise.stringSerialize() + "_" + System.currentTimeMillis();
+                        System.out.println("Copying data:\n" + seri);
+                        Gdx.app.getClipboard().setContents(seri);
+                        break;
+                    case V: // paste in
+                        String pasted = Gdx.app.getClipboard().getContents();
+                        System.out.println("Pasting in data:\n" + pasted);
+                        if (pasted != null)
+                            noise.stringDeserialize(pasted);
                         break;
                     case W:
                         for (int c = 0; c < 256; c++) {
                             int w = 256, h = 256;
 //                            float halfW = (w-1) * 0.5f, halfH = (h-1) * 0.5f, inv = 1f / w;
-                            float cDeg = c * (360f/256f), cSin = MathUtils.sinDeg(cDeg) * 40, cCos = MathUtils.cosDeg(cDeg) * 40;
+                            float cDeg = c * (360f / 256f), cSin = MathUtils.sinDeg(cDeg) * 40, cCos = MathUtils.cosDeg(cDeg) * 40;
                             Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                             for (int x = 0; x < w; x++) {
                                 for (int y = 0; y < h; y++) {
@@ -122,9 +140,9 @@ public class NoiseVisualizer extends ApplicationAdapter {
                         }
                         Gdx.files.local("out/").mkdirs();
 
-                        String ser = noise.stringSerialize() + "_" + System.currentTimeMillis();
-                        System.out.println(ser);
-                        gif.write(Gdx.files.local("out/" + ser + ".gif"), frames, 16);
+                        FileHandle file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + ".gif");
+                        System.out.println("Writing to file:\n" + file);
+                        gif.write(file, frames, 16);
                         for (int i = 0; i < frames.size; i++) {
                             frames.get(i).dispose();
                         }
@@ -132,46 +150,74 @@ public class NoiseVisualizer extends ApplicationAdapter {
                         break;
                     case P: //pause
                         keepGoing = !keepGoing;
+                        if (keepGoing)
+                            System.out.println("Now playing");
+                        else
+                            System.out.println("Now paused");
+                        break;
                     case SPACE:
-                        ctr += 1f/60f;
+                        ctr += 1f / 60f;
+                        System.out.println("Stepping ahead so ctr is " + ctr);
                         break;
                     case E: //earlier seed
-                        noise.setSeed( noise.getSeed() - 1);
+                        noise.setSeed(noise.getSeed() - 1);
+                        System.out.println("Seed is now " + noise.getSeed());
                         break;
                     case S: //seed
-                        noise.setSeed( noise.getSeed() + 1);
+                        noise.setSeed(noise.getSeed() + 1);
+                        System.out.println("Seed is now " + noise.getSeed());
                         break;
                     case SLASH:
-                        noise.setSeed( Scramblers.scrambleInt(noise.getSeed()));
+                        noise.setSeed(Scramblers.scrambleInt(noise.getSeed()));
+                        System.out.println("Seed is now " + noise.getSeed());
                         break;
                     case N: // noise type
                     case EQUALS:
                     case ENTER:
                         noise.setWrapped(noises[noiseIndex = (noiseIndex + (UIUtils.shift() ? noises.length - 1 : 1)) % noises.length]);
+                        System.out.println("Switched to " + noises[noiseIndex].getTag());
                         break;
                     case M:
                     case MINUS:
                         noise.setWrapped(noises[noiseIndex = (noiseIndex + noises.length - 1) % noises.length]);
+                        System.out.println("Switched to " + noises[noiseIndex].getTag());
                         break;
                     case D: //dimension
                         dim = (dim + (UIUtils.shift() ? 5 : 1)) % 6;
+                        System.out.println("Now producing " + (dim + 1) + "-dimensional noise.");
                         break;
                     case F: // frequency
-//                        noise.setFrequency(NumberTools.sin(freq += 0.125f) * 0.25f + 0.25f + 0x1p-7f);
-//                        noise.setFrequency((float) Math.exp((System.currentTimeMillis() >>> 9 & 7) - 5));
                         noise.setFrequency(freq *= (UIUtils.shift() ? 1.25f : 0.8f));
+                        System.out.println("Frequency is now " + freq);
                         break;
-                    case R: // fRactal type
+                    case R: // fRactal type/mode
                         noise.setFractalType((noise.getFractalType() + (UIUtils.shift() ? 3 : 1)) % 4);
+                        switch (noise.getFractalType()) {
+                            case FBM:
+                                System.out.println("Fractal Type/Mode is now FBM");
+                                break;
+                            case BILLOW:
+                                System.out.println("Fractal Type/Mode is now BILLOW");
+                                break;
+                            case RIDGED:
+                                System.out.println("Fractal Type/Mode is now RIDGED");
+                                break;
+                            case WARP:
+                                System.out.println("Fractal Type/Mode is now WARP");
+                                break;
+                        }
                         break;
                     case H: // higher octaves
                         noise.setFractalOctaves((octaves = octaves + 1 & 7) + 1);
+                        System.out.println("Using " + (octaves + 1) + " octaves");
                         break;
                     case L: // lower octaves
                         noise.setFractalOctaves((octaves = octaves + 7 & 7) + 1);
+                        System.out.println("Using " + (octaves + 1) + " octaves");
                         break;
                     case K: // sKip
                         ctr += 1000;
+                        System.out.println("Skipping ahead so ctr is " + ctr);
                         break;
                     case Q:
                     case ESCAPE: {

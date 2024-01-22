@@ -146,7 +146,7 @@ public class PerlinNoise extends RawNoise {
      */
     @Override
     public String getTag() {
-        return "PerN";
+        return "PerlinNoise";
     }
 
     /**

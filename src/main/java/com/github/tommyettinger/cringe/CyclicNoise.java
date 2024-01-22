@@ -175,7 +175,7 @@ float cyclicNoise(vec3 p){
 
     @Override
     public String getTag() {
-        return "CycN";
+        return "CyclicNoise";
     }
 
     public String stringSerialize() {

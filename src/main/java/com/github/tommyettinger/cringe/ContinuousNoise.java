@@ -178,7 +178,7 @@ public class ContinuousNoise extends RawNoise {
 
     @Override
     public String getTag() {
-        return "WraN";
+        return "ContinuousNoise";
     }
 
     @Override

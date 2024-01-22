@@ -42,7 +42,7 @@ public class ValueNoise extends RawNoise {
 
     @Override
     public String getTag() {
-        return "ValN";
+        return "ValueNoise";
     }
 
     public String stringSerialize() {

@@ -107,7 +107,7 @@ public class SorbetNoise extends CyclicNoise {
 
     @Override
     public String getTag() {
-        return "SorN";
+        return "SorbetNoise";
     }
 
     @Override

@@ -40,7 +40,7 @@ public class HoneyNoise extends RawNoise {
 
     @Override
     public String getTag() {
-        return "HnyN";
+        return "HoneyNoise";
     }
 
     public String stringSerialize() {

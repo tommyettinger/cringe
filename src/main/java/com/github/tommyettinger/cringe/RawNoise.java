@@ -133,7 +133,8 @@ public abstract class RawNoise implements Json.Serializable{
     public abstract int getSeed();
 
     /**
-     * Returns a typically-four-character String constant that should uniquely identify this RawNoise as well as possible.
+     * Returns a String constant that should uniquely identify this RawNoise as well as possible; usually this is just
+     * the class name.
      * If a duplicate tag is already registered and {@link Serializer#register(RawNoise)} attempts to register the same
      * tag again, a message is printed to {@code System.err}. The default implementation returns the String
      * {@code (NO)}, which is already registered in Serializer to a null value. Implementing this is required for any
@@ -145,14 +146,10 @@ public abstract class RawNoise implements Json.Serializable{
     /**
      * Produces a String that describes everything needed to recreate this RawNoise in full. This String can be read back
      * in by {@link #stringDeserialize(String)} to reassign the described state to another RawNoise. The syntax here
-     * should always start and end with the {@code `} character, which is used by
+     * should always start and end with the {@code `} (backtick) character, which is typically used by
      * {@link #stringDeserialize(String)} to identify the portion of a String that can be read back. The
      * {@code `} character should not be otherwise used unless to serialize another RawNoise that this uses.
-     * <br>
-     * The default implementation throws an {@link UnsupportedOperationException} only. RawNoise classes do not have to
-     * implement any serialization methods, but they aren't serializable by the methods in this class or in
-     * {@link Serializer} unless they do implement this, {@link #getTag()}, {@link #stringDeserialize(String)}, and
-     * {@link #copy()}.
+     * @see Serializer#serialize(RawNoise) RawNoise.Serializer wraps this method so registered RawNoise types can be deserialized.
      * @return a String that describes this RawNoise for serialization
      */
     public abstract String stringSerialize();
@@ -160,11 +157,7 @@ public abstract class RawNoise implements Json.Serializable{
     /**
      * Given a serialized String produced by {@link #stringSerialize()}, reassigns this RawNoise to have the described
      * state from the given String. The serialized String must have been produced by the same class as this object is.
-     * <br>
-     * The default implementation throws an {@link UnsupportedOperationException} only. RawNoise classes do not have to
-     * implement any serialization methods, but they aren't serializable by the methods in this class or in
-     * {@link Serializer} unless they do implement this, {@link #getTag()}, {@link #stringSerialize()}, and
-     * {@link #copy()}.
+     * @see Serializer#deserialize(String) RawNoise.Serializer uses this method to deserialize any registered RawNoise type.
      * @param data a serialized String, typically produced by {@link #stringSerialize()}
      * @return this RawNoise, after being modified (if possible)
      */
@@ -401,6 +394,12 @@ public abstract class RawNoise implements Json.Serializable{
         static {
             NOISE_BY_TAG.put("(NO)", null); // for classes that cannot be serialized
             // TODO: register every type of raw noise generator here
+            register(new CyclicNoise(1, 1));
+            register(new FoamNoise(1));
+            register(new HoneyNoise(1));
+            register(new PerlinNoise(1));
+            register(new SimplexNoise(1));
+            register(new SorbetNoise(1, 1));
             register(new ValueNoise(1));
 
             register(new ContinuousNoise(new ValueNoise(1)));

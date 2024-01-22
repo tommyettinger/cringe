@@ -421,7 +421,7 @@ public class FoamNoise extends RawNoise {
      */
     @Override
     public String getTag() {
-        return "FoaN";
+        return "FoamNoise";
     }
 
     /**

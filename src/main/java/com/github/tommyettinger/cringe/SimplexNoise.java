@@ -748,7 +748,7 @@ public class SimplexNoise extends RawNoise {
 
     @Override
     public String getTag() {
-        return "SimN";
+        return "SimplexNoise";
     }
 
     public String stringSerialize() {

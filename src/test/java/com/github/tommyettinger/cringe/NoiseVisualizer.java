@@ -26,6 +26,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -51,7 +52,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             new SorbetNoise(1, 3),
     };
     int noiseIndex = 6;
-    private int dim = 1; // this can be 0, 1, 2, 3, or 4; add 2 to get the actual dimensions
+    private int dim = 0; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
     private int octaves = 2; // starts at 1
     private float freq = 0x1p-4f;
     private ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, 0, octaves);
@@ -153,7 +154,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                         noise.setWrapped(noises[noiseIndex = (noiseIndex + noises.length - 1) % noises.length]);
                         break;
                     case D: //dimension
-                        dim = (dim + (UIUtils.shift() ? 4 : 1)) % 5;
+                        dim = (dim + (UIUtils.shift() ? 5 : 1)) % 6;
                         break;
                     case F: // frequency
 //                        noise.setFrequency(NumberTools.sin(freq += 0.125f) * 0.25f + 0.25f + 0x1p-7f);
@@ -190,7 +191,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             case 0:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        bright = basicPrepare(noise.getNoise(x + c, y + c));
+                        bright = basicPrepare(noise.getNoise(Vector2.dst(x, y, width * 0.5f, height * 0.5f) - c));
                         renderer.color(bright, bright, bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -199,13 +200,22 @@ public class NoiseVisualizer extends ApplicationAdapter {
             case 1:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        bright = basicPrepare(noise.getNoise(x, y, c));
+                        bright = basicPrepare(noise.getNoise(x + c, y + c));
                         renderer.color(bright, bright, bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
                 }
                 break;
             case 2:
+                for (int x = 0; x < width; x++) {
+                    for (int y = 0; y < height; y++) {
+                        bright = basicPrepare(noise.getNoise(x, y, c));
+                        renderer.color(bright, bright, bright, 1f);
+                        renderer.vertex(x, y, 0);
+                    }
+                }
+                break;
+            case 3:
                 for (int x = 0; x < width; x++) {
                     float xc = MathUtils.cosDeg(360 * x * iWidth) * 64 + c, xs = MathUtils.sinDeg(360 * x * iWidth) * 64 + c;
                     for (int y = 0; y < height; y++) {
@@ -216,7 +226,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     }
                 }
                 break;
-            case 3: {
+            case 4: {
                 for (int x = 0; x < width; x++) {
                     float xc = MathUtils.cosDeg(360 * x * iWidth) * 64, xs = MathUtils.sinDeg(360 * x * iWidth) * 64;
                     for (int y = 0; y < height; y++) {
@@ -228,7 +238,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                 }
             }
                 break;
-            case 4: {
+            case 5: {
                 for (int x = 0; x < width; x++) {
                     float xc = MathUtils.cosDeg(360 * x * iWidth) * 64 + c, xs = MathUtils.sinDeg(360 * x * iWidth) * 64 + c;
                     for (int y = 0; y < height; y++) {

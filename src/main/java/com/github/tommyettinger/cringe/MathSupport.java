@@ -260,8 +260,8 @@ public final class MathSupport {
      * @return sb, after modification, for chaining.
      */
     public static StringBuilder appendUnsignedHex(StringBuilder sb, int number) {
-        for (int i = 28; i >= 0; i -= 4) {
-            sb.append(hexChar(number >>> i & 15));
+        for (int s = 28; s >= 0; s -= 4) {
+            sb.append(hexChar(number >>> s & 15));
         }
         return sb;
     }
@@ -278,6 +278,50 @@ public final class MathSupport {
             sb.append(hexChar(number >>> i & 15));
         }
         return sb;
+    }
+
+    /**
+     * Allocates a new 8-char array filled with the unsigned hex format of {@code number}, and returns it.
+     * @param number any int to write in hex format
+     * @return a new char array holding the 8-character unsigned hex representation of {@code number}
+     */
+    public static char[] unsignedHexArray(int number) {
+        final char[] chars = new char[8];
+        for (int i = 0, s = 28; i < 8; i++, s -= 4) {
+            chars[i] = hexChar(number >>> s & 15);
+        }
+        return chars;
+    }
+
+    /**
+     * Allocates a new 16-char array filled with the unsigned hex format of {@code number}, and returns it.
+     * @param number any long to write in hex format
+     * @return a new char array holding the 16-character unsigned hex representation of {@code number}
+     */
+    public static char[] unsignedHexArray(long number) {
+        final char[] chars = new char[16];
+        for (int i = 0, s = 60; i < 16; i++, s -= 4) {
+            chars[i] = hexChar(number >>> s & 15);
+        }
+        return chars;
+    }
+
+    /**
+     * Allocates a new 8-char String filled with the unsigned hex format of {@code number}, and returns it.
+     * @param number any int to write in hex format
+     * @return a new String holding the 8-character unsigned hex representation of {@code number}
+     */
+    public static String unsignedHex(int number) {
+        return String.valueOf(unsignedHexArray(number));
+    }
+
+    /**
+     * Allocates a new 16-char String filled with the unsigned hex format of {@code number}, and returns it.
+     * @param number any long to write in hex format
+     * @return a new String holding the 16-character unsigned hex representation of {@code number}
+     */
+    public static String unsignedHex(long number) {
+        return String.valueOf(unsignedHexArray(number));
     }
 
     /**
@@ -392,7 +436,7 @@ public final class MathSupport {
      * and returns the int they represent, reading at most 8 characters (9 if there is a sign) and returning the
      * result if valid, or 0 if nothing could be read. The leading sign can be '+' or '-' if present. This can also
      * represent negative numbers as they are printed by such methods as String.format() given %X in the formatting
-     * string; that is, if the first char of a 8-char (or longer)
+     * string; that is, if the first char of an 8-char (or longer)
      * CharSequence is a hex digit 8 or higher, then the whole number represents a negative number, using two's
      * complement and so on. This means "FFFFFFFF" would return the int -1 when passed to this, though you
      * could also simply use "-1" . If you use both '-' at the start and have the most significant digit as 8 or higher,
@@ -402,7 +446,7 @@ public final class MathSupport {
      * Should be fairly close to Java 8's Integer.parseUnsignedInt method, which is an odd omission from earlier JDKs.
      * This doesn't throw on invalid input, though, instead returning 0 if the first char is not a hex digit, or
      * stopping the parse process early if a non-hex-digit char is read before end is reached. If the parse is stopped
-     * early, this behaves as you would expect for a number with fewer digits, and simply doesn't fill the larger places.
+     * early, this behaves as you would expect for a number with fewer digits, and just doesn't fill the larger places.
      *
      * @param cs    a CharSequence, such as a String, containing hex digits with an optional sign (no 0x at the start)
      * @param start the (inclusive) first character position in cs to read
@@ -428,10 +472,65 @@ public final class MathSupport {
             else {
                 sign = 1;
                 lim = 8;
+                h = hexCode(c);
             }
-            h = hexCode(c);
         }
         int data = h;
+        for (int i = start + 1; i < end && i < start + lim; i++) {
+            c = cs.charAt(i);
+            if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')))
+                return data * sign;
+            data <<= 4;
+            data |= hexCode(c);
+        }
+        return data * sign;
+    }
+
+    /**
+     * Reads in a CharSequence containing only hex digits (only 0-9, a-f, and A-F) with an optional sign at the start
+     * and returns the long they represent, reading at most 16 characters (17 if there is a sign) and returning the
+     * result if valid, or 0 if nothing could be read. The leading sign can be '+' or '-' if present. This can also
+     * represent negative numbers as they are printed by such methods as String.format() given %X in the formatting
+     * string; that is, if the first char of a 16-char (or longer) CharSequence is a hex digit 8 or higher, then the
+     * whole number represents a negative number, using two's complement and so on. This means "FFFFFFFFFFFFFFFF" would
+     * return the long -1 when passed to this, though you could also simply use "-1" . If you use both '-' at the start
+     * and have the most significant digit as 8 or higher, such as with "-FFFFFFFFFFFFFFFF", then both indicate a
+     * negative number, but the digits will be processed first (producing -1) and then the whole thing will be
+     * multiplied by -1 to flip the sign again (returning 1).
+     * <br>
+     * Should be fairly close to Java 8's Long.parseUnsignedLong method, which is an odd omission from earlier JDKs.
+     * This doesn't throw on invalid input, though, instead returning 0 if the first char is not a hex digit, or
+     * stopping the parse process early if a non-hex-digit char is read before end is reached. If the parse is stopped
+     * early, this behaves as you would expect for a number with fewer digits, and just doesn't fill the larger places.
+     *
+     * @param cs    a CharSequence, such as a String, containing hex digits with an optional sign (no 0x at the start)
+     * @param start the (inclusive) first character position in cs to read
+     * @param end   the (exclusive) last character position in cs to read (this stops after 8 characters if end is too large)
+     * @return the long that cs represents
+     */
+    public static long longFromHex(final CharSequence cs, final int start, int end) {
+        int sign, h, lim;
+        if (cs == null || start < 0 || end <= 0 || (end = Math.min(end, cs.length())) - start <= 0)
+            return 0;
+        char c = cs.charAt(start);
+        if (c == '-') {
+            sign = -1;
+            h = 0;
+            lim = 17;
+        } else if (c == '+') {
+            sign = 1;
+            h = 0;
+            lim = 17;
+        } else {
+            if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')))
+                return 0;
+            else {
+                sign = 1;
+                lim = 16;
+                h = hexCode(c);
+            }
+        }
+        long data = h;
         for (int i = start + 1; i < end && i < start + lim; i++) {
             c = cs.charAt(i);
             if (!((c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')))

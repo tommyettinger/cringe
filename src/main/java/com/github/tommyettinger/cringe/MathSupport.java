@@ -226,6 +226,61 @@ public final class MathSupport {
     }
 
     /**
+     * Converts the given number, which should be between 0 and 15 inclusive, to its corresponding hex digit as a char.
+     * This does not use a table lookup. It will return garbage if not given a number in range, but will not crash
+     * or throw an Exception on any input.
+     * @param number an int that should really be between 0 (inclusive) and 15 (inclusive)
+     * @return the hex digit that matches the given number
+     */
+    @SuppressWarnings("ShiftOutOfRange")
+    public static char hexChar(final int number) {
+        return (char)(number + 48 + (9 - number >>> -3));
+    }
+
+    /**
+     * Converts the given number, which should be between 0 and 15 inclusive, to its corresponding hex digit as a char.
+     * This does not use a table lookup. It will return garbage if not given a number in range, but will not crash
+     * or throw an Exception on any input.
+     * <br>
+     * This overload only exists to ease conversion to hex digits when given a long input. Its body is the same as the
+     * overload that takes an int, {@link #hexChar(int)}.
+     * @param number an int that should really be between 0 (inclusive) and 15 (inclusive)
+     * @return the hex digit that matches the given number
+     */
+    @SuppressWarnings("ShiftOutOfRange")
+    public static char hexChar(final long number) {
+        return (char)(number + 48 + (9 - number >>> -3));
+    }
+
+    /**
+     * Appends the 8-digit unsigned hex format of {@code number} to the given StringBuilder. This always draws from
+     * only the digits 0-9 and the capital letters A-F for its hex digits.
+     * @param sb an existing StringBuilder to append to
+     * @param number any int to write in hex format
+     * @return sb, after modification, for chaining.
+     */
+    public static StringBuilder appendUnsignedHex(StringBuilder sb, int number) {
+        for (int i = 28; i >= 0; i -= 4) {
+            sb.append(hexChar(number >>> i & 15));
+        }
+        return sb;
+    }
+
+    /**
+     * Appends the 16-digit unsigned hex format of {@code number} to the given StringBuilder. This always draws from
+     * only the digits 0-9 and the capital letters A-F for its hex digits.
+     * @param sb an existing StringBuilder to append to
+     * @param number any long to write in hex format
+     * @return sb, after modification, for chaining.
+     */
+    public static StringBuilder appendUnsignedHex(StringBuilder sb, long number) {
+        for (int i = 60; i >= 0; i -= 4) {
+            sb.append(hexChar(number >>> i & 15));
+        }
+        return sb;
+    }
+
+    /**
      * Reads in a CharSequence containing only decimal digits (only 0-9) with an optional sign at the start
      * and returns the long they represent, reading at most 19 characters (20 if there is a sign) and returning the
      * result if valid, or 0 if nothing could be read. The leading sign can be '+' or '-' if present. This can also

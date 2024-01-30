@@ -77,13 +77,13 @@ public final class ColorSupport {
     }
 
     /**
-     * Gets the hue of the given RGBA color, from 0.0f to 1.0f, both inclusive.
+     * Gets the saturation of the given RGBA color, from 0.0f to 1.0f, both inclusive.
      *
      * @param r red, from 0.0 to 1.0
      * @param g green, from 0.0 to 1.0
      * @param b blue, from 0.0 to 1.0
      * @param a alpha, from 0.0 to 1.0 (ignored)
-     * @return the hue as a float from 0 to 1, both inclusive
+     * @return the saturation as a float from 0 to 1, both inclusive
      */
     public static float saturation(final float r, final float g, final float b, final float a) {
         float x, y, w;

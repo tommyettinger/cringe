@@ -160,13 +160,12 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
             return new UniqueIdentifier(stateA, stateB);
         }
         public String stringSerialize() {
-            return "`" + stateA + "~" + stateB + "`";
+            return MathSupport.appendUnsignedHex(MathSupport.appendUnsignedHex(new StringBuilder(33), stateA).append('$'), stateB).toString();
         }
 
         public Generator stringDeserialize(String data) {
-            int mid = data.indexOf('~');
-            stateA = MathSupport.longFromDec(data, 1, mid);
-            stateB = MathSupport.longFromDec(data, mid+1, Integer.MAX_VALUE);
+            stateA = MathSupport.longFromHex(data, 0, 16);
+            stateB = MathSupport.longFromHex(data, 17, 33);
             return this;
         }
 

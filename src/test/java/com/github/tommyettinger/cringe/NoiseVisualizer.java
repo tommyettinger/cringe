@@ -94,23 +94,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
         gif.setDitherAlgorithm(Dithered.DitherAlgorithm.WREN);
         gif.setDitherStrength(0.2f);
         gif.palette = new PaletteReducer(gray256);
-        // copy out
-        // paste in
-        //                            float halfW = (w-1) * 0.5f, halfH = (h-1) * 0.5f, inv = 1f / w;
-        // fisheye-like effect:
-        //                                    float color = basicPrepare(noise.getNoise(x, y, c - inv * ((x - halfW) * (x - halfW) + (y - halfH) * (y - halfH))));
-        //pause
-        //earlier seed
-        //seed
-        // noise type
-        //dimension
-        // frequency
-        //                        noise.setFrequency(NumberTools.sin(freq += 0.125f) * 0.25f + 0.25f + 0x1p-7f);
-        //                        noise.setFrequency((float) Math.exp((System.currentTimeMillis() >>> 9 & 7) - 5));
-        // fRactal type/mode
-        // higher octaves
-        // lower octaves
-        // sKip
+
         InputAdapter input = new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
@@ -134,9 +118,9 @@ public class NoiseVisualizer extends ApplicationAdapter {
                             Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                             for (int x = 0; x < w; x++) {
                                 for (int y = 0; y < h; y++) {
-                                    float color = basicPrepare(noise.getNoise(x, y, cSin, cCos));
+                                    float color = basicPrepare(noise.getNoiseWithSeed(x, y, cSin, cCos, noise.seed));
                                     // fisheye-like effect:
-//                                    float color = basicPrepare(noise.getNoise(x, y, c - inv * ((x - halfW) * (x - halfW) + (y - halfH) * (y - halfH))));
+//                                    float color = basicPrepare(noise.getNoiseWithSeed(x, y, c - inv * ((x - halfW) * (x - halfW) + (y - halfH) * (y - halfH)), noise.seed));
                                     p.setColor(color, color, color, 1f);
                                     p.drawPixel(x, y);
                                 }
@@ -271,7 +255,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             case 0:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        bright = basicPrepare(noise.getNoise(Vector2.dst(x, y, width * 0.5f, height * 0.5f) - c));
+                        bright = basicPrepare(noise.getNoiseWithSeed(Vector2.dst(x, y, width * 0.5f, height * 0.5f) - c, noise.seed));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -280,7 +264,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             case 1:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        bright = basicPrepare(noise.getNoise(x + c, y + c));
+                        bright = basicPrepare(noise.getNoiseWithSeed(x + c, y + c, noise.seed));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -289,7 +273,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             case 2:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        bright = basicPrepare(noise.getNoise(x, y, c));
+                        bright = basicPrepare(noise.getNoiseWithSeed(x, y, c, noise.seed));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -300,7 +284,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     float xc = MathUtils.cosDeg(360 * x * iWidth) * 64 + c, xs = MathUtils.sinDeg(360 * x * iWidth) * 64 + c;
                     for (int y = 0; y < height; y++) {
                         float yc = MathUtils.cosDeg(360 * y * iHeight) * 64 + c, ys = MathUtils.sinDeg(360 * y * iHeight) * 64 + c;
-                        bright = basicPrepare(noise.getNoise(xc, yc, xs, ys));
+                        bright = basicPrepare(noise.getNoiseWithSeed(xc, yc, xs, ys, noise.seed));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -311,7 +295,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     float xc = MathUtils.cosDeg(360 * x * iWidth) * 64, xs = MathUtils.sinDeg(360 * x * iWidth) * 64;
                     for (int y = 0; y < height; y++) {
                         float yc = MathUtils.cosDeg(360 * y * iHeight) * 64, ys = MathUtils.sinDeg(360 * y * iHeight) * 64;
-                        bright = basicPrepare(noise.getNoise(xc, yc, xs, ys, c));
+                        bright = basicPrepare(noise.getNoiseWithSeed(xc, yc, xs, ys, c, noise.seed));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -324,7 +308,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     for (int y = 0; y < height; y++) {
                         float yc = MathUtils.cosDeg(360 * y * iHeight) * 64 + c, ys = MathUtils.sinDeg(360 * y * iHeight) * 64 + c,
                                 zc = MathUtils.cosDeg(360 * (x - y) * 0.5f * iWidth) * 64 - c, zs = MathUtils.sinDeg(360 * (x - y) * 0.5f * iWidth) * 64 - c;
-                        bright = basicPrepare(noise.getNoise(xc, yc, zc, xs, ys, zs));
+                        bright = basicPrepare(noise.getNoiseWithSeed(xc, yc, zc, xs, ys, zs, noise.seed));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }

@@ -211,14 +211,14 @@ float cyclicNoise(vec3 p){
 
     /**
      * Gets 1D noise with using this generator's {@link #getSeed() seed}.
-     * Delegates to {@link LineWobble#bicubicWobble(float, long)}.
+     * Delegates to {@link LineWobble#splineWobble(float, long)}.
      *
      * @param x x position; can be any finite float
      * @return a noise value between -1.0f and 1.0f, both inclusive
      */
     @Override
     public float getNoise(float x) {
-        return LineWobble.bicubicWobble(x, seed);
+        return LineWobble.splineWobble(x, seed);
     }
 
     @Override

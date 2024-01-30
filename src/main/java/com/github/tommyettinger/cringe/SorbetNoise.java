@@ -56,10 +56,6 @@ public class SorbetNoise extends CyclicNoise {
         return new SorbetNoise(seed, octaves, freq);
     }
 
-    public float getNoise(float x) {
-        return LineWobble.bicubicWobble(x, seed);
-    }
-
     public float getNoise(float x, float y) {
         float xx = x * 0.25f;
         float yy = y * 0.25f;
@@ -91,6 +87,51 @@ public class SorbetNoise extends CyclicNoise {
     }
 
     public float getNoise(float x, float y, float z, float w, float u, float v) {
+        float xx = x * 0.25f;
+        float yy = y * 0.25f;
+        float zz = z * 0.25f;
+        float ww = w * 0.25f;
+        float uu = u * 0.25f;
+        float vv = v * 0.25f;
+        return super.getNoise(x, y, z, w, u, v, 2.00f * SimplexNoise.noise(xx, yy, zz, ww, uu, vv, seed));
+    }
+
+    @Override
+    public float getNoiseWithSeed(float x, float y, int seed) {
+        float xx = x * 0.25f;
+        float yy = y * 0.25f;
+        return super.getNoise(x, y, 2.00f * SimplexNoise.noise(xx, yy, seed));
+    }
+
+    @Override
+    public float getNoiseWithSeed(float x, float y, float z, int seed) {
+        float xx = x * 0.25f;
+        float yy = y * 0.25f;
+        float zz = z * 0.25f;
+        return super.getNoise(x, y, z, 2.00f * SimplexNoise.noise(xx, yy, zz, seed));
+    }
+
+    @Override
+    public float getNoiseWithSeed(float x, float y, float z, float w, int seed) {
+        float xx = x * 0.25f;
+        float yy = y * 0.25f;
+        float zz = z * 0.25f;
+        float ww = w * 0.25f;
+        return super.getNoise(x, y, z, w, 2.00f * SimplexNoise.noise(xx, yy, zz, ww, seed));
+    }
+
+    @Override
+    public float getNoiseWithSeed(float x, float y, float z, float w, float u, int seed) {
+        float xx = x * 0.25f;
+        float yy = y * 0.25f;
+        float zz = z * 0.25f;
+        float ww = w * 0.25f;
+        float uu = u * 0.25f;
+        return super.getNoise(x, y, z, w, u, 2.00f * SimplexNoise.noise(xx, yy, zz, ww, uu, seed));
+    }
+
+    @Override
+    public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
         float xx = x * 0.25f;
         float yy = y * 0.25f;
         float zz = z * 0.25f;

@@ -372,7 +372,7 @@ public final class MathSupport {
             if (!(c >= '0' && c <= '9'))
                 return data * sign;
             data *= 10;
-            data |= (c - '0');
+            data += (c - '0');
         }
         return data * sign;
     }
@@ -426,7 +426,7 @@ public final class MathSupport {
             if (!(c >= '0' && c <= '9'))
                 return data * sign;
             data *= 10;
-            data |= (c - '0');
+            data += (c - '0');
         }
         return data * sign;
     }

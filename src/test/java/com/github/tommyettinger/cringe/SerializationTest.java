@@ -95,4 +95,22 @@ public class SerializationTest {
         dser = UniqueIdentifier.next();
         Assert.assertEquals(orig, dser);
     }
+
+    @Test
+    public void testUniqueIdentifierString() {
+        UniqueIdentifier orig = UniqueIdentifier.next();
+        String ser = orig.stringSerialize();
+        System.out.println(ser);
+        UniqueIdentifier dser = new UniqueIdentifier().stringDeserialize(ser);
+        System.out.println(ser + " deserializes to " + dser.stringSerialize());
+        Assert.assertEquals("Failure with " + ser, orig, dser);
+        String serG = UniqueIdentifier.GENERATOR.stringSerialize();
+        orig = UniqueIdentifier.next();
+        orig = UniqueIdentifier.next();
+        UniqueIdentifier.GENERATOR.stringDeserialize(serG);
+
+        dser = UniqueIdentifier.next();
+        dser = UniqueIdentifier.next();
+        Assert.assertEquals(orig, dser);
+    }
 }

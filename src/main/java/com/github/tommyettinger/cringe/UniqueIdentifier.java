@@ -82,15 +82,25 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
                 '}';
     }
 
+    /**
+     * Serializes this UniqueIdentifier to a String, where it can be read back by {@link #stringDeserialize(String)}.
+     * This is different from most other stringSerialize() methods in that it always produces a 33-character String,
+     * consisting of {@link #getHi()}, then a {@code '_'}, then {@link #getLo()}, with hi and lo represented as unsigned
+     * hex long Strings.
+     * @return a 33-character-long String storing this identifier; can be read back with {@link #stringDeserialize(String)}
+     */
     public String stringSerialize() {
-        return "`" + hi + "~" + lo + "`";
+        return MathSupport.appendUnsignedHex(MathSupport.appendUnsignedHex(new StringBuilder(33), hi).append('_'), lo).toString();
     }
 
+    /**
+     * Reads back a String produced by {@link #stringSerialize()}, storing the result in this UniqueIdentifier.
+     * @param data a String almost certainly produced by {@link #stringSerialize()}
+     * @return this UniqueIdentifier, after it has been modified.
+     */
     public UniqueIdentifier stringDeserialize(String data) {
-        int mid = data.indexOf('~');
-        hi = MathSupport.longFromDec(data, 1, mid);
-        lo = MathSupport.longFromDec(data, mid+1, Integer.MAX_VALUE);
-
+        hi = MathSupport.longFromHex(data, 0, 16);
+        lo = MathSupport.longFromHex(data, 17, 33);
         return this;
     }
 

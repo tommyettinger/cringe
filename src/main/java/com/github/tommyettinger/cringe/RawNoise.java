@@ -394,11 +394,13 @@ public abstract class RawNoise implements Json.Serializable{
         static {
             NOISE_BY_TAG.put("(NO)", null); // for classes that cannot be serialized
             // TODO: register every type of raw noise generator here
+            register(new BadgerNoise(1));
             register(new CyclicNoise(1, 1));
             register(new FoamNoise(1));
             register(new HoneyNoise(1));
             register(new PerlinNoise(1));
             register(new SimplexNoise(1));
+            register(new SnakeNoise(1));
             register(new SorbetNoise(1, 1));
             register(new ValueNoise(1));
 

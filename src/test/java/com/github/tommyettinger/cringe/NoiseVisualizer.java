@@ -53,6 +53,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
             new HoneyNoise(1),
             new CyclicNoise(1, 3),
             new SorbetNoise(1, 3),
+            new BadgerNoise(1),
+            new SnakeNoise(1),
     };
     int noiseIndex = 6;
     private int dim = 0; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
@@ -68,7 +70,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
     private float ctr = -256;
     private boolean keepGoing = true;
 
-    private Color color = new Color(Color.LIME);
+    private Color color = new Color(Color.WHITE);//new Color(Color.LIME);
     private float hue = hue(color), sat = saturation(color), lit = lightness(color);
     
     private AnimatedGif gif;

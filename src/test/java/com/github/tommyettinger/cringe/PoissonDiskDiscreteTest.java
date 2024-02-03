@@ -23,7 +23,7 @@ import com.badlogic.gdx.utils.OrderedMap;
 /**
  * A test for the randomized spraying of GridPoint2 values in the PoissonDiskDiscrete class.
  */
-public class PoissonDiskTest {
+public class PoissonDiskDiscreteTest {
 
     public static void main(String[] args) {
         RandomAce320 rng = new RandomAce320();

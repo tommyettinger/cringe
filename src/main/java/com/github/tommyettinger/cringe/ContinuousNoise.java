@@ -22,7 +22,8 @@ public class ContinuousNoise extends RawNoise {
 
     /**
      * "Standard" layered octaves of noise, where each octave has a different frequency and weight.
-     * Tends to look cloudy with more octaves, and generally like a natural process.
+     * Tends to look cloudy with more octaves, and generally like a natural process. This only has
+     * an effect with 2 octaves or more.
      * <br>
      * Meant to be used with {@link #setMode(int)}.
      */
@@ -50,7 +51,7 @@ public class ContinuousNoise extends RawNoise {
     /**
      * Layered octaves of noise, where each octave has a different frequency and weight, and the results of
      * earlier octaves affect the inputs to later octave calculations. Tends to look cloudy but with swirling
-     * distortions, and generally like a natural process.
+     * distortions, and generally like a natural process. This only has an effect with 2 octaves or more.
      * <br>
      * Meant to be used with {@link #setMode(int)}.
      */
@@ -380,6 +381,8 @@ public class ContinuousNoise extends RawNoise {
     
     protected float fbm(float x, int seed) {
         float sum = wrapped.getNoiseWithSeed(x, seed);
+        if(octaves <= 1) return sum;
+
         float amp = 1;
 
         for (int i = 1; i < octaves; i++) {
@@ -418,6 +421,8 @@ public class ContinuousNoise extends RawNoise {
 
     protected float warp(float x, int seed) {
         float latest = wrapped.getNoiseWithSeed(x, seed);
+        if(octaves <= 1) return latest;
+
         float sum = latest;
         float amp = 1;
 
@@ -436,6 +441,8 @@ public class ContinuousNoise extends RawNoise {
 
     protected float fbm(float x, float y, int seed) {
         float sum = wrapped.getNoiseWithSeed(x, y, seed);
+        if(octaves <= 1) return sum;
+
         float amp = 1;
 
         for (int i = 1; i < octaves; i++) {
@@ -477,6 +484,8 @@ public class ContinuousNoise extends RawNoise {
 
     protected float warp(float x, float y, int seed) {
         float latest = wrapped.getNoiseWithSeed(x, y, seed);
+        if(octaves <= 1) return latest;
+
         float sum = latest;
         float amp = 1;
 
@@ -497,6 +506,8 @@ public class ContinuousNoise extends RawNoise {
     
     protected float fbm(float x, float y, float z, int seed) {
         float sum = wrapped.getNoiseWithSeed(x, y, z, seed);
+        if(octaves <= 1) return sum;
+
         float amp = 1;
 
         for (int i = 1; i < octaves; i++) {
@@ -541,6 +552,8 @@ public class ContinuousNoise extends RawNoise {
 
     protected float warp(float x, float y, float z, int seed) {
         float latest = wrapped.getNoiseWithSeed(x, y, z, seed);
+        if(octaves <= 1) return latest;
+
         float sum = latest;
         float amp = 1;
 
@@ -565,6 +578,8 @@ public class ContinuousNoise extends RawNoise {
     
     protected float fbm(float x, float y, float z, float w, int seed) {
         float sum = wrapped.getNoiseWithSeed(x, y, z, w, seed);
+        if(octaves <= 1) return sum;
+
         float amp = 1;
 
         for (int i = 1; i < octaves; i++) {
@@ -612,6 +627,8 @@ public class ContinuousNoise extends RawNoise {
 
     protected float warp(float x, float y, float z, float w, int seed) {
         float latest = wrapped.getNoiseWithSeed(x, y, z, w, seed);
+        if(octaves <= 1) return latest;
+
         float sum = latest;
         float amp = 1;
 
@@ -638,6 +655,8 @@ public class ContinuousNoise extends RawNoise {
 
     protected float fbm(float x, float y, float z, float w, float u, int seed) {
         float sum = wrapped.getNoiseWithSeed(x, y, z, w, u, seed);
+        if(octaves <= 1) return sum;
+
         float amp = 1;
 
         for (int i = 1; i < octaves; i++) {
@@ -688,6 +707,8 @@ public class ContinuousNoise extends RawNoise {
 
     protected float warp(float x, float y, float z, float w, float u, int seed) {
         float latest = wrapped.getNoiseWithSeed(x, y, z, w, u, seed);
+        if(octaves <= 1) return latest;
+
         float sum = latest;
         float amp = 1;
 
@@ -716,6 +737,8 @@ public class ContinuousNoise extends RawNoise {
 
     protected float fbm(float x, float y, float z, float w, float u, float v, int seed) {
         float sum = wrapped.getNoiseWithSeed(x, y, z, w, u, v, seed);
+        if(octaves <= 1) return sum;
+
         float amp = 1;
 
         for (int i = 1; i < octaves; i++) {
@@ -769,6 +792,8 @@ public class ContinuousNoise extends RawNoise {
 
     protected float warp(float x, float y, float z, float w, float u, float v, int seed) {
         float latest = wrapped.getNoiseWithSeed(x, y, z, w, u, v, seed);
+        if(octaves <= 1) return latest;
+
         float sum = latest;
         float amp = 1;
 

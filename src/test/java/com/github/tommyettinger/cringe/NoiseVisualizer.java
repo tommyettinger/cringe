@@ -26,7 +26,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -45,6 +44,10 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.*;
  */
 public class NoiseVisualizer extends ApplicationAdapter {
 
+    static {
+        Serializer.register(new BadgerNoise(1));
+        Serializer.register(new SnakeNoise(1));
+    }
     RawNoise[] noises = new RawNoise[]{
             new ValueNoise(1),
             new FoamNoise(1),

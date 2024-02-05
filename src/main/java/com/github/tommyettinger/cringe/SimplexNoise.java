@@ -44,7 +44,7 @@ public class SimplexNoise extends RawNoise {
 
     @Override
     public float getNoise(float x) {
-        return LineWobble.wobble(x, seed);
+        return LineWobble.trigWobble(x, seed);
     }
     @Override
     public float getNoise(final float x, final float y) {
@@ -69,7 +69,7 @@ public class SimplexNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, int seed) {
-        return LineWobble.wobble(x, seed);
+        return LineWobble.trigWobble(x, seed);
     }
     @Override
     public float getNoiseWithSeed(final float x, final float y, final int seed) {
@@ -723,7 +723,7 @@ public class SimplexNoise extends RawNoise {
 
     @Override
     public int getMinDimension() {
-        return 2;
+        return 1;
     }
 
     @Override

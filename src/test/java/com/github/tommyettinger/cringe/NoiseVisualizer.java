@@ -260,7 +260,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
             case 0:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        bright = basicPrepare(noise.getNoiseWithSeed(Vector2.dst(x, y, width * 0.5f, height * 0.5f) - c, noise.seed));
+                        bright = basicPrepare(noise.getNoiseWithSeed(Math.abs(x - width * 0.5f) + Math.abs(y - height * 0.5f) - c, noise.seed));
+//                        bright = basicPrepare(noise.getNoiseWithSeed(Vector2.dst(x, y, width * 0.5f, height * 0.5f) - c, noise.seed));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }

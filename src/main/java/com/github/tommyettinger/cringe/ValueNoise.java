@@ -109,9 +109,11 @@ public class ValueNoise extends RawNoise {
      * @return a mediocre 10-bit hash
      */
     private static int hashPart1024(final int x, int s) {
-        s *= ((x ^ x >>> 12) | 1);
-        s += (x ^ x >>> 16) * 0xAC451;
-        return (s >>> 3 ^ s >>> 10) & 0x3FF;
+//        s *= ((x ^ x >>> 12) | 1);
+//        s += (x ^ x >>> 16) * 0xAC451;
+//        return (s >>> 3 ^ s >>> 10) & 0x3FF;
+        s += x;
+        return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493 >>> 22;
     }
 
     public static float valueNoise(float x, float y, int seed)

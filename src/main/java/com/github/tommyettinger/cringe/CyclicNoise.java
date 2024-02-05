@@ -576,7 +576,7 @@ float cyclicNoise(vec3 p){
 
     @Override
     public int getMinDimension() {
-        return 2;
+        return 1;
     }
 
     @Override

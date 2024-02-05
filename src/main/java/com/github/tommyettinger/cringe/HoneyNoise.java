@@ -90,7 +90,7 @@ public class HoneyNoise extends RawNoise {
 
     @Override
     public int getMinDimension() {
-        return 2;
+        return 1;
     }
 
     @Override
@@ -112,7 +112,7 @@ public class HoneyNoise extends RawNoise {
      */
     @Override
     public float getNoise(float x) {
-        return LineWobble.splineWobble(x, seed);
+        return LineWobble.bicubicWobble(x, seed);
     }
 
     @Override
@@ -164,7 +164,7 @@ public class HoneyNoise extends RawNoise {
      */
     @Override
     public float getNoiseWithSeed(float x, int seed) {
-        return LineWobble.wobble(x, seed);
+        return LineWobble.bicubicWobble(x, seed);
     }
 
     @Override

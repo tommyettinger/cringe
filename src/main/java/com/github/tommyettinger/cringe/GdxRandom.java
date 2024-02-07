@@ -410,7 +410,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * <br>
 	 * It should be mentioned that the technique this uses has some bias, depending
 	 * on {@code bound}, but it typically isn't measurable without specifically looking
-	 * for it. Using the method this does allows this method to always advance the state
+	 * for it. Using the method this does allow this method to always advance the state
 	 * by one step, instead of a varying and unpredictable amount with the more typical
 	 * ways of rejection-sampling random numbers and only using numbers that can produce
 	 * an int within the bound without bias.
@@ -427,6 +427,33 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	}
 
 	/**
+	 * Returns a pseudorandom, uniformly distributed {@code int} value
+	 * between 0 (inclusive) and the specified value (exclusive), drawn from
+	 * this random number generator's sequence.  The general contract of
+	 * {@code nextInt} is that one {@code int} value in the specified range
+	 * is pseudorandomly generated and returned.  All {@code bound} possible
+	 * {@code int} values are produced with (approximately) equal
+	 * probability.
+	 * <br>
+	 * This method treats the outer bound as unsigned, so if a negative int is passed as
+	 * {@code bound}, it will be treated as positive and larger than {@link Integer#MAX_VALUE}.
+	 * That means this can produce results that are positive or negative, but when you
+	 * mask the result and the bound with {@code 0xFFFFFFFFL} (to treat them as unsigned),
+	 * the result will always be between {@code 0L} (inclusive) and the masked bound
+	 * (exclusive).
+	 * <br>
+	 * This is primarily useful as a building block for other methods in this class.
+	 *
+	 * @param bound the upper bound (exclusive); treated as unsigned
+	 * @return the next pseudorandom, uniformly distributed {@code int}
+	 * value between zero (inclusive) and {@code bound} (exclusive), treated as
+	 * unsigned, from this random number generator's sequence
+	 */
+	public int nextUnsignedInt (int bound) {
+		return (int)((bound & 0xFFFFFFFFL) * (nextLong() & 0xFFFFFFFFL) >>> 32);
+	}
+
+	/**
 	 * Returns a pseudorandom, uniformly distributed {@code int} value between an
 	 * inner bound of 0 (inclusive) and the specified {@code outerBound} (exclusive).
 	 * This is meant for cases where the outer bound may be negative, especially if
@@ -437,7 +464,6 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 *
 	 * @param outerBound the outer exclusive bound; may be any int value, allowing negative
 	 * @return a pseudorandom int between 0 (inclusive) and outerBound (exclusive)
-	 * @see #nextInt(int) Here's a note about the bias present in the bounded generation.
 	 */
 	public int nextSignedInt (int outerBound) {
 		outerBound = (int)(outerBound * (nextLong() & 0xFFFFFFFFL) >> 32);
@@ -448,11 +474,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * Returns a pseudorandom, uniformly distributed {@code int} value between the
 	 * specified {@code innerBound} (inclusive) and the specified {@code outerBound}
 	 * (exclusive). If {@code outerBound} is less than or equal to {@code innerBound},
-	 * this always returns {@code innerBound}. This is significantly slower than
-	 * {@link #nextInt(int)} or {@link #nextSignedInt(int)},
-	 * because this handles even ranges that go from large negative numbers to large
-	 * positive numbers, and since that would be larger than the largest possible int,
-	 * this has to use {@link #nextLong(long, long)}.
+	 * this always returns {@code innerBound}.
 	 *
 	 * <br> For any case where outerBound might be valid but less than innerBound, you
 	 * can use {@link #nextSignedInt(int, int)}. If outerBound is less than innerBound
@@ -461,30 +483,23 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param innerBound the inclusive inner bound; may be any int, allowing negative
 	 * @param outerBound the exclusive outer bound; must be greater than innerBound (otherwise this returns innerBound)
 	 * @return a pseudorandom int between innerBound (inclusive) and outerBound (exclusive)
-	 * @see #nextInt(int) Here's a note about the bias present in the bounded generation.
-	 */
+=	 */
 	public int nextInt (int innerBound, int outerBound) {
-		return (int)nextLong(innerBound, outerBound);
+		return (int)(innerBound + (nextUnsignedInt(outerBound - innerBound) & ~((long)outerBound - (long)innerBound >> 63)));
 	}
 
 	/**
 	 * Returns a pseudorandom, uniformly distributed {@code int} value between the
 	 * specified {@code innerBound} (inclusive) and the specified {@code outerBound}
 	 * (exclusive). This is meant for cases where either bound may be negative,
-	 * especially if the bounds are unknown or may be user-specified. It is slightly
-	 * slower than {@link #nextInt(int, int)}, and significantly slower than
-	 * {@link #nextInt(int)} or {@link #nextSignedInt(int)}. This last part is
-	 * because this handles even ranges that go from large negative numbers to large
-	 * positive numbers, and since that range is larger than the largest possible int,
-	 * this has to use {@link #nextSignedLong(long, long)}.
+	 * especially if the bounds are unknown or may be user-specified.
 	 *
 	 * @param innerBound the inclusive inner bound; may be any int, allowing negative
 	 * @param outerBound the exclusive outer bound; may be any int, allowing negative
 	 * @return a pseudorandom int between innerBound (inclusive) and outerBound (exclusive)
-	 * @see #nextInt(int) Here's a note about the bias present in the bounded generation.
 	 */
 	public int nextSignedInt (int innerBound, int outerBound) {
-		return (int)nextSignedLong(innerBound, outerBound);
+		return innerBound + nextUnsignedInt(outerBound - innerBound);
 	}
 
 	/**
@@ -511,7 +526,6 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @return the next pseudorandom, uniformly distributed {@code long}
 	 * value between zero (inclusive) and {@code bound} (exclusive)
 	 * from this random number generator's sequence
-	 * @see #nextInt(int) Here's a note about the bias present in the bounded generation.
 	 */
 	public long nextLong (long bound) {
 		return nextLong(0L, bound);
@@ -534,7 +548,6 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 *
 	 * @param outerBound the outer exclusive bound; may be any long value, allowing negative
 	 * @return a pseudorandom long between 0 (inclusive) and outerBound (exclusive)
-	 * @see #nextInt(int) Here's a note about the bias present in the bounded generation.
 	 */
 	public long nextSignedLong (long outerBound) {
 		return nextSignedLong(0L, outerBound);
@@ -552,7 +565,6 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param inner the inclusive inner bound; may be any long, allowing negative
 	 * @param outer the exclusive outer bound; must be greater than inner (otherwise this returns inner)
 	 * @return a pseudorandom long between inner (inclusive) and outer (exclusive)
-	 * @see #nextInt(int) Here's a note about the bias present in the bounded generation.
 	 */
 	public long nextLong (long inner, long outer) {
 		final long rand = nextLong();
@@ -575,7 +587,6 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * @param inner the inclusive inner bound; may be any long, allowing negative
 	 * @param outer the exclusive outer bound; may be any long, allowing negative
 	 * @return a pseudorandom long between inner (inclusive) and outer (exclusive)
-	 * @see #nextInt(int) Here's a note about the bias present in the bounded generation.
 	 */
 	public long nextSignedLong (long inner, long outer) {
 		final long rand = nextLong();

@@ -85,7 +85,12 @@ public final class PoissonDiskSmooth {
                                                  float maxX, float maxY, int pointsPerIteration, Random rng)
     {
         int radius2 = Math.round(radius);
-        return sample(center.cpy().add(-radius2, -radius2), center.cpy().add(radius2, radius2), radius, minimumDistance, maxX, maxY, pointsPerIteration, rng);
+        Vector2 min = center.cpy().add(-radius2, -radius2);
+        min.set(MathUtils.clamp(min.x, 0f, maxX), MathUtils.clamp(min.y, 0f, maxY));
+        Vector2 max = center.cpy().add(radius2, radius2);
+        max.set(MathUtils.clamp(max.x, 0f, maxX), MathUtils.clamp(max.y, 0f, maxY));
+
+        return sample(min, max, radius, minimumDistance, maxX, maxY, pointsPerIteration, rng);
     }
 
     /**
@@ -217,9 +222,9 @@ public final class PoissonDiskSmooth {
         final float i1 = Math.min(i + 2, gridWidth);
         final float j1 = Math.min(j + 2, gridX[0].length);
         int xx, yy;
-        for (float ic = i0; ic <= i1; ic++) {
+        for (float ic = i0; ic < i1; ic++) {
             xx = (int)ic;
-            for (float jc = j0; jc <= j1; jc++) {
+            for (float jc = j0; jc < j1; jc++) {
                 yy = (int)jc;
                 float dx = gridX[xx][yy];
                 if(dx >= 0){

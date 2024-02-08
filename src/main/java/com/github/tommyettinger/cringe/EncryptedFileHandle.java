@@ -290,7 +290,7 @@ public final class EncryptedFileHandle extends FileHandle {
 
 	@Override
 	public void write(InputStream input, boolean append) {
-		throw new UnsupportedOperationException("EncryptedFileHandle cannot be used to emit an InputStream.");
+		throw new UnsupportedOperationException("EncryptedFileHandle cannot write from an InputStream.");
 	}
 
 	@Override

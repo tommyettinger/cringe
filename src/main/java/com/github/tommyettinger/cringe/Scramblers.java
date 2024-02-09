@@ -228,32 +228,32 @@ public final class Scramblers {
 
     /**
      * Big constant 0. Used by {@link #hash64(long, CharSequence)}, and taken from
-     * <a href="https://github.com/wangyi-fudan/wyhash>wyhash</a> (in an earlier version).
+     * <a href="https://github.com/wangyi-fudan/wyhash">wyhash</a> (in an earlier version).
      */
     public static final long b0 = 0xA0761D6478BD642FL;
     /**
      * Big constant 1. Used by {@link #hash64(long, CharSequence)}, and taken from
-     * <a href="https://github.com/wangyi-fudan/wyhash>wyhash</a> (in an earlier version).
+     * <a href="https://github.com/wangyi-fudan/wyhash">wyhash</a> (in an earlier version).
      */
     public static final long b1 = 0xE7037ED1A0B428DBL;
     /**
      * Big constant 2. Used by {@link #hash64(long, CharSequence)}, and taken from
-     * <a href="https://github.com/wangyi-fudan/wyhash>wyhash</a> (in an earlier version).
+     * <a href="https://github.com/wangyi-fudan/wyhash">wyhash</a> (in an earlier version).
      */
     public static final long b2 = 0x8EBC6AF09C88C6E3L;
     /**
      * Big constant 3. Used by {@link #hash64(long, CharSequence)}, and taken from
-     * <a href="https://github.com/wangyi-fudan/wyhash>wyhash</a> (in an earlier version).
+     * <a href="https://github.com/wangyi-fudan/wyhash">wyhash</a> (in an earlier version).
      */
     public static final long b3 = 0x589965CC75374CC3L;
     /**
      * Big constant 4. Used by {@link #hash64(long, CharSequence)}, and taken from
-     * <a href="https://github.com/wangyi-fudan/wyhash>wyhash</a> (in an earlier version).
+     * <a href="https://github.com/wangyi-fudan/wyhash">wyhash</a> (in an earlier version).
      */
     public static final long b4 = 0x1D8E4E27C47D124FL;
     /**
      * Big constant 5. Used by {@link #hash64(long, CharSequence)}, and taken from
-     * <a href="https://github.com/wangyi-fudan/wyhash>wyhash</a> (in an earlier version).
+     * <a href="https://github.com/wangyi-fudan/wyhash">wyhash</a> (in an earlier version).
      */
     public static final long b5 = 0xEB44ACCAB455D165L;
 

@@ -55,6 +55,44 @@ its just like `UUID` but it works on GWT i guess and its like `Json.Serializable
 
 o and theres `Scramblers` to take a number and make it like wiggly jiggly or smth
 
+# o wate moar!!!
+
+now there like all these like um `RawNoise` types
+
+each 1 has liek a diff flavor i guess?
+
+`PerlinNoise` is all squarey but also liek blobby
+
+`SimplexNoise` is liek triagnles n stuffs
+
+`ValueNoise` is real dum squarezzz so u better use it wit somethin else
+
+`HoneyNoise` mixiz it up wit `SimplexNoise` and `ValueNoise` all hot n hevay
+
+`FoamNoise` is super orgnanic an natrual lookin
+
+`CyclicNoise` uses som liek rotaiton stuf an looks real diff
+
+`SorbetNoise` tastes nice but its also liek `CyclicNoise` and bettr in 2D i think?
+
+then u can give 1 of thoes 2 `ContinuousNoise` n get liek rideged mode n octaevs n stuf
+
+these r all liek `Json.Serializable` so u can liek saev and laod stuf
+
+`LineWobble` is kinda liek those but jus 4 1D noise
+
+# even moar!!!!!!11!!!
+
+`PoissonDiskDiscrete` maeks poitns placed far aways from each ohter, but liek on a liek grid
+
+`PoissonDiskSmooth` maeks poitns placed far aways from each ohter, but liek not on um a grid
+
+`PointHasher` is liek `Scrambler` but 4 a bunch of numburs insted of liek 1
+
+`EncryptedFileHandle` is liek lamebad encarption 4 ur filez but it does liek hide ur images and scriptz
+
+this new stuf is p. cool
+
 # get
 
 The easiest way to use this library is to copy files from the source code.
@@ -113,14 +151,21 @@ You don't need any of these 3 files to use the library, but they may come in han
 any GdxRandom. Instead, it produces a sequence of UUID-like values that are guaranteed to be unique unless an impossibly
 large amount of identifiers have been produced (2 to the 128 minus 1).
 
-Alternatively, you can depend on the library as a whole, using it as a normal Gradle or Maven
-dependency.
+In more recent versions, `cringe` has gotten larger, and now has code for continuous noise, which is fittingly
+random-like, and `EncryptedFileHandle`s, which are akin to randomized, but reversible, scrambling of files.
+The noise classes are almost always used with a `ContinuousNoise` object wrapping some `RawNoise` implementation.
+The ContinuousNoise provides the most useful features, but the RawNoise provides the underlying algorithm. The
+noise classes are more inter-dependent; most RawNoise types use `LineWobble` to provide 1D noise, and classes like
+`FoamNoise` and `HoneyNoise` call `ValueNoise` methods directly. Meanwhile, `SorbetNoise` inherits from `CyclicNoise`,
+and there's lots of other connections. To use the noise, you should probably have a dependency on all of `cringe`.
 
-`implementation "com.github.tommyettinger:cringe:0.0.2"`
+You can depend on the library as a whole, using it as a normal Gradle or Maven dependency.
+
+`implementation "com.github.tommyettinger:cringe:0.0.3"`
 
 If you use GWT, then your GWT module needs to depend on:
 
-`implementation "com.github.tommyettinger:cringe:0.0.2:sources"`
+`implementation "com.github.tommyettinger:cringe:0.0.3:sources"`
 
 GWT also needs this `inherits` line added to your `GdxDefinition.gwt.xml` file, with the other inherits lines:
 

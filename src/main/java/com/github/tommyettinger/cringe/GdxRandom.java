@@ -2416,30 +2416,41 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 
 	// Json serialization and deserialization
 
+	/**
+	 * Writes the serialized value of this to the given Json.
+	 * @param json a non-null libGDX Json instance that this will use to write a JsonValue
+	 */
 	@Override
 	public void write(Json json) {
 		json.writeValue("r", stringSerialize());
 	}
 
+	/**
+	 * Reads the data from {@code jsonData} into this object, using {@code json} to help read if necessary.
+	 * Modifies this object in-place.
+	 *
+	 * @param json a non-null libGDX Json instance that this may or may not use to help read from jsonData
+	 * @param jsonData a JsonValue containing the serialized form of an object that can be assigned to this
+	 */
 	@Override
 	public void read(Json json, JsonValue jsonData) {
 		stringDeserialize(jsonData.getString("r"));
 	}
 
 	/**
-	 * Writes the state of this GdxRandom instance into a String JsonValue. This overload does not write to a child
+	 * Writes the state of this into a String JsonValue. This overload does not write to a child
 	 * of the given JsonValue, and instead {@link JsonValue#set(String) sets} the JsonValue directly.
-	 * @param modifying the JsonValue that will have this added as a child using the given key name
+	 * @param modifying the JsonValue that will be set to the serialized version of this
 	 */
-	public void writeToJsonValue(JsonValue modifying) {
+	public void writeToJsonValue(Json json, JsonValue modifying) {
 		modifying.set(stringSerialize());
 	}
 
 	/**
-	 * Reads the state of this GdxRandom instance from a String JsonValue.
-	 * @param value the JsonValue that this will look the given key name up in
+	 * Reads the state of this from a String JsonValue.
+	 * @param value the JsonValue that will be used to assign this
 	 */
-	public void readFromJsonValue(JsonValue value) {
+	public void readFromJsonValue(Json json, JsonValue value) {
 		String string = value.asString();
 		if(string != null) {
 			stringDeserialize(string);
@@ -2447,20 +2458,20 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	}
 
 	/**
-	 * Writes the state of this GdxRandom instance into a String child of the given JsonValue.
+	 * Writes the state of this into a String child of the given JsonValue.
 	 * @param parent the JsonValue that will have this added as a child using the given key name
-	 * @param key the name to store the GdxRandom into
+	 * @param key the name to store the state into
 	 */
-	public void writeToJsonValue(JsonValue parent, String key) {
+	public void writeToJsonValue(Json json, JsonValue parent, String key) {
 		parent.addChild(key, new JsonValue(stringSerialize()));
 	}
 
 	/**
-	 * Reads the state of this GdxRandom instance from a String child of the given JsonValue.
+	 * Reads the state of this from a String child of the given JsonValue.
 	 * @param parent the JsonValue that this will look the given key name up in
-     * @param key the name to read the GdxRandom data from
+     * @param key the name to read the data from
 	 */
-	public void readFromJsonValue(JsonValue parent, String key) {
+	public void readFromJsonValue(Json json, JsonValue parent, String key) {
 		String string = parent.getString(key, null);
 		if(string != null) {
 			stringDeserialize(string);

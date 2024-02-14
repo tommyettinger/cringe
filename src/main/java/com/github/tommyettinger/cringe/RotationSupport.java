@@ -283,6 +283,23 @@ public final class RotationSupport {
     }
 
     /**
+     * Fills {@code out} with a 1D float array that can be used as a 2D rotation matrix by
+     * {@link #rotate(float[], float[], float[])}. Scrambles the given seed with {@link Scramblers#scrambleFloat(long)},
+     * then gets an angle using {@link MathUtils}.
+     * @param seed any long; will be scrambled
+     * @param out a float array that must have at least 4 elements; will be cleared and returned
+     * @return {@code out}, meant as effectively a 2D rotation matrix
+     */
+    public static float[] fillRandomRotation2D(long seed, float[] out) {
+        final float theta = Scramblers.scrambleFloat(seed) * 6.2831855f;
+        final float s = MathUtils.sin(theta);
+        final float c = MathUtils.cos(theta);
+        out[0] = out[3] = c;
+        out[2] = -(out[1] = s);
+        return out;
+    }
+
+    /**
      * Creates a new 1D float array that can be used as a 3D rotation matrix by
      * {@link #rotate(float[], float[], float[])}. Uses the given long seed to get an angle using
      * {@link MathUtils} and Gaussian floats using {@link Scramblers#scrambleGaussian(long)}.

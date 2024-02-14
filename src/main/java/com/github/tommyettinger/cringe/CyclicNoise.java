@@ -88,21 +88,25 @@ float cyclicNoise(vec3 p){
     protected transient float[][][] rotations = new float[6][4][];
     protected transient float[][] inputs = new float[][]{new float[2], new float[3], new float[4], new float[5], new float[6], new float[7]};
     protected transient float[][] outputs = new float[][]{new float[2], new float[3], new float[4], new float[5], new float[6], new float[7]};
+    protected transient float[] gauss = new float[7], house = new float[49], large = new float[49], temp = new float[49];
     public CyclicNoise() {
         this(3);
     }
     public CyclicNoise(int octaves) {
-        setOctaves(octaves);
-        setSeed(0xBEEF1E57);
+        this(0xBEEF1E57, octaves, 2f);
     }
 
     public CyclicNoise(int seed, int octaves) {
-        setOctaves(octaves);
-        setSeed(seed);
+        this(seed, octaves, 2f);
     }
 
     public CyclicNoise(int seed, int octaves, float frequency) {
         setOctaves(octaves);
+        for (int i = 0, s = 2; i < 6; i++, s++) {
+            for (int j = 0; j < 4; j++) {
+                rotations[i][j] = new float[s * s];
+            }
+        }
         setSeed(seed, frequency);
     }
 
@@ -133,8 +137,8 @@ float cyclicNoise(vec3 p){
     }
 
     /**
-     * Sets the seed, and in doing so creates 20 new rotation matrices for different dimensions to use. Note that this
-     * may be considerably more expensive than a typical setter, because of how much it allocates.
+     * Sets the seed, and in doing so edits 24 rotation matrices for different dimensions to use. Note that this
+     * may be considerably more expensive than a typical setter, because all matrices are set whenever the seed changes.
      * @param seed any long
      */
     @Override
@@ -142,8 +146,9 @@ float cyclicNoise(vec3 p){
         setSeed(seed, frequency);
     }
     /**
-     * Sets the seed, and in doing so creates 24 new rotation matrices for different dimensions to use. Note that this
-     * may be considerably more expensive than a typical setter, because of how much it allocates.
+     * Sets the seed, and in doing so edits 24 rotation matrices for different dimensions to use. Note that this
+     * may be considerably more expensive than a typical setter, because all matrices are set whenever the seed changes.
+     * Also sets the frequency; the default is 2.
      * @param seed any long
      * @param frequency a multiplier that will apply to all coordinates; higher changes faster, lower changes slower
      */
@@ -152,12 +157,12 @@ float cyclicNoise(vec3 p){
         this.frequency = frequency;
         for (int i = 0; i < 4; i++) {
             seed = this.seed ^ i;
-            rotations[0][i] = RotationSupport.randomRotation2D(seed);
-            rotations[1][i] = RotationSupport.randomRotation3D(seed, rotations[0][i]);
-            rotations[2][i] = RotationSupport.randomRotation4D(seed, rotations[1][i]);
-            rotations[3][i] = RotationSupport.randomRotation5D(seed, rotations[2][i]);
-            rotations[4][i] = RotationSupport.randomRotation6D(seed, rotations[3][i]);
-            rotations[5][i] = RotationSupport.randomRotation7D(seed, rotations[4][i]);
+            RotationSupport.fillRandomRotation2D(seed, rotations[0][i]);
+            System.arraycopy(RotationSupport.rotateStep(seed, rotations[0][i], 3, gauss, house, large, temp), 0, rotations[1][i], 0, 9);
+            System.arraycopy(RotationSupport.rotateStep(seed, rotations[1][i], 4, gauss, house, large, temp), 0, rotations[2][i], 0, 16);
+            System.arraycopy(RotationSupport.rotateStep(seed, rotations[2][i], 5, gauss, house, large, temp), 0, rotations[3][i], 0, 25);
+            System.arraycopy(RotationSupport.rotateStep(seed, rotations[3][i], 6, gauss, house, large, temp), 0, rotations[4][i], 0, 36);
+            System.arraycopy(RotationSupport.rotateStep(seed, rotations[4][i], 7, gauss, house, large, temp), 0, rotations[5][i], 0, 49);
         }
     }
 
@@ -166,12 +171,11 @@ float cyclicNoise(vec3 p){
     }
 
     /**
-     * Sets the frequency; note that this works by setting the seed with {@link #setSeed(int, float)}, so if you want
-     * to change both seed and frequency, use that method instead.
+     * Sets the frequency; the default is 2. Higher frequencies produce output that changes more quickly.
      * @param frequency a multiplier that will apply to all coordinates; higher changes faster, lower changes slower
      */
     public void setFrequency(float frequency) {
-        setSeed(seed, frequency);
+        this.frequency = frequency;
     }
 
     @Override

@@ -732,7 +732,7 @@ public class SimplexNoise extends RawNoise {
     }
 
     @Override
-    public boolean canUseSeed() {
+    public boolean hasEfficientSetSeed() {
         return true;
     }
 

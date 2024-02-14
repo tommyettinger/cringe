@@ -123,7 +123,7 @@ float cyclicNoise(vec3 p){
     }
 
     @Override
-    public boolean canUseSeed() {
+    public boolean hasEfficientSetSeed() {
         return false;
     }
 
@@ -151,6 +151,7 @@ float cyclicNoise(vec3 p){
         this.seed = seed;
         this.frequency = frequency;
         for (int i = 0; i < 4; i++) {
+            seed = this.seed ^ i;
             rotations[0][i] = RotationSupport.randomRotation2D(seed);
             rotations[1][i] = RotationSupport.randomRotation3D(seed, rotations[0][i]);
             rotations[2][i] = RotationSupport.randomRotation4D(seed, rotations[1][i]);
@@ -246,7 +247,7 @@ float cyclicNoise(vec3 p){
             xx = outputs[0][0];
             yy = outputs[0][1];
 
-            noise += MathUtils.sin((
+            noise += sin(x + y + (
                             cos(xx) * sin(yy) + cos(yy) * sin(xx)
                     ) * (MathUtils.PI/2f)
             ) * amp;
@@ -289,7 +290,7 @@ float cyclicNoise(vec3 p){
             yy = outputs[1][1];
             zz = outputs[1][2];
 
-            noise += MathUtils.sin((
+            noise += sin((
                     cos(xx) * sin(zz) +
                     cos(yy) * sin(xx) +
                     cos(zz) * sin(yy)
@@ -339,7 +340,7 @@ float cyclicNoise(vec3 p){
             zz = outputs[2][2];
             ww = outputs[2][3];
 
-            noise += MathUtils.sin((
+            noise += sin((
                     + cos(xx) * sin(ww)
                     + cos(yy) * sin(xx)
                     + cos(zz) * sin(yy)
@@ -395,7 +396,7 @@ float cyclicNoise(vec3 p){
             ww = outputs[3][3];
             uu = outputs[3][4];
 
-            noise += MathUtils.sin((
+            noise += sin((
                     + cos(xx) * sin(uu)
                     + cos(yy) * sin(xx)
                     + cos(zz) * sin(yy)
@@ -457,7 +458,7 @@ float cyclicNoise(vec3 p){
             uu = outputs[4][4];
             vv = outputs[4][5];
 
-            noise += MathUtils.sin((
+            noise += sin((
                     + cos(xx) * sin(vv)
                     + cos(yy) * sin(xx)
                     + cos(zz) * sin(yy)
@@ -524,7 +525,7 @@ float cyclicNoise(vec3 p){
             vv = outputs[5][5];
             mm = outputs[5][6];
 
-            noise += MathUtils.sin((
+            noise += sin((
                                     + cos(xx) * sin(mm)
                                     + cos(yy) * sin(xx)
                                     + cos(zz) * sin(yy)

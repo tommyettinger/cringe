@@ -48,7 +48,7 @@ public class SnakeNoise extends RawNoise {
     }
 
     @Override
-    public boolean canUseSeed() {
+    public boolean hasEfficientSetSeed() {
         return true;
     }
 

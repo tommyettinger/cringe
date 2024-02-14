@@ -640,7 +640,7 @@ public class ValueNoise extends RawNoise {
     }
 
     @Override
-    public boolean canUseSeed() {
+    public boolean hasEfficientSetSeed() {
         return true;
     }
 

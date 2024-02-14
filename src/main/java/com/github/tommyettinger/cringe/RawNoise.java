@@ -40,11 +40,15 @@ public abstract class RawNoise implements Json.Serializable{
     public abstract int getMaxDimension();
 
     /**
-     * Returns true if this generator can be seeded with {@link #setSeed(int)} (and if so, retrieved with
-     * {@link #getSeed()}).
-     * @return true if {@link #setSeed(int)} and {@link #getSeed()} are supported, false if either isn't supported
+     * Returns true if this generator can be seeded with {@link #setSeed(int)} during each call to obtain noise, or
+     * false if calling setSeed() is slow enough or allocates enough that alternative approaches should be used. You
+     * can always call setSeed() on your own, but generators that don't have any seed won't do anything, and generators
+     * that return false for this method will generally behave differently when comparing how
+     * {@link #getNoiseWithSeed(float, float, int)} changes the seed and how setSeed() does.
+     *
+     * @return whether {@link #setSeed(int)} should be safe to call in every {@link #getNoiseWithSeed} call
      */
-    public abstract boolean canUseSeed();
+    public abstract boolean hasEfficientSetSeed();
 
     /**
      * Gets 1D noise with a default or pre-set seed. Most noise algorithms don't behave as well in 1D, so a common
@@ -111,23 +115,22 @@ public abstract class RawNoise implements Json.Serializable{
     public abstract float getNoise(float x, float y, float z, float w, float u, float v);
 
     /**
-     * Sets the seed to the given int, if int seeds are
-     * supported. If {@link #canUseSeed()} returns true, this must be implemented and must set the seed given an int
-     * input. If this generator cannot be seeded, this is permitted to either do nothing or throw an
-     * {@link UnsupportedOperationException}. If this operation allocates or is time-intensive, then that performance
-     * cost will be passed along to {@link #getNoiseWithSeed}, since that calls this twice unless overridden. In the
-     * case where seeding is expensive to perform, setSeed() can still be implemented while {@link #canUseSeed()}
-     * returns false. This makes the {@link #getNoiseWithSeed} methods avoid reseeding, and instead move their inputs
-     * around in space.
+     * Sets the seed to the given int, if int seeds are supported.
+     * If this generator cannot be seeded, this should do nothing, and should not throw an exception. If this operation
+     * allocates or is time-intensive, then {@link #hasEfficientSetSeed()} should return false. That method is checked
+     * in {@link #getNoiseWithSeed}, and if it returns false, the noise call will avoid calling setSeed(). You can
+     * always at least try to set the seed, even if it does nothing or is heavy on performance, and doing it a few times
+     * each frame should typically be fine for any generator. In the case this is called thousands of times each frame,
+     * check {@link #hasEfficientSetSeed()}.
+     *
      * @param seed an int seed, with no restrictions unless otherwise documented
      */
     public abstract void setSeed(int seed);
 
     /**
      * Gets the current seed of the generator, as an int.
-     * If {@link #canUseSeed()} returns true, this must be implemented, but if canUseSeed() returns false, this is
-     * permitted to either still be implemented (but typically only if it is time- or space-intensive to call getSeed())
-     * or to throw an {@link UnsupportedOperationException}.
+     * This must be implemented, but if the generator doesn't have a seed that can be expressed as an int (potentially
+     * using {@link com.badlogic.gdx.utils.NumberUtils#floatToIntBits(float)}), this can just return {@code 0}.
      * @return the current seed, as an int
      */
     public abstract int getSeed();
@@ -175,7 +178,7 @@ public abstract class RawNoise implements Json.Serializable{
 
     /**
      * Gets 1D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
-     * {@link #getNoise}; you can check if this will happen with {@link #canUseSeed()}. Most noise algorithms don't
+     * {@link #getNoise}; you can check if this will happen with {@link #hasEfficientSetSeed()}. Most noise algorithms don't
      * behave as well in 1D, so a common approach for implementations is to delegate to one of the LineWobble methods.
      * @param x x position; can be any finite float
      * @param seed any int; must be the same between calls for the noise to be continuous
@@ -183,7 +186,7 @@ public abstract class RawNoise implements Json.Serializable{
      * @throws UnsupportedOperationException if 1D noise cannot be produced by this generator
      */
     public float getNoiseWithSeed(float x, int seed){
-        if(!canUseSeed()) {
+        if(!hasEfficientSetSeed()) {
             float s = seed * 0x1.9E3779B9p-16f;
             return getNoise(x + s);
         }
@@ -196,7 +199,7 @@ public abstract class RawNoise implements Json.Serializable{
 
     /**
      * Gets 2D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
-     * {@link #getNoise}; you can check if this will happen with {@link #canUseSeed()}.
+     * {@link #getNoise}; you can check if this will happen with {@link #hasEfficientSetSeed()}.
      * @param x x position; can be any finite float
      * @param y y position; can be any finite float
      * @param seed any int; must be the same between calls for the noise to be continuous
@@ -204,7 +207,7 @@ public abstract class RawNoise implements Json.Serializable{
      * @throws UnsupportedOperationException if 2D noise cannot be produced by this generator
      */
     public float getNoiseWithSeed(float x, float y, int seed) {
-        if(!canUseSeed()) {
+        if(!hasEfficientSetSeed()) {
             float s = seed * 0x1p-16f;
             return getNoise(x + s, y + s);
         }
@@ -217,7 +220,7 @@ public abstract class RawNoise implements Json.Serializable{
 
     /**
      * Gets 3D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
-     * {@link #getNoise}; you can check if this will happen with {@link #canUseSeed()}.
+     * {@link #getNoise}; you can check if this will happen with {@link #hasEfficientSetSeed()}.
      * @param x x position; can be any finite float
      * @param y y position; can be any finite float
      * @param z z position; can be any finite float
@@ -226,7 +229,7 @@ public abstract class RawNoise implements Json.Serializable{
      * @throws UnsupportedOperationException if 3D noise cannot be produced by this generator
      */
     public float getNoiseWithSeed(float x, float y, float z, int seed) {
-        if(!canUseSeed()) {
+        if(!hasEfficientSetSeed()) {
             float s = seed * 0x1p-16f;
             return getNoise(x + s, y + s, z + s);
         }
@@ -239,7 +242,7 @@ public abstract class RawNoise implements Json.Serializable{
 
     /**
      * Gets 4D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
-     * {@link #getNoise}; you can check if this will happen with {@link #canUseSeed()}.
+     * {@link #getNoise}; you can check if this will happen with {@link #hasEfficientSetSeed()}.
      * @param x x position; can be any finite float
      * @param y y position; can be any finite float
      * @param z z position; can be any finite float
@@ -249,7 +252,7 @@ public abstract class RawNoise implements Json.Serializable{
      * @throws UnsupportedOperationException if 4D noise cannot be produced by this generator
      */
     public float getNoiseWithSeed(float x, float y, float z, float w, int seed) {
-        if(!canUseSeed()) {
+        if(!hasEfficientSetSeed()) {
             float s = seed * 0x1p-16f;
             return getNoise(x + s, y + s, z + s, w + s);
         }
@@ -262,7 +265,7 @@ public abstract class RawNoise implements Json.Serializable{
 
     /**
      * Gets 5D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
-     * {@link #getNoise}; you can check if this will happen with {@link #canUseSeed()}.
+     * {@link #getNoise}; you can check if this will happen with {@link #hasEfficientSetSeed()}.
      * @param x x position; can be any finite float
      * @param y y position; can be any finite float
      * @param z z position; can be any finite float
@@ -273,7 +276,7 @@ public abstract class RawNoise implements Json.Serializable{
      * @throws UnsupportedOperationException if 5D noise cannot be produced by this generator
      */
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, int seed) {
-        if(!canUseSeed()) {
+        if(!hasEfficientSetSeed()) {
             float s = seed * 0x1p-16f;
             return getNoise(x + s, y + s, z + s, w + s, u + s);
         }
@@ -286,7 +289,7 @@ public abstract class RawNoise implements Json.Serializable{
 
     /**
      * Gets 6D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
-     * {@link #getNoise}; you can check if this will happen with {@link #canUseSeed()}.
+     * {@link #getNoise}; you can check if this will happen with {@link #hasEfficientSetSeed()}.
      * @param x x position; can be any finite float
      * @param y y position; can be any finite float
      * @param z z position; can be any finite float
@@ -298,7 +301,7 @@ public abstract class RawNoise implements Json.Serializable{
      * @throws UnsupportedOperationException if 6D noise cannot be produced by this generator
      */
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
-        if(!canUseSeed()) {
+        if(!hasEfficientSetSeed()) {
             float s = seed * 0x1p-16f;
             return getNoise(x + s, y + s, z + s, w + s, u + s, v + s);
         }

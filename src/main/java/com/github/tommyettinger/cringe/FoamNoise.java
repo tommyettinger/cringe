@@ -451,7 +451,7 @@ public class FoamNoise extends RawNoise {
      * @return true
      */
     @Override
-    public boolean canUseSeed() {
+    public boolean hasEfficientSetSeed() {
         return true;
     }
 

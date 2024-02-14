@@ -70,11 +70,11 @@ public class ContinuousNoise extends RawNoise {
     }
 
     public ContinuousNoise(RawNoise toWrap){
-        this(toWrap, toWrap.canUseSeed() ? toWrap.getSeed() : 123, 0.03125f, FBM, 1);
+        this(toWrap, toWrap.hasEfficientSetSeed() ? toWrap.getSeed() : 123, 0.03125f, FBM, 1);
     }
 
     public ContinuousNoise(RawNoise toWrap, float frequency, int mode, int octaves){
-        this(toWrap, toWrap.canUseSeed() ? toWrap.getSeed() : 123, frequency, mode, octaves);
+        this(toWrap, toWrap.hasEfficientSetSeed() ? toWrap.getSeed() : 123, frequency, mode, octaves);
     }
     public ContinuousNoise(RawNoise toWrap, int seed, float frequency, int mode, int octaves){
         wrapped = toWrap;
@@ -173,8 +173,8 @@ public class ContinuousNoise extends RawNoise {
     }
 
     @Override
-    public boolean canUseSeed() {
-        return wrapped.canUseSeed();
+    public boolean hasEfficientSetSeed() {
+        return wrapped.hasEfficientSetSeed();
     }
 
     @Override
@@ -313,8 +313,7 @@ public class ContinuousNoise extends RawNoise {
     @Override
     public void setSeed(int seed) {
         this.seed = seed;
-        if(wrapped.canUseSeed())
-            wrapped.setSeed(seed);
+        wrapped.setSeed(seed);
     }
 
     @Override

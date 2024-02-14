@@ -99,7 +99,7 @@ public class HoneyNoise extends RawNoise {
     }
 
     @Override
-    public boolean canUseSeed() {
+    public boolean hasEfficientSetSeed() {
         return true;
     }
 

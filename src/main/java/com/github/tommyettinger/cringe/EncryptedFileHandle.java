@@ -3,6 +3,7 @@ package com.github.tommyettinger.cringe;
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.StreamUtils;
 
 import java.io.*;
 
@@ -10,15 +11,18 @@ import java.io.*;
  * A basic way to encrypt a {@link FileHandle} using the <a href="https://en.wikipedia.org/wiki/Speck_(cipher)">Speck
  * Cipher</a>. The supported operations are mostly limited to
  * reading or writing byte arrays, which this always keeps in memory as unencrypted bytes and writes to disk as
- * encrypted bytes. {@link #write(boolean)} and {@link #write(InputStream, boolean)} are not supported. The operations
- * this class supports are sufficient to read and write {@link com.badlogic.gdx.graphics.Pixmap} and
- * {@link com.badlogic.gdx.graphics.Texture} objects with encryption. You can also use
- * {@link #writeString(String, boolean, String)} and {@link #readString(String)} to read and write Strings, but you must
- * be careful to avoid version control (such as Git) changing line endings in encrypted text files. For those, using a
- * file extension like {@code .dat} is a good idea to avoid your data being sometimes changed irreversibly.
+ * encrypted bytes. All FileHandle operations are supported on at least some platforms. This can read and write
+ * {@link com.badlogic.gdx.graphics.Pixmap} and {@link com.badlogic.gdx.graphics.Texture} objects with encryption. You
+ * can also use {@link #writeString(String, boolean, String)} and {@link #readString(String)} to read and write Strings,
+ * but you must be careful to avoid version control (such as Git) changing line endings in encrypted text files. For
+ * those, using a file extension like {@code .dat} can help avoid your data being sometimes changed irreversibly.
  * <br>
  * You may want to use this class to encrypt or decrypt files on platforms that don't have the javax.crypto package,
  * such as GWT (this is probably compatible). That is probably the most valid usage of the class at this point.
+ * Note that the default GWT backend (as of libGDX 1.12.1) has what appears to be a bug, and {@link FileHandle#file()}
+ * doesn't throw an Exception like you would expect -- instead it is undefined, which breaks compilation. Using an
+ * <a href="https://jitpack.io/#tommyettinger/gdx-backends/e8b4415765">alternate GWT backend</a> can fix this while it
+ * gets looked at in libGDX and eventually released there.
  * <br>
  * This uses four {@code long} items as its key, and additionally generates one long nonce from the key and the relative
  * path of the given FileHandle. Don't expect much meaningful security out of this, but this is enough to prevent the
@@ -263,6 +267,7 @@ public final class EncryptedFileHandle extends FileHandle {
 		return encryptInPlace(nonce, ciphertext, cipherOffset, textLength);
 	}
 
+	@Override
 	public int readBytes(byte[] bytes, int offset, int size) {
 		int ret = file.readBytes(bytes, offset, size);
 		decryptInPlace(n0, bytes, offset, size);
@@ -275,6 +280,7 @@ public final class EncryptedFileHandle extends FileHandle {
 		return decryptInPlace(n0, bytes, 0, bytes.length);
 	}
 
+	@Override
 	public InputStream read() {
 		try (InputStream is = new ByteArrayInputStream(readBytes())) {
 			return is;
@@ -284,13 +290,75 @@ public final class EncryptedFileHandle extends FileHandle {
 	}
 
 	@Override
-	public OutputStream write(boolean append) {
-		throw new UnsupportedOperationException("EncryptedFileHandle cannot be used to obtain an OutputStream.");
+	public OutputStream write(final boolean append) {
+		return new FilterOutputStream(file.write(append)){
+			private long bytesWritten = append ? file.length() : 0L;
+			private final byte[] text = new byte[16];
+			private boolean consumedBlock = true;
+
+			@Override
+			public void write(int b) throws IOException {
+				if(consumedBlock)
+					encryptStep(n0, bytesWritten & -16, text, 0);
+				super.write(b ^ text[(int)(bytesWritten++ & 15)]);
+				consumedBlock = ((bytesWritten & 15) == 0);
+			}
+
+			@Override
+			public void write(byte[] b) throws IOException {
+				write(b, 0, b.length);
+			}
+
+			@Override
+			public void write(byte[] b, int off, int len) throws IOException {
+				while (len >= 16) {
+					if(consumedBlock) {
+						System.arraycopy(b, off, text, 0, 16);
+						encryptStepWithXor(n0, bytesWritten & -16, text, 0);
+						bytesWritten += 16;
+						super.write(text, 0, 16);
+					} else {
+						long n = (bytesWritten & -16) + 16;
+						int start = (int)(bytesWritten & 15);
+						for (int i = start; bytesWritten < n; bytesWritten++, i++) {
+							text[i] ^= b[off+i];
+						}
+						super.write(text, start, 16 - start);
+					}
+					len -= 16;
+					consumedBlock = true;
+				}
+				if(len > 0){
+					if(consumedBlock) {
+						System.arraycopy(b, off, text, 0, len);
+						encryptStepWithXor(n0, bytesWritten & -16, text, 0);
+						bytesWritten += len;
+						super.write(text, 0, len);
+					} else {
+						long n = (bytesWritten & -16) + len;
+						int start = (int)(bytesWritten & 15);
+						for (int i = start; bytesWritten < n; bytesWritten++, i++) {
+							text[i] ^= b[off+i];
+						}
+						super.write(text, start, len - start);
+					}
+				}
+			}
+		};
 	}
 
 	@Override
 	public void write(InputStream input, boolean append) {
-		throw new UnsupportedOperationException("EncryptedFileHandle cannot write from an InputStream.");
+		OutputStream output = null;
+		try {
+			output = write(append);
+			StreamUtils.copyStream(input, output);
+		} catch (Exception ex) {
+			throw new GdxRuntimeException("Error stream writing to file: " + file + " (" + type + ")", ex);
+		} finally {
+			StreamUtils.closeQuietly(input);
+			StreamUtils.closeQuietly(output);
+		}
 	}
 
 	@Override
@@ -354,29 +422,43 @@ public final class EncryptedFileHandle extends FileHandle {
 		return file.file();
 	}
 
+	/** Returns a buffered stream for reading this file as bytes.
+	 * @throws GdxRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. */
 	@Override
-	public BufferedInputStream read(int bufferSize) {
-		throw new UnsupportedOperationException("EncryptedFileHandle.read(int) is unsupported.");
+	public BufferedInputStream read (int bufferSize) {
+		return new BufferedInputStream(read(), bufferSize);
 	}
 
+	/** Returns a reader for reading this file as characters.
+	 * @throws GdxRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. */
 	@Override
-	public Reader reader() {
-		throw new UnsupportedOperationException("EncryptedFileHandle.reader() is unsupported.");
+	public Reader reader () {
+		return new InputStreamReader(read());
 	}
 
+	/** Returns a reader for reading this file as characters.
+	 * @throws GdxRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. */
 	@Override
-	public Reader reader(String charset) {
-		throw new UnsupportedOperationException("EncryptedFileHandle.reader(String) is unsupported.");
+	public Reader reader (String charset) {
+		try {
+			return new InputStreamReader(read(), charset);
+		} catch (UnsupportedEncodingException e) {
+			throw new GdxRuntimeException("Encoding '" + charset + "' not supported", e);
+		}
 	}
 
+	/** Returns a buffered reader for reading this file as characters.
+	 * @throws GdxRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. */
 	@Override
-	public BufferedReader reader(int bufferSize) {
-		throw new UnsupportedOperationException("EncryptedFileHandle.reader(int) is unsupported.");
+	public BufferedReader reader (int bufferSize) {
+		return new BufferedReader(reader(), bufferSize);
 	}
 
+	/** Returns a buffered reader for reading this file as characters.
+	 * @throws GdxRuntimeException if the file handle represents a directory, doesn't exist, or could not be read. */
 	@Override
-	public BufferedReader reader(int bufferSize, String charset) {
-		throw new UnsupportedOperationException("EncryptedFileHandle.reader(int, String) is unsupported.");
+	public BufferedReader reader (int bufferSize, String charset) {
+		return new BufferedReader(reader(charset), bufferSize);
 	}
 
 	@Override
@@ -395,12 +477,25 @@ public final class EncryptedFileHandle extends FileHandle {
 
 	@Override
 	public Writer writer(boolean append) {
-		throw new UnsupportedOperationException("EncryptedFileHandle.writer(boolean) is unsupported.");
+		return writer(append, null);
 	}
 
 	@Override
 	public Writer writer(boolean append, String charset) {
-		throw new UnsupportedOperationException("EncryptedFileHandle.writer(boolean, String) is unsupported.");
+		if (type == Files.FileType.Classpath) throw new GdxRuntimeException("Cannot write to a classpath file: " + file);
+		if (type == Files.FileType.Internal) throw new GdxRuntimeException("Cannot write to an internal file: " + file);
+		parent().mkdirs();
+		try {
+			OutputStream output = write(append);
+			if (charset == null)
+				return new OutputStreamWriter(output);
+			else
+				return new OutputStreamWriter(output, charset);
+		} catch (IOException ex) {
+			if (file().isDirectory())
+				throw new GdxRuntimeException("Cannot open a stream to a directory: " + file + " (" + type + ")", ex);
+			throw new GdxRuntimeException("Error writing file: " + file + " (" + type + ")", ex);
+		}
 	}
 
 	@Override

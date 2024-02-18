@@ -161,7 +161,7 @@ and there's lots of other connections. To use the noise, you should probably hav
 
 You can depend on the library as a whole, using it as a normal Gradle or Maven dependency.
 
-`implementation "com.github.tommyettinger:cringe:0.0.3"`
+`api "com.github.tommyettinger:cringe:0.0.3"`
 
 If you use GWT, then your GWT module needs to depend on:
 

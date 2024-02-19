@@ -213,7 +213,7 @@ public final class Scramblers {
         x ^= x >>> 32;
         x *= 0xBEA225F9EB34556DL;
         x ^= x >>> 29;
-        return MathSupport.probit(NumberUtils.longBitsToDouble(1022L - Long.numberOfTrailingZeros(x) << 52 | x >>> 12));
+        return MathSupport.probit(NumberUtils.longBitsToDouble(1022L - Compatibility.countTrailingZeros(x) << 52 | x >>> 12));
     }
 
     /**

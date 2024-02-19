@@ -751,7 +751,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 */
 	public double nextInclusiveDouble () {
 		final long bits = nextLong();
-		return NumberUtils.longBitsToDouble(1022L - Long.numberOfTrailingZeros(bits) << 52 | bits >>> 12) + 0x1p-12 - 0x1p-12;
+		return NumberUtils.longBitsToDouble(1022L - Compatibility.countTrailingZeros(bits) << 52 | bits >>> 12) + 0x1p-12 - 0x1p-12;
 	}
 
 	/**
@@ -792,7 +792,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 */
 	public float nextInclusiveFloat () {
 		final long bits = nextLong();
-		return NumberUtils.intBitsToFloat(126 - Long.numberOfTrailingZeros(bits) << 23 | (int)(bits >>> 41)) + 0x1p-22f - 0x1p-22f;
+		return NumberUtils.intBitsToFloat(126 - Compatibility.countTrailingZeros(bits) << 23 | (int)(bits >>> 41)) + 0x1p-22f - 0x1p-22f;
 	}
 
 	/**
@@ -839,7 +839,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * The implementation may have different performance characteristics than {@link #nextDouble()}, because this
 	 * doesn't perform any floating-point multiplication or division, and instead assembles bits obtained by one call to
 	 * {@link #nextLong()}. This uses {@link NumberUtils#longBitsToDouble(long)} and
-	 * {@link Long#numberOfTrailingZeros(long)}, both of which typically have optimized intrinsics on HotSpot, and this
+	 * {@link Compatibility#countTrailingZeros(long)}, both of which have optimized intrinsics on HotSpot, and this
 	 * is branchless and loopless, unlike the original algorithm by Allen Downey. When compared with
 	 * {@link #nextExclusiveDoubleEquidistant()}, this method performs better on at least HotSpot JVMs. On GraalVM 17,
 	 * this is over twice as fast as nextExclusiveDoubleEquidistant().
@@ -848,7 +848,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 */
 	public double nextExclusiveDouble () {
 		final long bits = nextLong();
-		return NumberUtils.longBitsToDouble(1022L - Long.numberOfTrailingZeros(bits) << 52 | bits >>> 12);
+		return NumberUtils.longBitsToDouble(1022L - Compatibility.countTrailingZeros(bits) << 52 | bits >>> 12);
 	}
 
 	/**
@@ -913,7 +913,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 */
 	public double nextExclusiveSignedDouble(){
 		final long bits = nextLong();
-		return NumberUtils.longBitsToDouble(1022L - Long.numberOfLeadingZeros(bits) << 52 | ((bits << 63 | bits >>> 1) & 0x800FFFFFFFFFFFFFL));
+		return NumberUtils.longBitsToDouble(1022L - Compatibility.countLeadingZeros(bits) << 52 | ((bits << 63 | bits >>> 1) & 0x800FFFFFFFFFFFFFL));
 	}
 
 	/**
@@ -930,7 +930,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * The implementation may have different performance characteristics than {@link #nextFloat()},
 	 * because this doesn't perform any floating-point multiplication or division, and instead assembles bits
 	 * obtained by one call to {@link #nextLong()}. This uses {@link NumberUtils#intBitsToFloat(int)} and
-	 * {@link Long#numberOfTrailingZeros(long)}, both of which typically have optimized intrinsics on HotSpot,
+	 * {@link Compatibility#countTrailingZeros(long)}, both of which have optimized intrinsics on HotSpot,
 	 * and this is branchless and loopless, unlike the original algorithm by Allen Downey. When compared with
 	 * {@link #nextExclusiveFloatEquidistant()}, this method performs better on at least HotSpot JVMs. On GraalVM 17,
 	 * this is over twice as fast as nextExclusiveFloatEquidistant().
@@ -939,7 +939,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 */
 	public float nextExclusiveFloat () {
 		final long bits = nextLong();
-		return NumberUtils.intBitsToFloat(126 - Long.numberOfTrailingZeros(bits) << 23 | (int)(bits >>> 41));
+		return NumberUtils.intBitsToFloat(126 - Compatibility.countTrailingZeros(bits) << 23 | (int)(bits >>> 41));
 	}
 
 	/**
@@ -1003,7 +1003,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 */
 	public float nextExclusiveSignedFloat(){
 		final long bits = nextLong();
-		return NumberUtils.intBitsToFloat(126 - Long.numberOfLeadingZeros(bits) << 23 | ((int)bits & 0x807FFFFF));
+		return NumberUtils.intBitsToFloat(126 - Compatibility.countLeadingZeros(bits) << 23 | ((int)bits & 0x807FFFFF));
 	}
 
 	/**

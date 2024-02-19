@@ -2,6 +2,7 @@ package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.backends.gwt.GwtFileHandle;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.StreamUtils;
 
@@ -32,7 +33,7 @@ import java.io.*;
  * <br>
  * Based off <a href="https://gist.github.com/MobiDevelop/6389767">a gist by MobiDevelop</a>.
  */
-public final class EncryptedFileHandle extends FileHandle {
+public final class EncryptedFileHandle extends GwtFileHandle {
 
 	private final transient FileHandle fh;
 	private final transient long k1, k2, k3, k4, n0;
@@ -57,7 +58,7 @@ public final class EncryptedFileHandle extends FileHandle {
 	}
 
 	/**
-     * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
+	 * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
 	 * encrypted data from the wrapped FileHandle. The four-part key and the {@code unique} String must all be the same
 	 * between encryption and decryption for them to refer to the same unencrypted file. This overload is meant to be
 	 * used when reading and writing to different paths; the unique String should be generated from only one of the
@@ -71,6 +72,7 @@ public final class EncryptedFileHandle extends FileHandle {
 	 * @param unique any String that is likely to be unique for a given key, such as the path to the wrapped file
 	 */
 	public EncryptedFileHandle(FileHandle file, long k1, long k2, long k3, long k4, String unique) {
+		super(file.path());
 		this.fh = file;
 		this.k1 = k1;
 		this.k2 = k2;
@@ -354,7 +356,7 @@ public final class EncryptedFileHandle extends FileHandle {
 			output = write(append);
 			StreamUtils.copyStream(input, output);
 		} catch (Exception ex) {
-			throw new GdxRuntimeException("Error stream writing to file: " + fh + " (" + type + ")", ex);
+			throw new GdxRuntimeException("Error stream writing to file: " + fh + " (" + fh.type() + ")", ex);
 		} finally {
 			StreamUtils.closeQuietly(input);
 			StreamUtils.closeQuietly(output);
@@ -373,17 +375,17 @@ public final class EncryptedFileHandle extends FileHandle {
 
 	@Override
 	public FileHandle child(String name) {
-		return new EncryptedFileHandle(fh.child(name), k1, k2, k3, k4);
+		return new com.github.tommyettinger.cringe.EncryptedFileHandle(fh.child(name), k1, k2, k3, k4);
 	}
 
 	@Override
 	public FileHandle sibling(String name) {
-		return new EncryptedFileHandle(fh.sibling(name), k1, k2, k3, k4);
+		return new com.github.tommyettinger.cringe.EncryptedFileHandle(fh.sibling(name), k1, k2, k3, k4);
 	}
 
 	@Override
 	public FileHandle parent() {
-		return new EncryptedFileHandle(fh.parent(), k1, k2, k3, k4);
+		return new com.github.tommyettinger.cringe.EncryptedFileHandle(fh.parent(), k1, k2, k3, k4);
 	}
 
 
@@ -482,8 +484,8 @@ public final class EncryptedFileHandle extends FileHandle {
 
 	@Override
 	public Writer writer(boolean append, String charset) {
-		if (type == Files.FileType.Classpath) throw new GdxRuntimeException("Cannot write to a classpath file: " + fh);
-		if (type == Files.FileType.Internal) throw new GdxRuntimeException("Cannot write to an internal file: " + fh);
+		if (fh.type() == Files.FileType.Classpath) throw new GdxRuntimeException("Cannot write to a classpath file: " + fh);
+		if (fh.type() == Files.FileType.Internal) throw new GdxRuntimeException("Cannot write to an internal file: " + fh);
 		parent().mkdirs();
 		try {
 			OutputStream output = write(append);
@@ -493,8 +495,8 @@ public final class EncryptedFileHandle extends FileHandle {
 				return new OutputStreamWriter(output, charset);
 		} catch (Exception ex) {
 			if (file().isDirectory())
-				throw new GdxRuntimeException("Cannot open a stream to a directory: " + fh + " (" + type + ")", ex);
-			throw new GdxRuntimeException("Error writing file: " + fh + " (" + type + ")", ex);
+				throw new GdxRuntimeException("Cannot open a stream to a directory: " + fh + " (" + fh.type() + ")", ex);
+			throw new GdxRuntimeException("Error writing file: " + fh + " (" + fh.type() + ")", ex);
 		}
 	}
 

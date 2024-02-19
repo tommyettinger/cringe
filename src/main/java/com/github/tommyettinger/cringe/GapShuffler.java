@@ -361,6 +361,7 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T>, Json.Serializab
     public void read(Json json, JsonValue jsonData) {
         jsonData = jsonData.get("gs");
         elements.clear();
+        //noinspection unchecked
         elements.addAll(json.readValue("items", Array.class, jsonData));
         random = json.readValue("rng", GdxRandom.class, jsonData);
         index = jsonData.get("idx").asInt();

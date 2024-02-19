@@ -59,10 +59,9 @@ public class LineWobble {
     public static float wobble(float value, int seed)
     {
         final int floor = MathUtils.floor(value);
-        // the three lines below break up multiplications into component parts to avoid precision loss on GWT.
-        final int z = seed + (floor * 0x22179 | 0) * 0x4A41; // this is the same as: seed + floor * 0x9E3779B9
-        final int start = ((z ^ 0xD1B54A35) * 0x923EF | 0) * 0x100D | 0; // the same as: (z ^ 0xD1B54A35) * 0x92B5C323
-        final int end   = ((z + 0x9E3779B9 ^ 0xD1B54A35) * 0x923EF | 0) * 0x100D | 0; // also * 0x92B5C323
+        final int z = seed + Compatibility.imul(floor, 0x9E3779B9);
+        final int start = Compatibility.imul(z ^ 0xD1B54A35, 0x92B5C323);
+        final int end   = Compatibility.imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323);
         value -= floor;
         value *= value * (3 - 2 * value);
         return ((1 - value) * start + value * end) * 0x0.ffffffp-31f;
@@ -120,10 +119,9 @@ public class LineWobble {
     {
         // int fast floor, from libGDX; 16384 is 2 to the 14, or 0x1p14, or 0x4000
         final int floor = ((int)(value + 16384.0) - 16384);
-        // the three lines below break up multiplications into component parts to avoid precision loss on GWT.
-        final int z = seed + (floor * 0x22179 | 0) * 0x4A41; // this is the same as: seed + floor * 0x9E3779B9
-        final int startBits = ((z ^ 0xD1B54A35) * 0x923EF | 0) * 0x100D | 0; // the same as: (z ^ 0xD1B54A35) * 0x92B5C323
-        final int endBits   = ((z + 0x9E3779B9 ^ 0xD1B54A35) * 0x923EF | 0) * 0x100D | 0; // also * 0x92B5C323
+        final int z = seed + Compatibility.imul(floor, 0x9E3779B9);
+        final int startBits = Compatibility.imul(z ^ 0xD1B54A35, 0x92B5C323);
+        final int endBits   = Compatibility.imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323);
         final int mixBits = startBits + endBits;
         value -= floor;
         value = MathSupport.barronSpline(value,
@@ -184,10 +182,9 @@ public class LineWobble {
     public static float trigWobble(float value, int seed)
     {
         final int floor = MathUtils.floor(value);
-        // the three lines below break up multiplications into component parts to avoid precision loss on GWT.
-        final int z = seed + (floor * 0x22179 | 0) * 0x4A41; // this is the same as: seed + floor * 0x9E3779B9
-        final int start = ((z ^ 0xD1B54A35) * 0x923EF | 0) * 0x100D | 0; // the same as: (z ^ 0xD1B54A35) * 0x92B5C323
-        final int end   = ((z + 0x9E3779B9 ^ 0xD1B54A35) * 0x923EF | 0) * 0x100D | 0; // also * 0x92B5C323
+        final int z = seed + Compatibility.imul(floor, 0x9E3779B9);
+        final int start = Compatibility.imul(z ^ 0xD1B54A35, 0x92B5C323);
+        final int end   = Compatibility.imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323);
         value = MathUtils.sinDeg((value - floor) * 90);
         value *= value;
         return ((1f - value) * start + value * end) * 0x0.ffffffp-31f;
@@ -251,10 +248,9 @@ public class LineWobble {
         // int fast floor, from libGDX
         final int floor = MathUtils.floor(value);
         // gets roughly-random values for the start and end, involving the seed also.
-        // the three lines below break up multiplications into component parts to avoid precision loss on GWT.
-        final int z = seed + (floor * 0x22179 | 0) * 0x4A41; // this is the same as: seed + floor * 0x9E3779B9
-        float start = (((z ^ 0xD1B54A35) * 0x923EF | 0) * 0x100D >>> 1) * 0x1p-31f;
-        float end = (((z + 0x9E3779B9 ^ 0xD1B54A35) * 0x923EF | 0) * 0x100D >>> 1) * 0x1p-31f;
+        final int z = seed + Compatibility.imul(floor, 0x9E3779B9);
+        float start = (Compatibility.imul(z ^ 0xD1B54A35, 0x92B5C323) >>> 1) * 0x1p-31f;
+        float end   = (Compatibility.imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323) >>> 1) * 0x1p-31f;
         value -= floor;
         // makes the changes smoother by slowing down near start or end.
         value *= value * (3f - 2f * value);
@@ -300,9 +296,9 @@ public class LineWobble {
     public static float splineWobbleAngleTurns(float value, int seed)
     {
         final int floor = ((int)(value + 16384.0) - 16384);
-        final int z = seed + (floor * 0x22179 | 0) * 0x4A41; // this is the same as: seed + floor * 0x9E3779B9
-        final int startBits = ((z ^ 0xD1B54A35) * 0x923EF | 0) * 0x100D | 0; // the same as: (z ^ 0xD1B54A35) * 0x92B5C323
-        final int endBits   = ((z + 0x9E3779B9 ^ 0xD1B54A35) * 0x923EF | 0) * 0x100D | 0; // also * 0x92B5C323
+        final int z = seed + Compatibility.imul(floor, 0x9E3779B9);
+        final int startBits = Compatibility.imul(z ^ 0xD1B54A35, 0x92B5C323);
+        final int endBits   = Compatibility.imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323);
         final int mixBits = startBits + endBits;
         value -= floor;
         value = MathSupport.barronSpline(value,

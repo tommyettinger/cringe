@@ -92,22 +92,12 @@ public final class Scramblers {
      */
     public static int scrambleInt(int x) {
         x ^= 0xFB8FAC03;
-        // This block could be used instead of the uncommented one if not targeting GWT.
-//        x ^= x >>> 16;
-//        x *= 0x236F7153;
-//        x ^= x >>> 12;
-//        x *= 0x33CD8663;
-//        x ^= x >>> 15;
-//        x *= 0x3E06B66B;
-//        x ^= x >>> 16;
-        // This block splits up the large multipliers into smaller factors. All but the last factor is composite.
-        // Because no factor is larger than 2 to the 20, none of the multiplications incur precision loss on GWT.
         x ^= x >>> 16;
-        x = (x * 0x00003A3B | 0) * 0x00009BC9;
+        x = Compatibility.imul(x, 0x236F7153);
         x ^= x >>> 12;
-        x = (x * 0x0000B86B | 0) * 0x000047E9;
+        x = Compatibility.imul(x, 0x33CD8663);
         x ^= x >>> 15;
-        x = (x * 0x00003597 | 0) * 0x0001284D;
+        x = Compatibility.imul(x, 0x3E06B66B);
         x ^= x >>> 16;
         return x;
     }

@@ -2335,10 +2335,11 @@ public abstract class GdxRandom extends Random implements Json.Serializable {
 	 * This calls {@link #nextLong()} twice and modifies one byte of each long to fit the UUID format.
 	 * This does not require initializing a SecureRandom instance, which makes this different from
 	 * {@link UUID#randomUUID()}. This should be used primarily with {@link RandomDistinct64}, because
-	 * the other implementations here are (theoretically) capable of returning the same UUID if this is
-	 * called many times over the course of the generator's period, while RandomDistinct64 cannot return
-	 * the same UUID, making the UUIDs actually unique until all (2 to the 63) UUIDs that RandomDistinct64
-	 * can return are exhausted.
+	 * it is the least likely to ever produce a duplicate UUID. It's still possible, since 6 bits out of
+	 * the 128 random bits this acquires have to be erased because of UUID format requirements. There are
+	 * 2 to the 63 possible results for calling {@link #nextLong()} twice on a RandomDistinct64, and there
+	 * are 2 to the 122 possible UUID values with the required format. Encountering a collision is still
+	 * extremely unlikely with RandomDistinct64, but it is (theoretically) possible.
 	 * <br>
 	 * You can also consider {@link UniqueIdentifier}, which is GWT-compatible and only supports random IDs.
 	 *

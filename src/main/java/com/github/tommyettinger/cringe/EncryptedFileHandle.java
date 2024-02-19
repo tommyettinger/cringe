@@ -284,7 +284,7 @@ public final class EncryptedFileHandle extends FileHandle {
 	public InputStream read() {
 		try (InputStream is = new ByteArrayInputStream(readBytes())) {
 			return is;
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			throw new GdxRuntimeException(ex);
 		}
 	}
@@ -491,7 +491,7 @@ public final class EncryptedFileHandle extends FileHandle {
 				return new OutputStreamWriter(output);
 			else
 				return new OutputStreamWriter(output, charset);
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			if (file().isDirectory())
 				throw new GdxRuntimeException("Cannot open a stream to a directory: " + file + " (" + type + ")", ex);
 			throw new GdxRuntimeException("Error writing file: " + file + " (" + type + ")", ex);

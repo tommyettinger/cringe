@@ -1,8 +1,8 @@
 package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.Files;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.backends.gwt.GwtFileHandle;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.StreamUtils;
 
@@ -19,24 +19,27 @@ import java.io.*;
  * those, using a file extension like {@code .dat} can help avoid your data being sometimes changed irreversibly.
  * <br>
  * You may want to use this class to encrypt or decrypt files on platforms that don't have the javax.crypto package,
- * such as GWT (this is probably compatible). That is probably the most valid usage of the class at this point.
- * Note that the default GWT backend (as of libGDX 1.12.1) has what appears to be a bug, and {@link FileHandle#file()}
- * doesn't throw an Exception like you would expect -- instead it is undefined, which breaks compilation. Using an
- * <a href="https://jitpack.io/#tommyettinger/gdx-backends/e8b4415765">alternate GWT backend</a> can fix this while it
- * gets looked at in libGDX and eventually released there.
+ * such as GWT. This is maybe technically compatible with GWT, but the libGDX Preloader generally makes using this code
+ * impossible on GWT. Text files that get encrypted will use line-ending characters as ordinary gibberish characters in
+ * the encoded output, but if a server does any filtering on line-endings, those characters will change and the encoding
+ * will break. This can be solved by setting text files to the 'b' (binary) file type in assets.txt, but there are other
+ * problems with images (and, in all likelihood, any other file types). Images are read in as binary during some of the
+ * process, but they also seem to be checked for validity and, if valid, added to a map of loaded files. The encrypted
+ * images this produces are not valid when read as PNG, JPG, or any other image format. So, sigh, GWT won't work yet.
  * <br>
- * This uses four {@code long} items as its key, and additionally generates one long nonce from the key and the relative
- * path of the given FileHandle. Don't expect much meaningful security out of this, but this is enough to prevent the
- * average user from just opening up a JAR to look at all the images or read the whole script. Someone determined enough
- * could use a Java agent to replace the writing part of this class with part that writes unencrypted, or just browse
- * the unencrypted data in-memory, so this is very far from bulletproof.
+ * This uses 34 {@code long} items as its full key, and additionally generates one long nonce from the key and some
+ * unique String, such as the relative path of the given FileHandle. Don't expect much meaningful security out of this,
+ * but this is enough to prevent the average user from just opening up a JAR to look at all the images or read the whole
+ * script. Someone determined enough could use a Java agent to replace the writing part of this class with part that
+ * writes files unencrypted, or just browse the unencrypted data in-memory, so this is very far from bulletproof.
  * <br>
  * Based off <a href="https://gist.github.com/MobiDevelop/6389767">a gist by MobiDevelop</a>.
  */
 public final class EncryptedFileHandle extends GwtFileHandle {
-
 	private final transient FileHandle fh;
-	private final transient long k1, k2, k3, k4, n0;
+	// nonce value
+	private final transient long n0;
+	// expanded, currently length 34
 	private final transient long[] key;
 
 	/**
@@ -59,6 +62,70 @@ public final class EncryptedFileHandle extends GwtFileHandle {
 
 	/**
 	 * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
+	 * encrypted data from the wrapped FileHandle. The long array keyBundle and the FileHandle's
+	 * {@link FileHandle#path()} must all be the same between encryption and decryption for them to refer to the same
+	 * unencrypted file. This overload is meant to be used when the path will be the same for reading and writing. If
+	 * the path may be different, use {@link #EncryptedFileHandle(FileHandle, long[], String)} with
+	 * either only the first path or some other source of a unique String.
+	 *
+	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
+	 * @param keyBundle a long array that should be at least length 34; if not, the remaining items are generated
+	 */
+	public EncryptedFileHandle(FileHandle file, long[] keyBundle) {
+		this(file, keyBundle, file.path());
+	}
+
+	/**
+	 * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
+	 * encrypted data from the wrapped FileHandle. The String or other CharSequence {@code keyphrase} and the FileHandle's
+	 * {@link FileHandle#path()} must all be the same between encryption and decryption for them to refer to the same
+	 * unencrypted file. This overload is meant to be used when the path will be the same for reading and writing. If
+	 * the path may be different, use {@link #EncryptedFileHandle(FileHandle, CharSequence, String)} with
+	 * either only the first path or some other source of a unique String.
+	 *
+	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
+	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
+	 */
+	public EncryptedFileHandle(FileHandle file, CharSequence keyphrase) {
+		this(file, keyphrase, file.path());
+	}
+
+	/**
+	 * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
+	 * encrypted data from the wrapped FileHandle. The {@code keyphrase} and the {@code unique} String must all be the same
+	 * between encryption and decryption for them to refer to the same unencrypted file. This overload is meant to be
+	 * used when reading and writing to different paths; the unique String should be generated from only one of the
+	 * paths, if you generate it from a path at all.
+	 *
+	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
+	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
+	 * @param unique any String that is likely to be unique for a given key, such as the path to the wrapped file
+	 */
+	public EncryptedFileHandle(FileHandle file, CharSequence keyphrase, String unique) {
+		this.fh = file;
+		this.key = expandKey(keyphrase);
+		this.n0 = Scramblers.hash64(Scramblers.scramble(this.key[0] ^ this.key[this.key.length-1]), unique);
+	}
+
+	/**
+	 * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
+	 * encrypted data from the wrapped FileHandle. The four-part key and the {@code unique} String must all be the same
+	 * between encryption and decryption for them to refer to the same unencrypted file. This overload is meant to be
+	 * used when reading and writing to different paths; the unique String should be generated from only one of the
+	 * paths, if you generate it from a path at all.
+	 *
+	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
+	 * @param keyBundle a long array that should be at least length 34; if not, the remaining items are generated
+	 * @param unique any String that is likely to be unique for a given key, such as the path to the wrapped file
+	 */
+	public EncryptedFileHandle(FileHandle file, long[] keyBundle, String unique) {
+		this.fh = file;
+		this.key = expandKey(keyBundle);
+		this.n0 = Scramblers.hash64(Scramblers.scramble(this.key[0] ^ this.key[this.key.length-1]), unique);
+	}
+
+	/**
+	 * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
 	 * encrypted data from the wrapped FileHandle. The four-part key and the {@code unique} String must all be the same
 	 * between encryption and decryption for them to refer to the same unencrypted file. This overload is meant to be
 	 * used when reading and writing to different paths; the unique String should be generated from only one of the
@@ -72,15 +139,68 @@ public final class EncryptedFileHandle extends GwtFileHandle {
 	 * @param unique any String that is likely to be unique for a given key, such as the path to the wrapped file
 	 */
 	public EncryptedFileHandle(FileHandle file, long k1, long k2, long k3, long k4, String unique) {
-		super(file.path());
 		this.fh = file;
-		this.k1 = k1;
-		this.k2 = k2;
-		this.k3 = k3;
-		this.k4 = k4;
 		this.key = expandKey(k1, k2, k3, k4);
-		this.n0 = k1 + k2 ^ k3 - (k4 ^ Scramblers.hash64(k1 ^ k2 ^ k3 ^ k4, unique));
+		this.n0 = Scramblers.hash64(Scramblers.scramble(this.key[0] ^ this.key[this.key.length-1]), unique);
 	}
+
+	/**
+	 * Given a long array that is usually an existing expanded key, this either copies that key if it is at least length
+	 * 34, or grows that initial key into a 2176-bit expanded key (a {@code long[34]}).
+	 * This doesn't reuse Speck, but it still only uses ARX operations if it has to grow the key.
+	 * @param keyBundle a long array that should be at least length 34; if not, the remaining items are generated
+	 * @return a 34-item long array that should, of course, be kept secret to be used cryptographically
+	 */
+	private static long[] expandKey(long[] keyBundle) {
+		long[] k = new long[34];
+		int length;
+		if(keyBundle == null) {
+			length = 1;
+			k[0] = 123456789L;
+		} else {
+			length = keyBundle.length;
+			System.arraycopy(keyBundle, 0, k, 0, Math.min(length, k.length));
+		}
+		if(length < 34) {
+			long stateA = length;
+			long stateB = length;
+			long stateC = length;
+			long stateD = length;
+			long stateE = length;
+			for (int i = length; i < k.length; i++) {
+				final long fa = stateA;
+				final long fb = stateB;
+				final long fc = stateC;
+				final long fd = stateD;
+				final long fe = stateE;
+				stateA = fa + 0x9E3779B97F4A7C15L;
+				stateB = fa ^ fe;
+				stateC = fb + fd;
+				stateD = (fc << 52 | fc >>> 12);
+				stateE = fb + fc;
+				k[i] = length + stateB;
+			}
+		}
+		return k;
+	}
+
+	/**
+	 * Given a CharSequence key such as a String, this grows that initial key into a 2176-bit expanded key (a
+	 * {@code long[34]}). This doesn't reuse Speck; if you require an ARX key schedule, use
+	 * {@link #expandKey(long, long, long, long)} instead.
+	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
+	 * @return a 34-item long array that should, of course, be kept secret to be used cryptographically
+	 */
+	private static long[] expandKey(CharSequence keyphrase) {
+		if(keyphrase == null) keyphrase = "You should really do a better job at selecting a keyphrase!";
+		long[] k = new long[34];
+		k[0] = Scramblers.scramble(Scramblers.hash64(keyphrase.length(), keyphrase));
+		for (int i = 1; i < k.length; i++) {
+			k[i] = Scramblers.scramble(Scramblers.hash64(k[i-1]^i, keyphrase));
+		}
+		return k;
+	}
+
 	/**
 	 * Given a 256-bit key as four long values, this grows that initial key into a 2176-bit expanded key (a
 	 * {@code long[34]}). This uses 34 rounds of the primary algorithm used by Speck.
@@ -375,17 +495,17 @@ public final class EncryptedFileHandle extends GwtFileHandle {
 
 	@Override
 	public FileHandle child(String name) {
-		return new com.github.tommyettinger.cringe.EncryptedFileHandle(fh.child(name), k1, k2, k3, k4);
+		return new EncryptedFileHandle(fh.child(name), key);
 	}
 
 	@Override
 	public FileHandle sibling(String name) {
-		return new com.github.tommyettinger.cringe.EncryptedFileHandle(fh.sibling(name), k1, k2, k3, k4);
+		return new EncryptedFileHandle(fh.sibling(name), key);
 	}
 
 	@Override
 	public FileHandle parent() {
-		return new com.github.tommyettinger.cringe.EncryptedFileHandle(fh.parent(), k1, k2, k3, k4);
+		return new EncryptedFileHandle(fh.parent(), key);
 	}
 
 

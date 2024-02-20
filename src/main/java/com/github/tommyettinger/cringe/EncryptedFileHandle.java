@@ -26,11 +26,11 @@ import java.io.*;
  * process, but they also seem to be checked for validity and, if valid, added to a map of loaded files. The encrypted
  * images this produces are not valid when read as PNG, JPG, or any other image format. So, sigh, GWT won't work yet.
  * <br>
- * This uses four {@code long} items as its key, and additionally generates one long nonce from the key and the relative
- * path of the given FileHandle. Don't expect much meaningful security out of this, but this is enough to prevent the
- * average user from just opening up a JAR to look at all the images or read the whole script. Someone determined enough
- * could use a Java agent to replace the writing part of this class with part that writes unencrypted, or just browse
- * the unencrypted data in-memory, so this is very far from bulletproof.
+ * This uses 34 {@code long} items as its full key, and additionally generates one long nonce from the key and some
+ * unique String, such as the relative path of the given FileHandle. Don't expect much meaningful security out of this,
+ * but this is enough to prevent the average user from just opening up a JAR to look at all the images or read the whole
+ * script. Someone determined enough could use a Java agent to replace the writing part of this class with part that
+ * writes files unencrypted, or just browse the unencrypted data in-memory, so this is very far from bulletproof.
  * <br>
  * Based off <a href="https://gist.github.com/MobiDevelop/6389767">a gist by MobiDevelop</a>.
  */
@@ -476,7 +476,7 @@ public final class EncryptedFileHandle extends FileHandle {
 			output = write(append);
 			StreamUtils.copyStream(input, output);
 		} catch (Exception ex) {
-			throw new GdxRuntimeException("Error stream writing to file: " + fh + " (" + type + ")", ex);
+			throw new GdxRuntimeException("Error stream writing to file: " + fh + " (" + fh.type() + ")", ex);
 		} finally {
 			StreamUtils.closeQuietly(input);
 			StreamUtils.closeQuietly(output);
@@ -604,8 +604,8 @@ public final class EncryptedFileHandle extends FileHandle {
 
 	@Override
 	public Writer writer(boolean append, String charset) {
-		if (type == Files.FileType.Classpath) throw new GdxRuntimeException("Cannot write to a classpath file: " + fh);
-		if (type == Files.FileType.Internal) throw new GdxRuntimeException("Cannot write to an internal file: " + fh);
+		if (fh.type() == Files.FileType.Classpath) throw new GdxRuntimeException("Cannot write to a classpath file: " + fh);
+		if (fh.type() == Files.FileType.Internal) throw new GdxRuntimeException("Cannot write to an internal file: " + fh);
 		parent().mkdirs();
 		try {
 			OutputStream output = write(append);
@@ -615,8 +615,8 @@ public final class EncryptedFileHandle extends FileHandle {
 				return new OutputStreamWriter(output, charset);
 		} catch (Exception ex) {
 			if (file().isDirectory())
-				throw new GdxRuntimeException("Cannot open a stream to a directory: " + fh + " (" + type + ")", ex);
-			throw new GdxRuntimeException("Error writing file: " + fh + " (" + type + ")", ex);
+				throw new GdxRuntimeException("Cannot open a stream to a directory: " + fh + " (" + fh.type() + ")", ex);
+			throw new GdxRuntimeException("Error writing file: " + fh + " (" + fh.type() + ")", ex);
 		}
 	}
 

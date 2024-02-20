@@ -76,6 +76,38 @@ public final class EncryptedFileHandle extends FileHandle {
 	}
 
 	/**
+	 * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
+	 * encrypted data from the wrapped FileHandle. The String or other CharSequence {@code keyphrase} and the FileHandle's
+	 * {@link FileHandle#path()} must all be the same between encryption and decryption for them to refer to the same
+	 * unencrypted file. This overload is meant to be used when the path will be the same for reading and writing. If
+	 * the path may be different, use {@link #EncryptedFileHandle(FileHandle, CharSequence, String)} with
+	 * either only the first path or some other source of a unique String.
+	 *
+	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
+	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
+	 */
+	public EncryptedFileHandle(FileHandle file, CharSequence keyphrase) {
+		this(file, keyphrase, file.path());
+	}
+
+	/**
+     * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
+	 * encrypted data from the wrapped FileHandle. The {@code keyphrase} and the {@code unique} String must all be the same
+	 * between encryption and decryption for them to refer to the same unencrypted file. This overload is meant to be
+	 * used when reading and writing to different paths; the unique String should be generated from only one of the
+	 * paths, if you generate it from a path at all.
+	 *
+	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
+	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
+	 * @param unique any String that is likely to be unique for a given key, such as the path to the wrapped file
+	 */
+	public EncryptedFileHandle(FileHandle file, CharSequence keyphrase, String unique) {
+		this.fh = file;
+		this.key = expandKey(keyphrase);
+		this.n0 = Scramblers.hash64(Scramblers.scramble(this.key[0] ^ this.key[this.key.length-1]), unique);
+	}
+
+	/**
      * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
 	 * encrypted data from the wrapped FileHandle. The four-part key and the {@code unique} String must all be the same
 	 * between encryption and decryption for them to refer to the same unencrypted file. This overload is meant to be
@@ -151,6 +183,24 @@ public final class EncryptedFileHandle extends FileHandle {
 		}
 		return k;
 	}
+
+	/**
+	 * Given a CharSequence key such as a String, this grows that initial key into a 2176-bit expanded key (a
+	 * {@code long[34]}). This doesn't reuse Speck; if you require an ARX key schedule, use
+	 * {@link #expandKey(long, long, long, long)} instead.
+	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
+	 * @return a 34-item long array that should, of course, be kept secret to be used cryptographically
+	 */
+	private static long[] expandKey(CharSequence keyphrase) {
+		if(keyphrase == null) keyphrase = "You should really do a better job at selecting a keyphrase!";
+		long[] k = new long[34];
+		k[0] = Scramblers.scramble(Scramblers.hash64(keyphrase.length(), keyphrase));
+		for (int i = 1; i < k.length; i++) {
+			k[i] = Scramblers.scramble(Scramblers.hash64(k[i-1]^i, keyphrase));
+		}
+		return k;
+	}
+
 	/**
 	 * Given a 256-bit key as four long values, this grows that initial key into a 2176-bit expanded key (a
 	 * {@code long[34]}). This uses 34 rounds of the primary algorithm used by Speck.

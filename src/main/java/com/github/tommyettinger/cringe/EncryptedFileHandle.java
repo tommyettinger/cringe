@@ -9,13 +9,13 @@ import java.io.*;
 
 /**
  * A basic way to encrypt a {@link FileHandle} using the <a href="https://en.wikipedia.org/wiki/Speck_(cipher)">Speck
- * Cipher</a>. The supported operations are mostly limited to
- * reading or writing byte arrays, which this always keeps in memory as unencrypted bytes and writes to disk as
- * encrypted bytes. All FileHandle operations are supported on at least some platforms. This can read and write
- * {@link com.badlogic.gdx.graphics.Pixmap} and {@link com.badlogic.gdx.graphics.Texture} objects with encryption. You
- * can also use {@link #writeString(String, boolean, String)} and {@link #readString(String)} to read and write Strings,
- * but you must be careful to avoid version control (such as Git) changing line endings in encrypted text files. For
- * those, using a file extension like {@code .dat} can help avoid your data being sometimes changed irreversibly.
+ * Cipher</a>. This operates by treating files as byte arrays, which this always keeps in memory as unencrypted bytes
+ * and writes to disk as encrypted bytes. All FileHandle operations are supported on at least some platforms. Note that
+ * GWT is entirely unsupported for encryption, though the class will still compile without encryption. This can read and
+ * write {@link com.badlogic.gdx.graphics.Pixmap} and {@link com.badlogic.gdx.graphics.Texture} objects with encryption.
+ * You can also use {@link #writeString(String, boolean, String)} and {@link #readString(String)} to read and write
+ * Strings, but you must be careful to avoid version control (such as Git) changing line endings in encrypted text
+ * files. For those, using a file extension like {@code .dat} can help avoid your data being changed irreversibly.
  * <br>
  * You may want to use this class to encrypt or decrypt files on platforms that don't have the javax.crypto package,
  * such as GWT. This is maybe technically compatible with GWT, but the libGDX Preloader generally makes using this code
@@ -24,7 +24,8 @@ import java.io.*;
  * will break. This can be solved by setting text files to the 'b' (binary) file type in assets.txt, but there are other
  * problems with images (and, in all likelihood, any other file types). Images are read in as binary during some of the
  * process, but they also seem to be checked for validity and, if valid, added to a map of loaded files. The encrypted
- * images this produces are not valid when read as PNG, JPG, or any other image format. So, sigh, GWT won't work yet.
+ * images produced here are not valid when read as PNG, JPG, or any other image format. So, sigh, GWT won't work yet.
+ * This class is replaced on GWT by an unencrypted variant, so don't use it on GWT at all if you want encryption.
  * <br>
  * This uses 34 {@code long} items as its full key, and additionally generates one long nonce from the key and some
  * unique String, such as the relative path of the given FileHandle. Don't expect much meaningful security out of this,
@@ -91,7 +92,7 @@ public final class EncryptedFileHandle extends FileHandle {
 	}
 
 	/**
-     * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
+	 * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
 	 * encrypted data from the wrapped FileHandle. The {@code keyphrase} and the {@code unique} String must all be the same
 	 * between encryption and decryption for them to refer to the same unencrypted file. This overload is meant to be
 	 * used when reading and writing to different paths; the unique String should be generated from only one of the
@@ -103,12 +104,12 @@ public final class EncryptedFileHandle extends FileHandle {
 	 */
 	public EncryptedFileHandle(FileHandle file, CharSequence keyphrase, String unique) {
 		this.fh = file;
-		this.key = expandKey(keyphrase);
+		this.key = expandKeyphrase(keyphrase);
 		this.n0 = Scramblers.hash64(Scramblers.scramble(this.key[0] ^ this.key[this.key.length-1]), unique);
 	}
 
 	/**
-     * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
+	 * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
 	 * encrypted data from the wrapped FileHandle. The four-part key and the {@code unique} String must all be the same
 	 * between encryption and decryption for them to refer to the same unencrypted file. This overload is meant to be
 	 * used when reading and writing to different paths; the unique String should be generated from only one of the
@@ -120,12 +121,12 @@ public final class EncryptedFileHandle extends FileHandle {
 	 */
 	public EncryptedFileHandle(FileHandle file, long[] keyBundle, String unique) {
 		this.fh = file;
-		this.key = expandKey(keyBundle);
+		this.key = expandKeyBundle(keyBundle);
 		this.n0 = Scramblers.hash64(Scramblers.scramble(this.key[0] ^ this.key[this.key.length-1]), unique);
 	}
 
 	/**
-     * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
+	 * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
 	 * encrypted data from the wrapped FileHandle. The four-part key and the {@code unique} String must all be the same
 	 * between encryption and decryption for them to refer to the same unencrypted file. This overload is meant to be
 	 * used when reading and writing to different paths; the unique String should be generated from only one of the
@@ -140,7 +141,7 @@ public final class EncryptedFileHandle extends FileHandle {
 	 */
 	public EncryptedFileHandle(FileHandle file, long k1, long k2, long k3, long k4, String unique) {
 		this.fh = file;
-		this.key = expandKey(k1, k2, k3, k4);
+		this.key = expandKeys(k1, k2, k3, k4);
 		this.n0 = Scramblers.hash64(Scramblers.scramble(this.key[0] ^ this.key[this.key.length-1]), unique);
 	}
 
@@ -151,10 +152,10 @@ public final class EncryptedFileHandle extends FileHandle {
 	 * @param keyBundle a long array that should be at least length 34; if not, the remaining items are generated
 	 * @return a 34-item long array that should, of course, be kept secret to be used cryptographically
 	 */
-	private static long[] expandKey(long[] keyBundle) {
+	private static long[] expandKeyBundle(long[] keyBundle) {
 		long[] k = new long[34];
 		int length;
-		if(keyBundle == null) {
+		if(keyBundle == null || keyBundle.length == 0) {
 			length = 1;
 			k[0] = 123456789L;
 		} else {
@@ -162,7 +163,7 @@ public final class EncryptedFileHandle extends FileHandle {
 			System.arraycopy(keyBundle, 0, k, 0, Math.min(length, k.length));
 		}
 		if(length < 34) {
-			long stateA = length;
+			long stateA = k[0];
 			long stateB = length;
 			long stateC = length;
 			long stateD = length;
@@ -178,7 +179,20 @@ public final class EncryptedFileHandle extends FileHandle {
 				stateC = fb + fd;
 				stateD = (fc << 52 | fc >>> 12);
 				stateE = fb + fc;
-				k[i] = length + stateB;
+				k[i] += stateB;
+			}
+			for (int i = length; i < k.length; i++) {
+				final long fa = stateA;
+				final long fb = stateB;
+				final long fc = stateC;
+				final long fd = stateD;
+				final long fe = stateE;
+				stateA = fa + 0x9E3779B97F4A7C15L;
+				stateB = fa ^ fe;
+				stateC = fb + fd;
+				stateD = (fc << 52 | fc >>> 12);
+				stateE = fb + fc;
+				k[i] ^= stateB;
 			}
 		}
 		return k;
@@ -187,11 +201,11 @@ public final class EncryptedFileHandle extends FileHandle {
 	/**
 	 * Given a CharSequence key such as a String, this grows that initial key into a 2176-bit expanded key (a
 	 * {@code long[34]}). This doesn't reuse Speck; if you require an ARX key schedule, use
-	 * {@link #expandKey(long, long, long, long)} instead.
+	 * {@link #expandKeys(long, long, long, long)} instead.
 	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
 	 * @return a 34-item long array that should, of course, be kept secret to be used cryptographically
 	 */
-	private static long[] expandKey(CharSequence keyphrase) {
+	private static long[] expandKeyphrase(CharSequence keyphrase) {
 		if(keyphrase == null) keyphrase = "You should really do a better job at selecting a keyphrase!";
 		long[] k = new long[34];
 		k[0] = Scramblers.scramble(Scramblers.hash64(keyphrase.length(), keyphrase));
@@ -210,7 +224,7 @@ public final class EncryptedFileHandle extends FileHandle {
 	 * @param k4 a secret long; part of the key
 	 * @return a 34-item long array that should, of course, be kept secret to be used cryptographically
 	 */
-	private static long[] expandKey(long k1, long k2, long k3, long k4) {
+	private static long[] expandKeys(long k1, long k2, long k3, long k4) {
 		long tk0 = k4, tk1 = k3, tk2 = k2, tk3 = k1;
 		long[] k = new long[34];
 		k[0] = k4;
@@ -494,17 +508,17 @@ public final class EncryptedFileHandle extends FileHandle {
 	}
 
 	@Override
-	public FileHandle child(String name) {
+	public EncryptedFileHandle child(String name) {
 		return new EncryptedFileHandle(fh.child(name), key);
 	}
 
 	@Override
-	public FileHandle sibling(String name) {
+	public EncryptedFileHandle sibling(String name) {
 		return new EncryptedFileHandle(fh.sibling(name), key);
 	}
 
 	@Override
-	public FileHandle parent() {
+	public EncryptedFileHandle parent() {
 		return new EncryptedFileHandle(fh.parent(), key);
 	}
 

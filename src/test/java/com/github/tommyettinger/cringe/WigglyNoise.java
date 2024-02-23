@@ -30,56 +30,9 @@ import static com.badlogic.gdx.math.MathUtils.sin;
  * <a href="https://www.shadertoy.com/view/wl3czN">this ShaderToy by nimitz</a>. This is currently the second-slowest
  * noise here; only {@link SorbetNoise}, which subclasses this, is slower.
  */
-public class CyclicNoise extends RawNoise {
-    /* // Mostly the original GLSL code, with few changes, for comparison and archival purposes.
+public class WigglyNoise extends RawNoise {
+// Mostly the original GLSL code, with few changes, for comparison and archival purposes.
 // From https://www.shadertoy.com/view/3tcyD7 by jeyko, based on https://www.shadertoy.com/view/wl3czN by nimitz
-float cyclicNoise(vec3 p){
-    float noise = 0.;
-
-    // These are the variables. I renamed them from the original by nimitz
-    // So they are more similar to the terms used be other types of noise
-    float amp = 0.5;
-    const float gain = 0.5;
-    const float lacunarity = 2.;
-    const int octaves = 2;
-
-    const float warp = 0.3;
-    float warpTrk = 1.2 ;
-    const float warpTrkGain = 1.5;
-
-    // Step 1: Get a simple arbitrary rotation, defined by the direction.
-    vec3 seed = vec3(-1,-2.,0.5);
-    mat3 rotMatrix = getOrthogonalBasis(seed);
-
-    for(int i = 0; i < octaves; i++){
-
-        // Step 2: Do some domain warping, Similar to fbm. Optional.
-
-        p += sin(p.zxy*warpTrk)*warp;
-
-        // Step 3: Calculate a noise value.
-        // This works in a way vaguely similar to Perlin/Simplex noise,
-        // but instead of in a square/triangle lattice, it is done in a sine wave.
-
-        noise += sin(dot(cos(p), sin(p.zxy )))*amp;
-
-        // Step 4: Rotate and scale.
-
-        p *= rotMatrix;
-        p *= lacunarity;
-
-        warpTrk *= warpTrkGain;
-        amp *= gain;
-    }
-
-
-    #ifdef TURBULENT
-    return 1. - abs(noise);
-    #else
-    return (noise*0.5 + 0.5);
-    #endif
-}
-     */
 
     protected int octaves;
     protected float total = 1f, start = 1f, frequency = 2f;
@@ -90,18 +43,18 @@ float cyclicNoise(vec3 p){
     protected transient float[][] inputs = new float[][]{new float[2], new float[3], new float[4], new float[5], new float[6], new float[7]};
     protected transient float[][] outputs = new float[][]{new float[2], new float[3], new float[4], new float[5], new float[6], new float[7]};
     protected transient float[] gauss = new float[7], house = new float[49], large = new float[49], temp = new float[49];
-    public CyclicNoise() {
+    public WigglyNoise() {
         this(3);
     }
-    public CyclicNoise(int octaves) {
+    public WigglyNoise(int octaves) {
         this(0xBEEF1E57, octaves, 2f);
     }
 
-    public CyclicNoise(int seed, int octaves) {
+    public WigglyNoise(int seed, int octaves) {
         this(seed, octaves, 2f);
     }
 
-    public CyclicNoise(int seed, int octaves, float frequency) {
+    public WigglyNoise(int seed, int octaves, float frequency) {
         setOctaves(octaves);
         for (int i = 0, s = 2; i < 6; i++, s++) {
             for (int j = 0; j < 4; j++) {
@@ -181,7 +134,7 @@ float cyclicNoise(vec3 p){
 
     @Override
     public String getTag() {
-        return "CyclicNoise";
+        return "WigglyNoise";
     }
 
     public String stringSerialize() {
@@ -189,11 +142,11 @@ float cyclicNoise(vec3 p){
     }
 
     @Override
-    public CyclicNoise copy() {
-        return new CyclicNoise(seed, octaves, frequency);
+    public WigglyNoise copy() {
+        return new WigglyNoise(seed, octaves, frequency);
     }
 
-    public CyclicNoise stringDeserialize(String data) {
+    public WigglyNoise stringDeserialize(String data) {
         if(data == null || data.length() < 5)
             return this;
         int pos;
@@ -205,16 +158,17 @@ float cyclicNoise(vec3 p){
         return this;
     }
 
-    public static CyclicNoise recreateFromString(String data) {
+    public static WigglyNoise recreateFromString(String data) {
         if(data == null || data.length() < 5)
             return null;
         int pos;
         int seed =    MathSupport.intFromDec(data, 1, pos = data.indexOf('~'));
         int octaves = MathSupport.intFromDec(data, pos+1, pos = data.indexOf('~', pos+1));
         float freq  = MathSupport.floatFromDec(data, pos+1, data.indexOf('`', pos+1));
-        return new CyclicNoise(seed, octaves, freq);
+        return new WigglyNoise(seed, octaves, freq);
     }
 
+    
     /**
      * Gets 1D noise with using this generator's {@link #getSeed() seed}.
      * Delegates to {@link LineWobble#splineWobble(float, long)}.
@@ -224,7 +178,14 @@ float cyclicNoise(vec3 p){
      */
     @Override
     public float getNoise(float x) {
-        return LineWobble.splineWobble(x, seed);
+        return LineWobble.wobble(x, seed);
+    }
+
+    private float sin(float n) {
+        return LineWobble.wobble(n, ~seed);
+    }
+    private float cos(float n) {
+        return LineWobble.wobble(n + 0.5f, seed);
     }
 
     @Override
@@ -252,7 +213,7 @@ float cyclicNoise(vec3 p){
             xx = outputs[0][0];
             yy = outputs[0][1];
 
-            noise += sin(x + y + (
+            noise += MathUtils.sin((
                             cos(xx) * sin(yy) + cos(yy) * sin(xx)
                     ) * (MathUtils.PI/2f)
             ) * amp;
@@ -295,7 +256,7 @@ float cyclicNoise(vec3 p){
             yy = outputs[1][1];
             zz = outputs[1][2];
 
-            noise += sin((
+            noise += MathUtils.sin((
                     cos(xx) * sin(zz) +
                     cos(yy) * sin(xx) +
                     cos(zz) * sin(yy)
@@ -345,7 +306,7 @@ float cyclicNoise(vec3 p){
             zz = outputs[2][2];
             ww = outputs[2][3];
 
-            noise += sin((
+            noise += MathUtils.sin((
                     + cos(xx) * sin(ww)
                     + cos(yy) * sin(xx)
                     + cos(zz) * sin(yy)
@@ -401,7 +362,7 @@ float cyclicNoise(vec3 p){
             ww = outputs[3][3];
             uu = outputs[3][4];
 
-            noise += sin((
+            noise += MathUtils.sin((
                     + cos(xx) * sin(uu)
                     + cos(yy) * sin(xx)
                     + cos(zz) * sin(yy)
@@ -463,7 +424,7 @@ float cyclicNoise(vec3 p){
             uu = outputs[4][4];
             vv = outputs[4][5];
 
-            noise += sin((
+            noise += MathUtils.sin((
                     + cos(xx) * sin(vv)
                     + cos(yy) * sin(xx)
                     + cos(zz) * sin(yy)
@@ -530,7 +491,7 @@ float cyclicNoise(vec3 p){
             vv = outputs[5][5];
             mm = outputs[5][6];
 
-            noise += sin((
+            noise += MathUtils.sin((
                                     + cos(xx) * sin(mm)
                                     + cos(yy) * sin(xx)
                                     + cos(zz) * sin(yy)
@@ -557,7 +518,7 @@ float cyclicNoise(vec3 p){
 
     @Override
     public String toString() {
-        return "CyclicNoise with seed: " + seed + ", octaves:" + octaves + ", frequency: " + frequency;
+        return "WigglyNoise with seed: " + seed + ", octaves:" + octaves + ", frequency: " + frequency;
     }
 
     @Override
@@ -565,7 +526,7 @@ float cyclicNoise(vec3 p){
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        CyclicNoise that = (CyclicNoise) o;
+        WigglyNoise that = (WigglyNoise) o;
 
         if (octaves != that.octaves) return false;
         if (Float.compare(that.frequency, frequency) != 0) return false;

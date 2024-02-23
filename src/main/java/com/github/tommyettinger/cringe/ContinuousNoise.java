@@ -17,6 +17,7 @@
 package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.NumberUtils;
 
 public class ContinuousNoise extends RawNoise {
 
@@ -236,7 +237,7 @@ public class ContinuousNoise extends RawNoise {
     public int hashCode() {
         int result = wrapped.hashCode();
         result = 31 * result + seed;
-        result = 31 * result + (frequency != +0.0f ? Float.floatToIntBits(frequency) : 0);
+        result = 31 * result + (frequency != +0.0f ? NumberUtils.floatToIntBits(frequency) : 0);
         result = 31 * result + mode;
         result = 31 * result + octaves;
         return result;

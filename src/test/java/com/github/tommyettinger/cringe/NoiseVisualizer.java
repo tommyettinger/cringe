@@ -62,8 +62,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
             new WigglyNoise(1, 3),
     };
     int noiseIndex = noises.length - 1;
-    private int dim = 0; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
-    private int octaves = 2; // starts at 1
+    private int dim = 1; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
+    private int octaves = 1; // starts at 1
     private float freq = 0x1p-4f;
     private final ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, 0, octaves);
     private ImmediateModeRenderer20 renderer;

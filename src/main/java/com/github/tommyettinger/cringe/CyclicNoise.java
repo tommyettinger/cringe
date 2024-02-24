@@ -252,8 +252,9 @@ float cyclicNoise(vec3 p){
             xx = outputs[0][0];
             yy = outputs[0][1];
 
-            noise += sin(x + y + (
-                            cos(xx) * sin(yy) + cos(yy) * sin(xx)
+            noise += sin((
+                    cos(xx) * sin(yy) + cos(yy) * sin(xx)
+//                            + LineWobble.wobble(xx + yy, seed + i) * LineWobble.wobble(xx - yy, ~seed - i)
                     ) * (MathUtils.PI/2f)
             ) * amp;
 

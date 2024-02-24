@@ -182,10 +182,10 @@ public class WigglyNoise extends RawNoise {
     }
 
     private float sin(float n) {
-        return LineWobble.wobble(n, ~seed);
+        return LineWobble.wobble(n * 0.4f, ~seed);
     }
     private float cos(float n) {
-        return LineWobble.wobble(n + 0.5f, seed);
+        return LineWobble.wobble(n * 0.375f + 0.25f, seed);
     }
 
     @Override

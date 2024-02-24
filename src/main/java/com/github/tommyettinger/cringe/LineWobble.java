@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 
 import static com.badlogic.gdx.math.MathUtils.PI2;
+import static com.github.tommyettinger.cringe.Compatibility.imul;
 
 /**
  * Provides 1D noise methods that can be queried at any point on a line to get a continuous random value.
@@ -59,12 +60,68 @@ public class LineWobble {
     public static float wobble(float value, int seed)
     {
         final int floor = MathUtils.floor(value);
-        final int z = seed + Compatibility.imul(floor, 0x9E3779B9);
-        final int start = Compatibility.imul(z ^ 0xD1B54A35, 0x92B5C323);
-        final int end   = Compatibility.imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323);
+        final int z = seed + imul(floor, 0x9E3779B9);
+        final int start = imul(z ^ 0xD1B54A35, 0x92B5C323);
+        final int end   = imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323);
         value -= floor;
         value *= value * (3 - 2 * value);
         return ((1 - value) * start + value * end) * 0x0.ffffffp-31f;
+    }
+
+    /**
+     * A type of 1D noise that takes a long seed and is one of the faster "wobble methods" here when used on platforms
+     * other than GWT. This uses cubic interpolation between random peak or valley points.
+     *
+     * @param value a float that typically changes slowly, by less than 2.0, with direction changes at integer inputs
+     * @param seed a long seed that will determine the pattern of peaks and valleys this will generate as value changes; this should not change between calls
+     * @return a pseudo-random float between -1f and 1f (both exclusive), smoothly changing with value
+     */
+    public static float wobble(float value, long seed)
+    {
+        final int floor = ((int)(value + 0x1p14) - 0x4000);
+        final long z = seed + floor * 0x6C8E9CF570932BD5L;
+        final float start = ((z ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L),
+                end = ((z + 0x6C8E9CF570932BD5L ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L);
+        value -= floor;
+        value *= value * (3f - 2f * value);
+        return ((1f - value) * start + value * end) * 0x0.ffffffp-63f;
+    }
+
+    /**
+     * Sway smoothly using bicubic interpolation between 4 points (the two integers before t and the two after).
+     * This pretty much never produces steep changes between peaks and valleys; this may make it more useful for things
+     * like generating terrain that can be walked across in a side-scrolling game.
+     *
+     * @param t a distance traveled; should change by less than 1 between calls, and should be less than about 10000
+     * @param seed any int
+     * @return a smoothly-interpolated swaying value between -1 and 1, both exclusive
+     */
+    public static float bicubicWobble(float t, int seed)
+    {
+        // int fast floor, from libGDX; 16384 is 2 to the 14, or 0x1p14, or 0x4000
+        final int floor = ((int)(t + 16384.0) - 16384);
+        // fancy XOR-rotate-rotate is a way to mix bits both up and down without multiplication.
+        seed = (seed ^ (seed << 11 | seed >>> 21) ^ (seed << 25 | seed >>> 7)) + floor;
+        // we use a different technique here, relative to other wobble methods.
+        // to avoid frequent multiplication and replace it with addition by constants, we track 3 variables, each of
+        // which updates with a different large, negative int increment. when we want to get a result, we just XOR
+        // m, n, and o, and use mainly the upper bits (by multiplying by a tiny fraction).
+        final int m = imul(seed, 0xD1B54A33);
+        final int n = imul(seed, 0xABC98383);
+        final int o = imul(seed, 0x8CB92BA7);
+
+        final float a = (m ^ n ^ o);
+        final float b = (m + 0xD1B54A33 ^ n + 0xABC98383 ^ o + 0x8CB92BA7);
+        final float c = (m + 0xA36A9466 ^ n + 0x57930716 ^ o + 0x1972574E);
+        final float d = (m + 0x751FDE99 ^ n + 0x035C8A99 ^ o + 0xA62B82F5);
+
+        // get the fractional part of t.
+        t -= floor;
+        // this is bicubic interpolation, inlined
+        final float p = (d - c) - (a - b);
+        // 3.1044084E-10f , or 0x1.555555p-32f , is just inside {@code -2f/3f/Integer.MIN_VALUE} .
+        // it gets us about as close as we can go to 1.0 .
+        return (t * (t * t * p + t * (a - b - p) + c - a) + b) * 3.1044084E-10f;
     }
 
     /**
@@ -119,9 +176,9 @@ public class LineWobble {
     {
         // int fast floor, from libGDX; 16384 is 2 to the 14, or 0x1p14, or 0x4000
         final int floor = ((int)(value + 16384.0) - 16384);
-        final int z = seed + Compatibility.imul(floor, 0x9E3779B9);
-        final int startBits = Compatibility.imul(z ^ 0xD1B54A35, 0x92B5C323);
-        final int endBits   = Compatibility.imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323);
+        final int z = seed + imul(floor, 0x9E3779B9);
+        final int startBits = imul(z ^ 0xD1B54A35, 0x92B5C323);
+        final int endBits   = imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323);
         final int mixBits = startBits + endBits;
         value -= floor;
         value = MathSupport.barronSpline(value,
@@ -145,8 +202,8 @@ public class LineWobble {
     {
         final long floor = ((long)(value + 0x1p14) - 0x4000);
         final long z = seed + floor * 0x6C8E9CF570932BD5L;
-        final long startBits = ((z ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L ^ 0x9E3779B97F4A7C15L),
-                endBits = ((z + 0x6C8E9CF570932BD5L ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L ^ 0x9E3779B97F4A7C15L),
+        final long startBits = ((z ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L),
+                endBits = ((z + 0x6C8E9CF570932BD5L ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L),
                 mixBits = startBits + endBits;
         value -= floor;
         value = MathSupport.barronSpline(value, (mixBits & 0xFFFFFFFFL) * 0x1p-30f + 1f, (mixBits >>> 32 & 0xFFFFL) * 0x1.8p-17f + 0.125f);
@@ -182,9 +239,9 @@ public class LineWobble {
     public static float trigWobble(float value, int seed)
     {
         final int floor = MathUtils.floor(value);
-        final int z = seed + Compatibility.imul(floor, 0x9E3779B9);
-        final int start = Compatibility.imul(z ^ 0xD1B54A35, 0x92B5C323);
-        final int end   = Compatibility.imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323);
+        final int z = seed + imul(floor, 0x9E3779B9);
+        final int start = imul(z ^ 0xD1B54A35, 0x92B5C323);
+        final int end   = imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323);
         value = MathUtils.sinDeg((value - floor) * 90);
         value *= value;
         return ((1f - value) * start + value * end) * 0x0.ffffffp-31f;
@@ -248,9 +305,9 @@ public class LineWobble {
         // int fast floor, from libGDX
         final int floor = MathUtils.floor(value);
         // gets roughly-random values for the start and end, involving the seed also.
-        final int z = seed + Compatibility.imul(floor, 0x9E3779B9);
-        float start = (Compatibility.imul(z ^ 0xD1B54A35, 0x92B5C323) >>> 1) * 0x1p-31f;
-        float end   = (Compatibility.imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323) >>> 1) * 0x1p-31f;
+        final int z = seed + imul(floor, 0x9E3779B9);
+        float start = (imul(z ^ 0xD1B54A35, 0x92B5C323) >>> 1) * 0x1p-31f;
+        float end   = (imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323) >>> 1) * 0x1p-31f;
         value -= floor;
         // makes the changes smoother by slowing down near start or end.
         value *= value * (3f - 2f * value);
@@ -296,9 +353,9 @@ public class LineWobble {
     public static float splineWobbleAngleTurns(float value, int seed)
     {
         final int floor = ((int)(value + 16384.0) - 16384);
-        final int z = seed + Compatibility.imul(floor, 0x9E3779B9);
-        final int startBits = Compatibility.imul(z ^ 0xD1B54A35, 0x92B5C323);
-        final int endBits   = Compatibility.imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323);
+        final int z = seed + imul(floor, 0x9E3779B9);
+        final int startBits = imul(z ^ 0xD1B54A35, 0x92B5C323);
+        final int endBits   = imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323);
         final int mixBits = startBits + endBits;
         value -= floor;
         value = MathSupport.barronSpline(value,
@@ -349,8 +406,8 @@ public class LineWobble {
     {
         final long floor = ((long)(value + 0x1p14) - 0x4000);
         final long z = seed + floor * 0x6C8E9CF570932BD5L;
-        final long startBits = ((z ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L ^ 0x9E3779B97F4A7C15L),
-                endBits = ((z + 0x6C8E9CF570932BD5L ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L ^ 0x9E3779B97F4A7C15L),
+        final long startBits = ((z ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L),
+                endBits = ((z + 0x6C8E9CF570932BD5L ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L),
                 mixBits = startBits + endBits;
         value -= floor;
         value = MathSupport.barronSpline(value, (mixBits & 0xFFFFFFFFL) * 0x1p-30f + 1f, (mixBits & 0xFFFFL) * 0x1.8p-17f + 0.125f);

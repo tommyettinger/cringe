@@ -25,7 +25,7 @@ import java.io.*;
  * problems with images (and, in all likelihood, any other file types). Images are read in as binary during some of the
  * process, but they also seem to be checked for validity and, if valid, added to a map of loaded files. The encrypted
  * images produced here are not valid when read as PNG, JPG, or any other image format. So, sigh, GWT won't work yet.
- * This class is replaced on GWT by an unencrypted variant, so don't use it on GWT at all if you want encryption.
+ * This class is marked as {@link GwtIncompatible}, which affects the GWT compiler so it ignores this class there.
  * <br>
  * This uses 34 {@code long} items as its full key, and additionally generates one long nonce from the key and some
  * unique String, such as the relative path of the given FileHandle. Don't expect much meaningful security out of this,
@@ -35,6 +35,7 @@ import java.io.*;
  * <br>
  * Based off <a href="https://gist.github.com/MobiDevelop/6389767">a gist by MobiDevelop</a>.
  */
+@GwtIncompatible
 public final class EncryptedFileHandle extends FileHandle {
 
 	private final transient FileHandle fh;

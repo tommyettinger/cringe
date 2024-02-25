@@ -17,8 +17,8 @@ u dont need to understand how this works
 ```java
     public float nextExclusiveFloat () {
         final long bits = nextLong();
-        return NumberUtils.intBitsToFloat(126 - Long.numberOfTrailingZeros(bits) << 23 | (int)(bits >>> 41));
-    }
+        return NumberUtils.intBitsToFloat(126 - Compatibility.countTrailingZeros(bits) << 23 | (int)(bits >>> 41));
+}
 ```
 
 it can just be some cool magic code or smth
@@ -73,7 +73,9 @@ each 1 has liek a diff flavor i guess?
 
 `CyclicNoise` uses som liek rotaiton stuf an looks real diff
 
-`SorbetNoise` tastes nice but its also liek `CyclicNoise` and bettr in 2D i think?
+`SorbetNoise` tastes niiiice but its also liek `CyclicNoise` and bettr in 2D i think?
+
+an those 2 use liek `RotationTools` but u prolly dont have 2 lololol
 
 then u can give 1 of thoes 2 `ContinuousNoise` n get liek rideged mode n octaevs n stuf
 
@@ -83,6 +85,10 @@ these r all liek `Json.Serializable` so u can liek saev and laod stuf
 
 # even moar!!!!!!11!!!
 
+`Compatibility` maeks ur bit stuff work on the googles web tool kit thingy
+
+`ColorSupport` supports ur colors an stuff liek w hue an satruation an all that
+
 `PoissonDiskDiscrete` maeks poitns placed far aways from each ohter, but liek on a liek grid
 
 `PoissonDiskSmooth` maeks poitns placed far aways from each ohter, but liek not on um a grid
@@ -91,18 +97,21 @@ these r all liek `Json.Serializable` so u can liek saev and laod stuf
 
 `EncryptedFileHandle` is liek lamebad encarption 4 ur filez but it does liek hide ur images and scriptz
 
-this new stuf is p. cool
+teh encarption is not 4 web tho :(
+
+but i think this new stuf is p. cool
 
 # get
 
-The easiest way to use this library is to copy files from the source code.
-If you copy [GdxRandom](src/main/java/com/github/tommyettinger/cringe/GdxRandom.java) and
-[GwtIncompatible](src/main/java/com/github/tommyettinger/cringe/GwtIncompatible.java),
-and one of the three `Random` classes adjacent to it
+The easiest way to use this library was to copy files from the source code.
+... But, that was only in the earliest versions. In 0.1.0 and newer, you should probably use
+Gradle (or Maven or whatever your chosen build tool is) to depend on cringe.
+
+The three [GdxRandom](src/main/java/com/github/tommyettinger/cringe/GdxRandom.java) implementations:
 ([RandomAce320](src/main/java/com/github/tommyettinger/cringe/RandomAce320.java),
 [RandomDistinct64](src/main/java/com/github/tommyettinger/cringe/RandomDistinct64.java),
-or [RandomXMX256](src/main/java/com/github/tommyettinger/cringe/RandomXMX256.java)), you
-can use the `Random` class as a drop-in replacement for `java.util.Random` or an
+and [RandomXMX256](src/main/java/com/github/tommyettinger/cringe/RandomXMX256.java))
+can be used as drop-in replacements for `java.util.Random` or an
 almost-identical replacement for libGDX's `RandomXS128`.
 
 The different GdxRandom implementations differ in various properties. All are high-quality statistically, passing
@@ -161,11 +170,11 @@ and there's lots of other connections. To use the noise, you should probably hav
 
 You can depend on the library as a whole, using it as a normal Gradle or Maven dependency.
 
-`api "com.github.tommyettinger:cringe:0.0.3"`
+`api "com.github.tommyettinger:cringe:0.1.0"`
 
 If you use GWT, then your GWT module needs to depend on:
 
-`implementation "com.github.tommyettinger:cringe:0.0.3:sources"`
+`implementation "com.github.tommyettinger:cringe:0.1.0:sources"`
 
 GWT also needs this `inherits` line added to your `GdxDefinition.gwt.xml` file, with the other inherits lines:
 

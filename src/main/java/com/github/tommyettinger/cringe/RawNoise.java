@@ -178,7 +178,8 @@ public abstract class RawNoise implements Json.Serializable{
 
     /**
      * Gets 1D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
-     * {@link #getNoise}; you can check if this will happen with {@link #hasEfficientSetSeed()}. Most noise algorithms don't
+     * changing the position instead of the seed; you can check if this will happen with {@link #hasEfficientSetSeed()}.
+     * Most noise algorithms don't
      * behave as well in 1D, so a common approach for implementations is to delegate to one of the LineWobble methods.
      * @param x x position; can be any finite float
      * @param seed any int; must be the same between calls for the noise to be continuous
@@ -199,7 +200,7 @@ public abstract class RawNoise implements Json.Serializable{
 
     /**
      * Gets 2D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
-     * {@link #getNoise}; you can check if this will happen with {@link #hasEfficientSetSeed()}.
+     * changing the position instead of the seed; you can check if this will happen with {@link #hasEfficientSetSeed()}.
      * @param x x position; can be any finite float
      * @param y y position; can be any finite float
      * @param seed any int; must be the same between calls for the noise to be continuous
@@ -220,7 +221,7 @@ public abstract class RawNoise implements Json.Serializable{
 
     /**
      * Gets 3D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
-     * {@link #getNoise}; you can check if this will happen with {@link #hasEfficientSetSeed()}.
+     * changing the position instead of the seed; you can check if this will happen with {@link #hasEfficientSetSeed()}.
      * @param x x position; can be any finite float
      * @param y y position; can be any finite float
      * @param z z position; can be any finite float
@@ -242,7 +243,7 @@ public abstract class RawNoise implements Json.Serializable{
 
     /**
      * Gets 4D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
-     * {@link #getNoise}; you can check if this will happen with {@link #hasEfficientSetSeed()}.
+     * changing the position instead of the seed; you can check if this will happen with {@link #hasEfficientSetSeed()}.
      * @param x x position; can be any finite float
      * @param y y position; can be any finite float
      * @param z z position; can be any finite float
@@ -265,7 +266,7 @@ public abstract class RawNoise implements Json.Serializable{
 
     /**
      * Gets 5D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
-     * {@link #getNoise}; you can check if this will happen with {@link #hasEfficientSetSeed()}.
+     * changing the position instead of the seed; you can check if this will happen with {@link #hasEfficientSetSeed()}.
      * @param x x position; can be any finite float
      * @param y y position; can be any finite float
      * @param z z position; can be any finite float
@@ -289,7 +290,7 @@ public abstract class RawNoise implements Json.Serializable{
 
     /**
      * Gets 6D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
-     * {@link #getNoise}; you can check if this will happen with {@link #hasEfficientSetSeed()}.
+     * changing the position instead of the seed; you can check if this will happen with {@link #hasEfficientSetSeed()}.
      * @param x x position; can be any finite float
      * @param y y position; can be any finite float
      * @param z z position; can be any finite float

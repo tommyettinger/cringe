@@ -71,11 +71,11 @@ public class ContinuousNoise extends RawNoise {
     }
 
     public ContinuousNoise(RawNoise toWrap){
-        this(toWrap, toWrap.hasEfficientSetSeed() ? toWrap.getSeed() : 123, 0.03125f, FBM, 1);
+        this(toWrap, toWrap.getSeed(), 0.03125f, FBM, 1);
     }
 
     public ContinuousNoise(RawNoise toWrap, float frequency, int mode, int octaves){
-        this(toWrap, toWrap.hasEfficientSetSeed() ? toWrap.getSeed() : 123, frequency, mode, octaves);
+        this(toWrap, toWrap.getSeed(), frequency, mode, octaves);
     }
     public ContinuousNoise(RawNoise toWrap, int seed, float frequency, int mode, int octaves){
         wrapped = toWrap;

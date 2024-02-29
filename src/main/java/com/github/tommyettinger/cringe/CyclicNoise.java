@@ -81,10 +81,13 @@ float cyclicNoise(vec3 p){
 }
      */
 
+    protected static final float LACUNARITY = 1.6f;
+    protected static final float GAIN = 0.625f;
+
     protected int octaves;
-    protected float total = 1f, start = 1f, frequency = 2f;
-    protected final float lacunarity = 1.6f;
-    protected final float gain = 0.625f;
+    protected float total = 1f;
+    protected float start = 1f;
+    protected float frequency = 2f;
     protected int seed;
     protected transient float[][][] rotations = new float[6][4][];
     protected transient float[][] inputs = new float[][]{new float[2], new float[3], new float[4], new float[5], new float[6], new float[7]};
@@ -118,10 +121,10 @@ float cyclicNoise(vec3 p){
     public void setOctaves(int octaves) {
         this.octaves = Math.max(1, octaves);
 
-        start = gain;
+        start = GAIN;
         total = 0f;
         for (int i = 0; i < this.octaves; i++) {
-            start /= gain;
+            start /= GAIN;
             total += start;
         }
         total = 1f / total;
@@ -254,15 +257,14 @@ float cyclicNoise(vec3 p){
 
             noise += sin((
                     cos(xx) * sin(yy) + cos(yy) * sin(xx)
-//                            + LineWobble.wobble(xx + yy, seed + i) * LineWobble.wobble(xx - yy, ~seed - i)
                     ) * (MathUtils.PI/2f)
             ) * amp;
 
-            x = xx * lacunarity;
-            y = yy * lacunarity;
+            x = xx * LACUNARITY;
+            y = yy * LACUNARITY;
 
             warpTrk *= warpTrkGain;
-            amp *= gain;
+            amp *= GAIN;
         }
         return noise * total;
     }
@@ -303,12 +305,12 @@ float cyclicNoise(vec3 p){
                     ) * (MathUtils.PI/3f)
             ) * amp;
 
-            x = xx * lacunarity;
-            y = yy * lacunarity;
-            z = zz * lacunarity;
+            x = xx * LACUNARITY;
+            y = yy * LACUNARITY;
+            z = zz * LACUNARITY;
 
             warpTrk *= warpTrkGain;
-            amp *= gain;
+            amp *= GAIN;
         }
         return noise * total;
     }
@@ -354,13 +356,13 @@ float cyclicNoise(vec3 p){
                     ) * (MathUtils.PI/4f)
             ) * amp;
 
-            x = xx * lacunarity;
-            y = yy * lacunarity;
-            z = zz * lacunarity;
-            w = ww * lacunarity;
+            x = xx * LACUNARITY;
+            y = yy * LACUNARITY;
+            z = zz * LACUNARITY;
+            w = ww * LACUNARITY;
 
             warpTrk *= warpTrkGain;
-            amp *= gain;
+            amp *= GAIN;
         }
         return noise * total;
     }
@@ -411,14 +413,14 @@ float cyclicNoise(vec3 p){
                     ) * (MathUtils.PI/5f)
             ) * amp;
 
-            x = xx * lacunarity;
-            y = yy * lacunarity;
-            z = zz * lacunarity;
-            w = ww * lacunarity;
-            u = uu * lacunarity;
+            x = xx * LACUNARITY;
+            y = yy * LACUNARITY;
+            z = zz * LACUNARITY;
+            w = ww * LACUNARITY;
+            u = uu * LACUNARITY;
 
             warpTrk *= warpTrkGain;
-            amp *= gain;
+            amp *= GAIN;
         }
         return noise * total;
     }
@@ -474,15 +476,15 @@ float cyclicNoise(vec3 p){
                     ) * (MathUtils.PI/6f)
             ) * amp;
 
-            x = xx * lacunarity;
-            y = yy * lacunarity;
-            z = zz * lacunarity;
-            w = ww * lacunarity;
-            u = uu * lacunarity;
-            v = vv * lacunarity;
+            x = xx * LACUNARITY;
+            y = yy * LACUNARITY;
+            z = zz * LACUNARITY;
+            w = ww * LACUNARITY;
+            u = uu * LACUNARITY;
+            v = vv * LACUNARITY;
 
             warpTrk *= warpTrkGain;
-            amp *= gain;
+            amp *= GAIN;
         }
         return noise * total;
     }
@@ -542,16 +544,16 @@ float cyclicNoise(vec3 p){
                     ) * (MathUtils.PI/7f)
             ) * amp;
 
-            x = xx * lacunarity;
-            y = yy * lacunarity;
-            z = zz * lacunarity;
-            w = ww * lacunarity;
-            u = uu * lacunarity;
-            v = vv * lacunarity;
-            m = mm * lacunarity;
+            x = xx * LACUNARITY;
+            y = yy * LACUNARITY;
+            z = zz * LACUNARITY;
+            w = ww * LACUNARITY;
+            u = uu * LACUNARITY;
+            v = vv * LACUNARITY;
+            m = mm * LACUNARITY;
 
             warpTrk *= warpTrkGain;
-            amp *= gain;
+            amp *= GAIN;
         }
         return noise * total;
     }

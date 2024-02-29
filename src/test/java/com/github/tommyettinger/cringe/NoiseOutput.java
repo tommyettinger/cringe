@@ -2,8 +2,7 @@ package com.github.tommyettinger.cringe;
 
 public class NoiseOutput {
     public static void main(String[] args) {
-        RawNoise raw = new FoamNoise(123);
-        ContinuousNoise noise = new ContinuousNoise(raw, 123, 0.05f, ContinuousNoise.FBM, 2);
+        ContinuousNoise noise = new ContinuousNoise(new FoamNoise(123), 123, 0.05f, ContinuousNoise.FBM, 2);
         float[][][] field = new float[40][40][20];
         System.out.print("float[][][] noise = new float[][][]{ ");
         for (int x = 0; x < field.length; x++) {

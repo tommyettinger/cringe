@@ -114,6 +114,42 @@ public final class MathSupport {
                 * r + 1.0);
     }
 
+
+    /**
+     * The cumulative distribution function for the normal distribution, with the range expanded to {@code [-1,1]}
+     * instead of the usual {@code [0,1]} . This might be useful to bring noise functions (which sometimes have a range
+     * of {@code -1,1}) from a very-centrally-biased form to a more uniformly-distributed form. The math here doesn't
+     * exactly match the normal distribution's CDF because the goal was to handle inputs between -1 and 1, not the full
+     * range of a normal-distributed variate (which is infinite). The distribution is very slightly different here from
+     * the double-based overload, because this clamps inputs that would produce incorrect results from its approximation
+     * of {@link Math#exp(double)} otherwise, whereas the double-based method uses the actual Math.exp().
+     *
+     * @param x a float between -1 and 1; will be clamped if outside that domain
+     * @return a more-uniformly distributed value between -1 and 1
+     */
+    public static float redistributeNormal(float x) {
+        final float xx = Math.min(x * x * 6.03435f, 6.03435f), axx = 0.1400122886866665f * xx;
+        return Math.copySign((float) Math.sqrt(1.0051551f - exp(xx * (-1.2732395447351628f - axx) / (0.9952389057917015f + axx))), x);
+    }
+
+    /**
+     * A decent approximation of {@link Math#exp(double)} for small float arguments, meant to be faster than Math's
+     * version for floats at the expense of accuracy. This uses the 2/2 Padé
+     * approximant to {@code Math.exp(power)}, but halves the argument to exp() before approximating, and squares it
+     * before returning.The halving/squaring keeps the calculation in a more precise span for a larger domain. You
+     * should not use this if your {@code power} inputs will be much higher than about 3 or lower than -3 .
+     * <br>
+     * Pretty much all the work for this was done by Wolfram Alpha.
+     *
+     * @param power what exponent to raise {@link Math#E} to
+     * @return a rough approximation of E raised to the given power
+     */
+    public static float exp(float power) {
+        power *= 0.5f;
+        power = (12 + power * (6 + power)) / (12 + power * (-6 + power));
+        return power * power;
+    }
+
     /**
      * An approximation of the cube-root function for float inputs and outputs.
      * This can be about twice as fast as {@link Math#cbrt(double)}. It

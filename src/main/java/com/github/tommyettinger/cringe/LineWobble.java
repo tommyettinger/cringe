@@ -48,7 +48,7 @@ import static com.github.tommyettinger.cringe.Compatibility.imul;
  *     <li>Each of the splineWobbleAngle() methods also can take a long seed.</li>
  * </ul>
  */
-public class LineWobble {
+public final class LineWobble {
     /**
      * A type of 1D noise that takes an int seed and is optimized for usage on GWT. This uses cubic interpolation
      * between random peak or valley points.

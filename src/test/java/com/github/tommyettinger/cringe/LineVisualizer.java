@@ -36,11 +36,11 @@ import static com.badlogic.gdx.Input.Keys.*;
  */
 public class LineVisualizer extends ApplicationAdapter {
 
-    public interface IntFloatToFloatFunction {
+    public interface FloatIntToFloatFunction {
         float applyAsFloat(float f, int i);
     }
 
-    public IntFloatToFloatFunction[] wobbles = {
+    public FloatIntToFloatFunction[] wobbles = {
             LineWobble::wobble,                                                                              //0
             LineWobble::bicubicWobble,                                                                       //1
             LineWobble::splineWobble,                                                                        //2
@@ -59,7 +59,7 @@ public class LineVisualizer extends ApplicationAdapter {
 
 
     public float fbm(float x, final int seed) {
-        final IntFloatToFloatFunction wobble = wobbles[currentWobble];
+        final FloatIntToFloatFunction wobble = wobbles[currentWobble];
         float totalPower = (1 << octaves) - 1f, accrued = 0f, frequencyChange = 1 << (octaves - 1);
         //0x91E10DA5, 0xD1B54A35, and 0xA0F2EC75 are all sections of numbers from MathTools, in some R* sequence.
         //0x142543 is a subsequence of the bits of 0xd1342543de82ef95, which was found to be a strong LCG multiplier.
@@ -194,7 +194,7 @@ public class LineVisualizer extends ApplicationAdapter {
 
     public void putMap() {
         traveled += speed * Math.max(0.03125f, Gdx.graphics.getDeltaTime());
-        IntFloatToFloatFunction wobble = this::fbm;
+        FloatIntToFloatFunction wobble = this::fbm;
         switch (currentMode) {
             case 0:
                 lineSize = 256;

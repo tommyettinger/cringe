@@ -44,6 +44,10 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.*;
  */
 public class NoiseVisualizer extends ApplicationAdapter {
 
+    public interface FloatToFloatFunction {
+        float applyAsFloat(float f);
+    }
+
     static {
         Serializer.register(new BadgerNoise(1));
         Serializer.register(new SnakeNoise(1));
@@ -83,9 +87,16 @@ public class NoiseVisualizer extends ApplicationAdapter {
 
     public static float basicPrepare(float n)
     {
-//        return Math.max(0f, n);
         return n * 0.5f + 0.5f;
     }
+    public static float redistributedPrepare(float n)
+    {
+        return MathSupport.redistributeNormal(n) * 0.5f + 0.5f;
+    }
+
+    private static final FloatToFloatFunction[] PREPARATIONS = {NoiseVisualizer::basicPrepare, NoiseVisualizer::redistributedPrepare};
+    private int preparationIndex = 0;
+    private FloatToFloatFunction prepare = NoiseVisualizer::basicPrepare;
 
     @Override
     public void create() {
@@ -125,9 +136,9 @@ public class NoiseVisualizer extends ApplicationAdapter {
                             Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                             for (int x = 0; x < w; x++) {
                                 for (int y = 0; y < h; y++) {
-                                    float color = basicPrepare(noise.getNoiseWithSeed(x, y, cSin, cCos, noise.seed));
+                                    float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, cSin, cCos, noise.seed));
                                     // fisheye-like effect:
-//                                    float color = basicPrepare(noise.getNoiseWithSeed(x, y, c - inv * ((x - halfW) * (x - halfW) + (y - halfH) * (y - halfH)), noise.seed));
+//                                    float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, c - inv * ((x - halfW) * (x - halfW) + (y - halfH) * (y - halfH)), noise.seed));
                                     p.setColor(color, color, color, 1f);
                                     p.drawPixel(x, y);
                                 }
@@ -144,14 +155,14 @@ public class NoiseVisualizer extends ApplicationAdapter {
                         }
                         frames.clear();
                         break;
-                    case P: //pause
+                    case SPACE: //pause
                         keepGoing = !keepGoing;
                         if (keepGoing)
                             System.out.println("Now playing");
                         else
                             System.out.println("Now paused");
                         break;
-                    case SPACE:
+                    case COMMA: // step, step, step
                         ctr += 1f / 60f;
                         System.out.println("Stepping ahead so ctr is " + ctr);
                         break;
@@ -211,6 +222,10 @@ public class NoiseVisualizer extends ApplicationAdapter {
                         noise.setFractalOctaves((octaves = octaves + 7 & 7) + 1);
                         System.out.println("Using " + (octaves + 1) + " octaves");
                         break;
+                    case P:
+                        prepare = PREPARATIONS[preparationIndex = (preparationIndex + (UIUtils.shift() ? PREPARATIONS.length - 1 : 1)) % PREPARATIONS.length];
+                        System.out.println("Switched to prepare function #" + preparationIndex);
+                        break;
                     case K: // sKip
                         ctr += 1000;
                         System.out.println("Skipping ahead so ctr is " + ctr);
@@ -262,8 +277,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
             case 0:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        bright = basicPrepare(noise.getNoiseWithSeed(Math.abs(x - width * 0.5f) + Math.abs(y - height * 0.5f) - c, noise.seed));
-//                        bright = basicPrepare(noise.getNoiseWithSeed(Vector2.dst(x, y, width * 0.5f, height * 0.5f) - c, noise.seed));
+                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(Math.abs(x - width * 0.5f) + Math.abs(y - height * 0.5f) - c, noise.seed));
+//                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(Vector2.dst(x, y, width * 0.5f, height * 0.5f) - c, noise.seed));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -272,7 +287,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             case 1:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        bright = basicPrepare(noise.getNoiseWithSeed(x + c, y + c, noise.seed));
+                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(x + c, y + c, noise.seed));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -281,7 +296,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             case 2:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        bright = basicPrepare(noise.getNoiseWithSeed(x, y, c, noise.seed));
+                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, c, noise.seed));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -292,7 +307,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     float xc = MathUtils.cosDeg(360 * x * iWidth) * 64 + c, xs = MathUtils.sinDeg(360 * x * iWidth) * 64 + c;
                     for (int y = 0; y < height; y++) {
                         float yc = MathUtils.cosDeg(360 * y * iHeight) * 64 + c, ys = MathUtils.sinDeg(360 * y * iHeight) * 64 + c;
-                        bright = basicPrepare(noise.getNoiseWithSeed(xc, yc, xs, ys, noise.seed));
+                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(xc, yc, xs, ys, noise.seed));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -303,7 +318,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     float xc = MathUtils.cosDeg(360 * x * iWidth) * 64, xs = MathUtils.sinDeg(360 * x * iWidth) * 64;
                     for (int y = 0; y < height; y++) {
                         float yc = MathUtils.cosDeg(360 * y * iHeight) * 64, ys = MathUtils.sinDeg(360 * y * iHeight) * 64;
-                        bright = basicPrepare(noise.getNoiseWithSeed(xc, yc, xs, ys, c, noise.seed));
+                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(xc, yc, xs, ys, c, noise.seed));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -316,7 +331,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     for (int y = 0; y < height; y++) {
                         float yc = MathUtils.cosDeg(360 * y * iHeight) * 64 + c, ys = MathUtils.sinDeg(360 * y * iHeight) * 64 + c,
                                 zc = MathUtils.cosDeg(360 * (x - y) * 0.5f * iWidth) * 64 - c, zs = MathUtils.sinDeg(360 * (x - y) * 0.5f * iWidth) * 64 - c;
-                        bright = basicPrepare(noise.getNoiseWithSeed(xc, yc, zc, xs, ys, zs, noise.seed));
+                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(xc, yc, zc, xs, ys, zs, noise.seed));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }

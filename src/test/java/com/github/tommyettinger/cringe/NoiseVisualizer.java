@@ -91,7 +91,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
     }
     public static float redistributedPrepare(float n)
     {
-        return MathSupport.redistributeNormal(n) * 0.5f + 0.5f;
+        return RawNoise.redistribute(n, 2.3f, 0.75f) * 0.5f + 0.5f;
     }
 
     private static final FloatToFloatFunction[] PREPARATIONS = {NoiseVisualizer::basicPrepare, NoiseVisualizer::redistributedPrepare};

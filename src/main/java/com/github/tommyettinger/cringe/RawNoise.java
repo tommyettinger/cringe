@@ -16,6 +16,7 @@
 
 package com.github.tommyettinger.cringe;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -25,6 +26,23 @@ import com.badlogic.gdx.utils.ObjectMap;
  * noise are supported by that algorithm.
  */
 public abstract class RawNoise implements Json.Serializable{
+    /**
+     * Redistributes a noise value {@code n} using the given {@code mul} and {@code mix} parameters. This is meant to
+     * push high-octave noise results from being centrally biased to being closer to uniform. Getting the values right
+     * probably requires tweaking them; for {@link SimplexNoise}, mul=2.3f and mix=0.75f works well with 2 or more
+     * octaves (and not at all well for one octave, which can use mix=0.0f to avoid redistributing at all).
+     *
+     * @param n a noise value, between -1f and 1f inclusive
+     * @param mul a positive multiplier where higher values make extreme results more likely; often around 2.3f
+     * @param mix a blending amount between 0f and 1f where lower values keep {@code n} more; often around 0.75f
+     * @return a noise value between -1f and 1f, inclusive
+     */
+    public static float redistribute(float n, float mul, float mix) {
+        final float xx = n * n * mul, axx = 0.1400122886866665f * xx;
+        final float denormal = Math.copySign((float) Math.sqrt(1.0f - Math.exp(xx * (-1.2732395447351628f - axx) / (1.0f + axx))), n);
+        return MathUtils.lerp(n, denormal, mix);
+    }
+
     /**
      * Gets the minimum dimension supported by this generator, such as 2 for a generator that only is defined for flat
      * surfaces, or 3 for one that is only defined for 3D or higher-dimensional spaces.

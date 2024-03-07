@@ -12,7 +12,7 @@ its p. cool
 
 plus if u use this
 
-u dont need to understand how this works
+u dont need 2 understand how this works
 
 ```java
     public float nextExclusiveFloat () {
@@ -53,7 +53,7 @@ um theres like a new one called `UniqueIdentifier` and it just like makes unique
 
 its just like `UUID` but it works on GWT i guess and its like `Json.Serializable` which is p. cool
 
-o and theres `Scramblers` to take a number and make it like wiggly jiggly or smth
+o and theres `Scramblers` 2 take a number and make it like wiggly jiggly or smth
 
 # o wate moar!!!
 
@@ -98,6 +98,8 @@ these r all liek `Json.Serializable` so u can liek saev and laod stuf
 `EncryptedFileHandle` is liek lamebad encarption 4 ur filez but it does liek hide ur images and scriptz
 
 teh encarption is not 4 web tho :(
+
+`RoughMath` is omg so itchy n rough but has superfast math if u can handle a lil mess >:)
 
 but i think this new stuf is p. cool
 
@@ -186,7 +188,14 @@ You don't need the `inherits` line if you just copy a few classes into your sour
 
 [apache 2.0](LICENSE)
 
-also thanks to rafa skoberg for like giving me a ton of work to do lololol jk
+thanks 2 paul mineiro 4 makin these liek [blazign fast apropximations](https://code.google.com/archive/p/fastapprox/)
+w liek bit haxx
+
+those apropximations are [new bsd license](https://opensource.org/license/BSD-3-Clause) which should be cool i think???
+
+also thanks 2 rafa skoberg for like givin me a ton of work 2 do lololol jk
+
+n thanks 2 raeleus since ur liek the king of cringe
 
 # yeah
 

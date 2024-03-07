@@ -44,6 +44,30 @@ public abstract class RawNoise implements Json.Serializable{
     }
 
     /**
+     * Redistributes a noise value {@code n} using the given {@code mul}, {@code mix}, and {@code bias} parameters. This
+     * is meant to push high-octave noise results from being centrally biased to being closer to uniform. Getting the
+     * values right probably requires tweaking them manually; for {@link SimplexNoise}, using mul=2.3f, mix=0.75f, and
+     * bias=1f works well with 2 or more octaves (and not at all well for one octave, which can use mix=0.0f to avoid
+     * redistributing at all). This variation takes n in the -1f to 1f range, inclusive, and returns a value in the same
+     * range. You can give different bias values at different times to make noise that is more often high (when bias is
+     * above 1) or low (when bias is between 0 and 1). Using negative bias has undefined results. Bias should typically
+     * be calculated only when its value needs to change. If you have a variable {@code favor} that can have
+     * any float value and high values for favor should produce higher results from this function, you can get bias with
+     * {@code bias = (float)Math.exp(-favor);} .
+     *
+     * @param n a prepared noise value, between -1f and 1f inclusive
+     * @param mul a positive multiplier where higher values make extreme results more likely; often around 2.3f
+     * @param mix a blending amount between 0f and 1f where lower values keep {@code n} more; often around 0.75f
+     * @param bias should be 1 to have no bias, between 0 and 1 for lower results, and above 1 for higher results
+     * @return a noise value between -1f and 1f, inclusive
+     */
+    public static float redistribute(float n, float mul, float mix, float bias) {
+        final float xx = n * n * mul, axx = 0.1400122886866665f * xx;
+        final float denormal = Math.copySign((float) Math.sqrt(1.0f - Math.exp(xx * (-1.2732395447351628f - axx) / (1.0f + axx))), n);
+        return ((float) Math.pow(MathUtils.lerp(n, denormal, mix) * 0.5f + 0.5f, bias) - 0.5f) * 2f;
+    }
+
+    /**
      * Gets the minimum dimension supported by this generator, such as 2 for a generator that only is defined for flat
      * surfaces, or 3 for one that is only defined for 3D or higher-dimensional spaces.
      * @return the minimum supported dimension, from 2 to 6 inclusive

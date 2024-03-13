@@ -69,6 +69,9 @@ public class NoiseVisualizer extends ApplicationAdapter {
     private int dim = 1; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
     private int octaves = 1; // starts at 1
     private float freq = 0x1p-4f;
+    private float mulRaw = 1f, mul = RoughMath.pow2Rough(mulRaw);
+    private float mixRaw = 0f, mix = RoughMath.logisticRough(mixRaw);
+    private float biasRaw = 0f, bias = RoughMath.pow2Rough(mixRaw);
     private final ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, 0, octaves);
     private ImmediateModeRenderer20 renderer;
 
@@ -85,18 +88,18 @@ public class NoiseVisualizer extends ApplicationAdapter {
     private AnimatedGif gif;
     private final Array<Pixmap> frames = new Array<>(256);
 
-    public static float basicPrepare(float n)
+    public float basicPrepare(float n)
     {
         return n * 0.5f + 0.5f;
     }
-    public static float redistributedPrepare(float n)
+    public float redistributedPrepare(float n)
     {
-        return RawNoise.redistribute(n, 2.3f, 0.75f) * 0.5f + 0.5f;
+        return RawNoise.redistribute(n, mul, mix, bias) * 0.5f + 0.5f;
     }
 
-    private static final FloatToFloatFunction[] PREPARATIONS = {NoiseVisualizer::basicPrepare, NoiseVisualizer::redistributedPrepare};
+    private final FloatToFloatFunction[] PREPARATIONS = {this::basicPrepare, this::redistributedPrepare};
     private int preparationIndex = 0;
-    private FloatToFloatFunction prepare = NoiseVisualizer::basicPrepare;
+    private FloatToFloatFunction prepare = PREPARATIONS[preparationIndex];
 
     @Override
     public void create() {
@@ -129,6 +132,11 @@ public class NoiseVisualizer extends ApplicationAdapter {
                             noise.stringDeserialize(pasted);
                         break;
                     case W:
+                        Color t = new Color();
+                        for (int i = 1; i < 256; i++) {
+                            t.set(color).mul(i / 255f);
+                            gif.palette.paletteArray[i] = Color.rgba8888(t);;
+                        }
                         for (int c = 0; c < 256; c++) {
                             int w = 256, h = 256;
 //                            float halfW = (w-1) * 0.5f, halfH = (h-1) * 0.5f, inv = 1f / w;
@@ -179,12 +187,11 @@ public class NoiseVisualizer extends ApplicationAdapter {
                         System.out.println("Seed is now " + noise.getSeed());
                         break;
                     case N: // noise type
-                    case EQUALS:
+                    case EQUALS: // (also plus)
                     case ENTER:
                         noise.setWrapped(noises[noiseIndex = (noiseIndex + (UIUtils.shift() ? noises.length - 1 : 1)) % noises.length]);
                         System.out.println("Switched to " + noises[noiseIndex].getTag());
                         break;
-                    case M:
                     case MINUS:
                         noise.setWrapped(noises[noiseIndex = (noiseIndex + noises.length - 1) % noises.length]);
                         System.out.println("Switched to " + noises[noiseIndex].getTag());
@@ -225,6 +232,10 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     case P:
                         prepare = PREPARATIONS[preparationIndex = (preparationIndex + (UIUtils.shift() ? PREPARATIONS.length - 1 : 1)) % PREPARATIONS.length];
                         System.out.println("Switched to prepare function #" + preparationIndex);
+                        break;
+                    case O:
+                        System.out.println("mulRaw: " + mulRaw + ", mul: " + mul +
+                                ", mixRaw: " + mixRaw + ", mix: " + mix + ", biasRaw: " + biasRaw + ", bias: " + bias);
                         break;
                     case K: // sKip
                         ctr += 1000;
@@ -267,6 +278,18 @@ public class NoiseVisualizer extends ApplicationAdapter {
         else if(Gdx.input.isKeyPressed(RIGHT_BRACKET)) {
             sat = Math.min(1f, sat + Gdx.graphics.getDeltaTime() * 0.25f);
             ColorSupport.hsl2rgb(color, hue, sat, lit, 1f);
+        }
+        else if(Gdx.input.isKeyPressed(I)) {
+            mixRaw += Gdx.graphics.getDeltaTime() * (UIUtils.shift() ? 0.25f : -0.25f);
+            mix = RoughMath.logisticRough(mixRaw);
+        }
+        else if(Gdx.input.isKeyPressed(U)) {
+            mulRaw += Gdx.graphics.getDeltaTime() * (UIUtils.shift() ? 0.25f : -0.25f);
+            mul = RoughMath.pow2Rough(mulRaw);
+        }
+        else if(Gdx.input.isKeyPressed(Y)) {
+            biasRaw += Gdx.graphics.getDeltaTime() * (UIUtils.shift() ? 0.25f : -0.25f);
+            bias = RoughMath.pow2Rough(biasRaw);
         }
 
 

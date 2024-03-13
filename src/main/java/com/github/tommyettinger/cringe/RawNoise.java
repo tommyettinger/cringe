@@ -54,7 +54,6 @@ public abstract class RawNoise implements Json.Serializable{
      * be calculated only when its value needs to change. If you have a variable {@code favor} that can have
      * any float value and high values for favor should produce higher results from this function, you can get bias with
      * {@code bias = (float)Math.exp(-favor);} .
-     *
      * @param n a prepared noise value, between -1f and 1f inclusive
      * @param mul a positive multiplier where higher values make extreme results more likely; often around 2.3f
      * @param mix a blending amount between 0f and 1f where lower values keep {@code n} more; often around 0.75f

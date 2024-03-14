@@ -66,7 +66,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             new WigglyNoise(1, 3),
     };
     int noiseIndex = noises.length - 1;
-    private int dim = 1; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
+    private int dim = 0; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
     private int octaves = 1; // starts at 1
     private float freq = 0x1p-4f;
     private float mulRaw = 1f, mul = RoughMath.pow2Rough(mulRaw);
@@ -82,7 +82,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
     private float ctr = -256;
     private boolean keepGoing = true;
 
-    private Color color = new Color(Color.WHITE);//new Color(Color.LIME);
+    private final Color color = new Color(Color.WHITE);//new Color(Color.LIME);
+    private final Color tempColor = new Color(Color.WHITE);
     private float hue = hue(color), sat = saturation(color), lit = lightness(color);
     
     private AnimatedGif gif;
@@ -298,14 +299,23 @@ public class NoiseVisualizer extends ApplicationAdapter {
         float bright, c = ctr * 16f;
         switch (dim) {
             case 0:
-                for (int x = 0; x < width; x++) {
-                    for (int y = 0; y < height; y++) {
-                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(Math.abs(x - width * 0.5f) + Math.abs(y - height * 0.5f) - c, noise.seed));
-//                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(Vector2.dst(x, y, width * 0.5f, height * 0.5f) - c, noise.seed));
-                        renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
-                        renderer.vertex(x, y, 0);
-                    }
+                c *= 0.75f;
+                for (int d = 4096; d < 8192; d++) {
+                    float da = d * 0.0625f;
+                    float x = noise.getNoiseWithSeed(da * 1.25f + c, noise.seed) * da * 0.25f + width * 0.5f;
+                    float y = noise.getNoiseWithSeed(da + 0.50f + c, ~noise.seed) * da * 0.25f + height * 0.5f;
+                    bright = d / 8191f;
+                    ColorSupport.hsl2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright - 0.2f, 1f);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x, y, 0);
                 }
+//                for (int x = 0; x < width; x++) {
+//                    for (int y = 0; y < height; y++) {
+//                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(Math.abs(x - width * 0.5f) + Math.abs(y - height * 0.5f) - c, noise.seed));
+//                        renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
+//                        renderer.vertex(x, y, 0);
+//                    }
+//                }
                 break;
             case 1:
                 for (int x = 0; x < width; x++) {

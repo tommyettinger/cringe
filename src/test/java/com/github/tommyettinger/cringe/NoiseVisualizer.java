@@ -75,7 +75,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
     private final ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, 0, octaves);
     private ImmediateModeRenderer20 renderer;
 
-    private static final int width = 256, height = 256;
+    private static final int width = 512, height = 512;
+//    private static final int width = 256, height = 256;
     private static final float iWidth = 1f/width, iHeight = 1f/height;
 
     private Viewport view;
@@ -133,36 +134,81 @@ public class NoiseVisualizer extends ApplicationAdapter {
                             noise.stringDeserialize(pasted);
                         break;
                     case W:
-                        Color t = new Color();
-                        for (int i = 1; i < 256; i++) {
-                            t.set(color).mul(i / 255f);
-                            gif.palette.paletteArray[i] = Color.rgba8888(t);;
-                        }
-                        for (int c = 0; c < 256; c++) {
-                            int w = 256, h = 256;
-//                            float halfW = (w-1) * 0.5f, halfH = (h-1) * 0.5f, inv = 1f / w;
-                            float cDeg = c * (360f / 256f), cSin = MathUtils.sinDeg(cDeg) * 40, cCos = MathUtils.cosDeg(cDeg) * 40;
-                            Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-                            for (int x = 0; x < w; x++) {
-                                for (int y = 0; y < h; y++) {
-                                    float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, cSin, cCos, noise.seed));
-                                    // fisheye-like effect:
-//                                    float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, c - inv * ((x - halfW) * (x - halfW) + (y - halfH) * (y - halfH)), noise.seed));
-                                    p.setColor(color, color, color, 1f);
-                                    p.drawPixel(x, y);
+                        if(dim == 0) {
+                            for (int c = 0; c < 2048; c++) {
+                                Pixmap p = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+                                p.setColor(Color.BLACK);
+                                p.fill();
+                                float cc = c * 0.1f;
+                                for (int d = 4096; d < 10000; d++) {
+                                    float da = d * 0.05f;
+                                    float x = noise.getNoiseWithSeed(da * 1.25f + cc, noise.seed) * da * width * 0x1p-10f + width * 0.5f;
+                                    float y = noise.getNoiseWithSeed(da + 0.50f + cc, ~noise.seed) * da * height * 0x1p-10f + height * 0.5f;
+                                    float bright = d / 9999f;
+                                    ColorSupport.hsl2rgb(tempColor, hue + bright + c * 0.01f, 1f, (bright - 0.2f) * 0.3f, 1f);
+                                    p.setColor(tempColor);
+                                    p.drawCircle((int) x, (int)y, 3);
                                 }
+                                for (int d = 4096; d < 10000; d++) {
+                                    float da = d * 0.05f;
+                                    float x = noise.getNoiseWithSeed(da * 1.25f + cc, noise.seed) * da * width * 0x1p-10f + width * 0.5f;
+                                    float y = noise.getNoiseWithSeed(da + 0.50f + cc, ~noise.seed) * da * height * 0x1p-10f + height * 0.5f;
+                                    float bright = d / 9999f;
+                                    ColorSupport.hsl2rgb(tempColor, hue + bright + c * 0.01f, 1f, (bright - 0.2f) * 0.65f, 1f);
+                                    p.setColor(tempColor);
+                                    p.drawCircle((int) x, (int)y, 2);
+                                }
+                                for (int d = 4096; d < 10000; d++) {
+                                    float da = d * 0.05f;
+                                    float x = noise.getNoiseWithSeed(da * 1.25f + cc, noise.seed) * da * width * 0x1p-10f + width * 0.5f;
+                                    float y = noise.getNoiseWithSeed(da + 0.50f + cc, ~noise.seed) * da * height * 0x1p-10f + height * 0.5f;
+                                    p.drawPixel((int) x, (int)y, -1);
+                                }
+                                frames.add(p);
                             }
-                            frames.add(p);
-                        }
-                        Gdx.files.local("out/").mkdirs();
+                            Gdx.files.local("out/").mkdirs();
 
-                        FileHandle file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + ".gif");
-                        System.out.println("Writing to file:\n" + file);
-                        gif.write(file, frames, 16);
-                        for (int i = 0; i < frames.size; i++) {
-                            frames.get(i).dispose();
+                            FileHandle file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + "_1D.gif");
+                            System.out.println("Writing to file:\n" + file);
+                            gif.setFastAnalysis(true);
+                            gif.palette.analyze(frames);
+                            gif.write(file, frames, 60);
+                            for (int i = 0; i < frames.size; i++) {
+                                frames.get(i).dispose();
+                            }
+                            frames.clear();
+                        } else {
+                            Color t = tempColor;
+                            for (int i = 1; i < 256; i++) {
+                                t.set(color).mul(i / 255f);
+                                gif.palette.paletteArray[i] = Color.rgba8888(t);
+                            }
+                            for (int c = 0; c < 256; c++) {
+                                int w = 256, h = 256;
+//                            float halfW = (w-1) * 0.5f, halfH = (h-1) * 0.5f, inv = 1f / w;
+                                float cDeg = c * (360f / 256f), cSin = MathUtils.sinDeg(cDeg) * 40, cCos = MathUtils.cosDeg(cDeg) * 40;
+                                Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+                                for (int x = 0; x < w; x++) {
+                                    for (int y = 0; y < h; y++) {
+                                        float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, cSin, cCos, noise.seed));
+                                        // fisheye-like effect:
+//                                    float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, c - inv * ((x - halfW) * (x - halfW) + (y - halfH) * (y - halfH)), noise.seed));
+                                        p.setColor(color, color, color, 1f);
+                                        p.drawPixel(x, y);
+                                    }
+                                }
+                                frames.add(p);
+                            }
+                            Gdx.files.local("out/").mkdirs();
+
+                            FileHandle file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + ".gif");
+                            System.out.println("Writing to file:\n" + file);
+                            gif.write(file, frames, 16);
+                            for (int i = 0; i < frames.size; i++) {
+                                frames.get(i).dispose();
+                            }
+                            frames.clear();
                         }
-                        frames.clear();
                         break;
                     case SPACE: //pause
                         keepGoing = !keepGoing;
@@ -300,11 +346,14 @@ public class NoiseVisualizer extends ApplicationAdapter {
         switch (dim) {
             case 0:
                 c *= 0.75f;
+                // c and ctr are both about the same counter, they advance by a tiny float every frame.
                 for (int d = 4096; d < 8192; d++) {
-                    float da = d * 0.0625f;
-                    float x = noise.getNoiseWithSeed(da * 1.25f + c, noise.seed) * da * 0.25f + width * 0.5f;
-                    float y = noise.getNoiseWithSeed(da + 0.50f + c, ~noise.seed) * da * 0.25f + height * 0.5f;
-                    bright = d / 8191f;
+                    float da = d * 0.0625f; // 1/16f
+                    float x = noise.getNoiseWithSeed(da * 1.25f + c, noise.seed) * da * width   * 0x1p-10f + width * 0.5f;
+                    float y = noise.getNoiseWithSeed(da + 0.50f + c, ~noise.seed) * da * height * 0x1p-10f + height * 0.5f;
+                    bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
+                    // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
+                    // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
                     ColorSupport.hsl2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright - 0.2f, 1f);
                     renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
                     renderer.vertex(x, y, 0);

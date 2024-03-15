@@ -88,7 +88,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
     private float hue = hue(color), sat = saturation(color), lit = lightness(color);
     
     private AnimatedGif gif;
-    private final Array<Pixmap> frames = new Array<>(256);
+    private final Array<Pixmap> frames = new Array<>(1024);
 
     public float basicPrepare(float n)
     {
@@ -121,6 +121,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
         InputAdapter input = new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
+                FileHandle file;
                 switch (keycode) {
                     case C: // copy out
                         String seri = noise.stringSerialize() + "_" + System.currentTimeMillis();
@@ -131,44 +132,81 @@ public class NoiseVisualizer extends ApplicationAdapter {
                         String pasted = Gdx.app.getClipboard().getContents();
                         System.out.println("Pasting in data:\n" + pasted);
                         if (pasted != null)
-                            noise.stringDeserialize(pasted);
+                        {
+                            try {
+                                noise.stringDeserialize(pasted);
+                            } catch (Exception ignored){
+                            }
+                        }
                         break;
+                    case G:
+                        for (int c = 0; c < 1024; c++) {
+                            Pixmap p = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+                            p.setColor(Color.BLACK);
+                            p.fill();
+                            float cc = c * 0.2f;
+                            for (int d = 4096; d < 10000; d++) {
+                                float da = d * 0.05f;
+                                float x = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) * da * width   * 0x1p-9f;
+                                float y = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) * da * height * 0x1p-9f;
+                                float bright = d / 9999f;
+                                ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f) * 0.3f, 1f);
+                                p.setColor(tempColor);
+                                p.drawCircle((int) x, (int)y, 3);
+                            }
+                            for (int d = 4096; d < 10000; d++) {
+                                float da = d * 0.05f;
+                                float x = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) * da * width   * 0x1p-9f;
+                                float y = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) * da * height * 0x1p-9f;
+                                float bright = d / 9999f;
+                                ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f) * 0.55f, 1f);
+                                p.setColor(tempColor);
+                                p.drawCircle((int) x, (int)y, 2);
+                            }
+                            for (int d = 4096; d < 10000; d++) {
+                                float da = d * 0.05f;
+                                float x = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) * da * width   * 0x1p-9f;
+                                float y = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) * da * height * 0x1p-9f;
+                                float bright = d / 9999f;
+                                ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f), 1f);
+                                p.setColor(tempColor);
+                                p.drawPixel((int) x, (int)y);
+                            }
+                            frames.add(p);
+                        }
+                        Gdx.files.local("out/").mkdirs();
+
+                        file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + "_1D.gif");
+                        System.out.println("Writing to file:\n" + file);
+                        gif.setFastAnalysis(true);
+                        gif.palette.analyze(frames);
+                        gif.write(file, frames, 60);
+                        for (int i = 0; i < frames.size; i++) {
+                            frames.get(i).dispose();
+                        }
+                        frames.clear();
+                    break;
                     case W:
                         if(dim == 0) {
-                            for (int c = 0; c < 2048; c++) {
+                            for (int c = 0; c < 1024; c++) {
                                 Pixmap p = new Pixmap(width, height, Pixmap.Format.RGBA8888);
                                 p.setColor(Color.BLACK);
                                 p.fill();
-                                float cc = c * 0.1f;
+                                float cc = c * 0.2f;
                                 for (int d = 4096; d < 10000; d++) {
                                     float da = d * 0.05f;
-                                    float x = noise.getNoiseWithSeed(da * 1.25f + cc, noise.seed) * da * width * 0x1p-10f + width * 0.5f;
-                                    float y = noise.getNoiseWithSeed(da + 0.50f + cc, ~noise.seed) * da * height * 0x1p-10f + height * 0.5f;
+                                    float x = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) * da * width   * 0x1p-9f;
+                                    float y = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) * da * height * 0x1p-9f;
                                     float bright = d / 9999f;
-                                    ColorSupport.hsl2rgb(tempColor, hue + bright + c * 0.01f, 1f, (bright - 0.2f) * 0.3f, 1f);
-                                    p.setColor(tempColor);
-                                    p.drawCircle((int) x, (int)y, 3);
-                                }
-                                for (int d = 4096; d < 10000; d++) {
-                                    float da = d * 0.05f;
-                                    float x = noise.getNoiseWithSeed(da * 1.25f + cc, noise.seed) * da * width * 0x1p-10f + width * 0.5f;
-                                    float y = noise.getNoiseWithSeed(da + 0.50f + cc, ~noise.seed) * da * height * 0x1p-10f + height * 0.5f;
-                                    float bright = d / 9999f;
-                                    ColorSupport.hsl2rgb(tempColor, hue + bright + c * 0.01f, 1f, (bright - 0.2f) * 0.65f, 1f);
+                                    ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f), 1f);
                                     p.setColor(tempColor);
                                     p.drawCircle((int) x, (int)y, 2);
-                                }
-                                for (int d = 4096; d < 10000; d++) {
-                                    float da = d * 0.05f;
-                                    float x = noise.getNoiseWithSeed(da * 1.25f + cc, noise.seed) * da * width * 0x1p-10f + width * 0.5f;
-                                    float y = noise.getNoiseWithSeed(da + 0.50f + cc, ~noise.seed) * da * height * 0x1p-10f + height * 0.5f;
-                                    p.drawPixel((int) x, (int)y, -1);
                                 }
                                 frames.add(p);
                             }
                             Gdx.files.local("out/").mkdirs();
 
-                            FileHandle file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + "_1D.gif");
+                            file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + "_1D.gif");
                             System.out.println("Writing to file:\n" + file);
                             gif.setFastAnalysis(true);
                             gif.palette.analyze(frames);
@@ -201,7 +239,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                             }
                             Gdx.files.local("out/").mkdirs();
 
-                            FileHandle file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + ".gif");
+                            file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + ".gif");
                             System.out.println("Writing to file:\n" + file);
                             gif.write(file, frames, 16);
                             for (int i = 0; i < frames.size; i++) {
@@ -345,12 +383,12 @@ public class NoiseVisualizer extends ApplicationAdapter {
         float bright, c = ctr * 16f;
         switch (dim) {
             case 0:
-                c *= 0.75f;
+                c *= 0.5f;
                 // c and ctr are both about the same counter, they advance by a tiny float every frame.
                 for (int d = 4096; d < 8192; d++) {
                     float da = d * 0.0625f; // 1/16f
-                    float x = noise.getNoiseWithSeed(da * 1.25f + c, noise.seed) * da * width   * 0x1p-10f + width * 0.5f;
-                    float y = noise.getNoiseWithSeed(da + 0.50f + c, ~noise.seed) * da * height * 0x1p-10f + height * 0.5f;
+                    float x = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + c, noise.seed)) * da * width   * 0x1p-9f;
+                    float y = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.seed)) * da * height * 0x1p-9f;
                     bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
                     // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
                     // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).

@@ -51,28 +51,27 @@ public class FoamNoise extends RawNoise {
 
     /**
      * Gets 1D noise with using this generator's {@link #getSeed() seed}.
-     * Delegates to {@link LineWobble#splineWobble(float, int)}.
+     * Delegates to {@link LineWobble#smoothWobble(float, int)}.
      *
      * @param x x position; can be any finite float
      * @return a noise value between -1.0f and 1.0f, both inclusive
      */
     @Override
     public float getNoise(float x) {
-        return LineWobble.splineWobble(x, seed);
+        return LineWobble.smoothWobble(x, seed);
     }
 
     /**
      * Gets 1D noise with a specific seed.
-     * This delegates to {@link LineWobble#splineWobble(float, int)}.
+     * This delegates to {@link LineWobble#smoothWobble(float, int)}.
      *
      * @param x    x position; can be any finite float
      * @param seed any int; must be the same between calls for the noise to be continuous
      * @return a noise value between -1.0f and 1.0f, both inclusive
-     * @throws UnsupportedOperationException if 1D noise cannot be produced by this generator
      */
     @Override
     public float getNoiseWithSeed(float x, int seed) {
-        return LineWobble.splineWobble(x, seed);
+        return LineWobble.smoothWobble(x, seed);
     }
 
     // 2D SECTION

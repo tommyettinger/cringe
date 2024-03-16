@@ -376,7 +376,7 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T>, Json.Serializab
      * {@link GdxRandom}. These typically need to be registered before a GapShuffler can be written.
      * If you are using Apache Fury, the concrete subclass of GdxRandom is required to be registered (typically this is
      * {@link RandomAce320}), but GdxRandom itself does not need to be registered.
-     * 
+     *
      * @param out the stream to write the object to
      * @throws IOException Includes any I/O exceptions that may occur
      * @serialData Overriding methods should use this tag to describe

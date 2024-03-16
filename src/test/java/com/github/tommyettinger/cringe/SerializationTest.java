@@ -48,7 +48,6 @@ public class SerializationTest {
     @Test
     public void testGdxRandomFury() {
         Fury fury = Fury.builder().withLanguage(Language.JAVA).build();
-        fury.register(GdxRandom.class);
         fury.register(RandomDistinct64.class);
         fury.register(RandomXMX256.class);
         fury.register(RandomAce320.class);
@@ -106,7 +105,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void testWeightedTable() {
+    public void testWeightedTableJson() {
         Json json = new Json();
         WeightedTable orig = new WeightedTable(new RandomAce320(123), 1.1f, 2.2f, 3.3f, 4.4f, 5.5f);
         String ser = json.toJson(orig);
@@ -118,6 +117,24 @@ public class SerializationTest {
         dser.random();
         int dres = dser.random();
         Assert.assertEquals("Failure with " + ser, ores, dres);
+        System.out.println(orig.random() + " " + orig.random() + " " + orig.random() + " " + orig.random() + " " + orig.random());
+        System.out.println(dser.random() + " " + dser.random() + " " + dser.random() + " " + dser.random() + " " + dser.random());
+    }
+
+    @Test
+    public void testWeightedTableFury() {
+        Fury fury = Fury.builder().withLanguage(Language.JAVA).build();
+        fury.register(RandomAce320.class);
+        fury.register(WeightedTable.class);
+        WeightedTable orig = new WeightedTable(new RandomAce320(123), 1.1f, 2.2f, 3.3f, 4.4f, 5.5f), cpy = orig.copy();
+        byte[] ser = fury.serializeJavaObject(orig);
+        orig.random();
+        int ores = orig.random();
+        WeightedTable dser = fury.deserializeJavaObject(ser, WeightedTable.class);
+        System.out.println(cpy + "   " + dser.toString());
+        dser.random();
+        int dres = dser.random();
+        Assert.assertEquals("Failure with " + cpy, ores, dres);
         System.out.println(orig.random() + " " + orig.random() + " " + orig.random() + " " + orig.random() + " " + orig.random());
         System.out.println(dser.random() + " " + dser.random() + " " + dser.random() + " " + dser.random() + " " + dser.random());
     }

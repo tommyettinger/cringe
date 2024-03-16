@@ -68,7 +68,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void testGapShuffler() {
+    public void testGapShufflerJson() {
         Json json = new Json();
         GapShuffler<String> orig = new GapShuffler<>(
                 new String[]{"IT'S", "PEANUT", "BUTTER", "JELLY", "TIME"}, new RandomAce320(123));
@@ -81,6 +81,26 @@ public class SerializationTest {
         dser.next();
         String dres = dser.next();
         Assert.assertEquals("Failure with " + ser, ores, dres);
+        System.out.println(orig.next() + " " + orig.next() + " " + orig.next() + " " + orig.next() + " " + orig.next());
+        System.out.println(dser.next() + " " + dser.next() + " " + dser.next() + " " + dser.next() + " " + dser.next());
+    }
+
+    @Test
+    public void testGapShufflerFury() {
+        Fury fury = Fury.builder().withLanguage(Language.JAVA).build();
+        fury.register(Array.class);
+        fury.register(RandomAce320.class);
+        fury.register(GapShuffler.class);
+        GapShuffler<String> orig = new GapShuffler<>(
+                new String[]{"IT'S", "PEANUT", "BUTTER", "JELLY", "TIME"}, new RandomAce320(123));
+        GapShuffler<String> cpy = new GapShuffler<>(orig);
+        byte[] ser = fury.serializeJavaObject(orig);
+        orig.next();
+        String ores = orig.next();
+        GapShuffler<?> dser = fury.deserializeJavaObject(ser, GapShuffler.class);
+        dser.next();
+        String dres = (String) dser.next();
+        Assert.assertEquals("Failure with " + cpy, ores, dres);
         System.out.println(orig.next() + " " + orig.next() + " " + orig.next() + " " + orig.next() + " " + orig.next());
         System.out.println(dser.next() + " " + dser.next() + " " + dser.next() + " " + dser.next() + " " + dser.next());
     }
@@ -103,7 +123,7 @@ public class SerializationTest {
     }
 
     @Test
-    public void testUniqueIdentifier() {
+    public void testUniqueIdentifierJson() {
         Json json = new Json();
         UniqueIdentifier orig = UniqueIdentifier.next();
         String ser = json.toJson(orig);

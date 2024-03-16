@@ -20,6 +20,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.Iterator;
 
 /**
@@ -30,7 +34,7 @@ import java.util.Iterator;
  * a size that can be checked, but Iterables can be infinite (and in this case, this one is).
  * @param <T> the type of items to iterate over; ideally, the items are unique
  */
-public class GapShuffler<T> implements Iterator<T>, Iterable<T>, Json.Serializable {
+public class GapShuffler<T> implements Iterator<T>, Iterable<T>, Json.Serializable, Externalizable {
     public GdxRandom random;
     protected Array<T> elements;
     protected int index;
@@ -365,5 +369,45 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T>, Json.Serializab
         elements.addAll(json.readValue("items", Array.class, jsonData));
         random = json.readValue("rng", GdxRandom.class, jsonData);
         index = jsonData.get("idx").asInt();
+    }
+
+    /**
+     * Requires the deserializer to be able to read in an {@link Array} of {@code T} items, as well as a
+     * {@link GdxRandom}. These typically need to be registered before a GapShuffler can be written.
+     * If you are using Apache Fury, the concrete subclass of GdxRandom is required to be registered (typically this is
+     * {@link RandomAce320}), but GdxRandom itself does not need to be registered.
+     * 
+     * @param out the stream to write the object to
+     * @throws IOException Includes any I/O exceptions that may occur
+     * @serialData Overriding methods should use this tag to describe
+     * the data layout of this Externalizable object.
+     * List the sequence of element types and, if possible,
+     * relate the element to a public/protected field and/or
+     * method of this Externalizable class.
+     */
+    @GwtIncompatible
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(elements);
+        out.writeObject(random);
+        out.writeInt(index);
+    }
+
+    /**
+     * Requires the deserializer to be able to read in an {@link Array} of {@code T} items, as well as a
+     * {@link GdxRandom}. These typically need to be registered before a GapShuffler can be read in.
+     * If you are using Apache Fury, the concrete subclass of GdxRandom is required to be registered (typically this is
+     * {@link RandomAce320}), but GdxRandom itself does not need to be registered.
+     *
+     * @param in the stream to read data from in order to restore the object
+     * @throws IOException            if I/O errors occur
+     * @throws ClassNotFoundException If the class for an object being
+     *                                restored cannot be found.
+     */
+    @GwtIncompatible
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        //noinspection unchecked
+        elements = (Array<T>) in.readObject();
+        random = (GdxRandom) in.readObject();
+        index = in.readInt();
     }
 }

@@ -17,6 +17,10 @@
 
 package com.github.tommyettinger.cringe;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 /**
  * A random number generator that guarantees 4-dimensional equidistribution (except for the quartet with four
  * zeroes in a row, every quartet of long results is produced exactly once over the period). This particular generator
@@ -453,7 +457,23 @@ public class RandomXMX256 extends GdxRandom {
 		super.stringDeserialize(data);
 		return this;
 	}
-	
+
+	@GwtIncompatible
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeLong(stateA);
+		out.writeLong(stateB);
+		out.writeLong(stateC);
+		out.writeLong(stateD);
+	}
+
+	@GwtIncompatible
+	public void readExternal(ObjectInput in) throws IOException {
+		stateA = in.readLong();
+		stateB = in.readLong();
+		stateC = in.readLong();
+		stateD = in.readLong();
+	}
+
 	@Override
 	public boolean equals (Object o) {
 		if (this == o)

@@ -17,6 +17,10 @@
 
 package com.github.tommyettinger.cringe;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 /**
  * A variant on Java 8's SplittableRandom algorithm, removing the splittable quality so this has one possible stream.
  * You'd typically use this when you want every output of {@link #nextLong()} from one generator to be a different,
@@ -221,6 +225,16 @@ public class RandomDistinct64 extends GdxRandom {
 	public RandomDistinct64 stringDeserialize(String data) {
 		super.stringDeserialize(data);
 		return this;
+	}
+
+	@GwtIncompatible
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeLong(state);
+	}
+
+	@GwtIncompatible
+	public void readExternal(ObjectInput in) throws IOException {
+		state = in.readLong();
 	}
 
 	@Override

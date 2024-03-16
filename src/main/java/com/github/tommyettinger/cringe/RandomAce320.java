@@ -17,6 +17,10 @@
 
 package com.github.tommyettinger.cringe;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 /**
  * A random number generator with five 64-bit states; does not use multiplication, only add, subtract, XOR, and rotate
  * operations. Has a state that runs like a counter, guaranteeing a minimum period of 2 to the 64. This passes roughly
@@ -374,6 +378,24 @@ public class RandomAce320 extends GdxRandom {
 	public RandomAce320 stringDeserialize(String data) {
 		super.stringDeserialize(data);
 		return this;
+	}
+
+	@GwtIncompatible
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeLong(stateA);
+		out.writeLong(stateB);
+		out.writeLong(stateC);
+		out.writeLong(stateD);
+		out.writeLong(stateE);
+	}
+
+	@GwtIncompatible
+	public void readExternal(ObjectInput in) throws IOException {
+		stateA = in.readLong();
+		stateB = in.readLong();
+		stateC = in.readLong();
+		stateD = in.readLong();
+		stateE = in.readLong();
 	}
 
 	@Override

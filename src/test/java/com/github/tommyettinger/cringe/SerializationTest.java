@@ -1,6 +1,8 @@
 package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.utils.Json;
+import io.fury.Fury;
+import io.fury.config.Language;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,6 +41,28 @@ public class SerializationTest {
             de.nextLong();
             long dl = de.nextLong();
             Assert.assertEquals("Failure with " + s, rl, dl);
+        }
+    }
+
+    @Test
+    public void testGdxRandomFury() {
+        Fury fury = Fury.builder().withLanguage(Language.JAVA).build();
+        fury.register(GdxRandom.class);
+        fury.register(RandomDistinct64.class);
+        fury.register(RandomXMX256.class);
+        fury.register(RandomAce320.class);
+        List<GdxRandom> all = Arrays.asList(new RandomDistinct64(-1L), new RandomXMX256(-1L), new RandomAce320(-1L));
+        for (GdxRandom r : all) {
+            GdxRandom cpy = r.copy();
+            byte[] s = fury.serializeJavaObject(r);
+            r.nextLong();
+            long rl = r.nextLong();
+            r.setSeed(rl);
+            GdxRandom de = fury.deserializeJavaObject(s, r.getClass());
+            System.out.println(cpy + "   " + de);
+            de.nextLong();
+            long dl = de.nextLong();
+            Assert.assertEquals("Failure with " + r.getClass(), rl, dl);
         }
     }
 

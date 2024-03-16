@@ -138,7 +138,7 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
      * relate the element to a public/protected field and/or
      * method of this Externalizable class.
      */
-    @Override
+    @GwtIncompatible
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeLong(hi);
         out.writeLong(lo);
@@ -154,7 +154,7 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
      * @param in the stream to read data from in order to restore the object
      * @throws IOException            if I/O errors occur
      */
-    @Override
+    @GwtIncompatible
     public void readExternal(ObjectInput in) throws IOException {
         hi = in.readLong();
         lo = in.readLong();
@@ -263,7 +263,7 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
          * relate the element to a public/protected field and/or
          * method of this Externalizable class.
          */
-        @Override
+        @GwtIncompatible
         public void writeExternal(ObjectOutput out) throws IOException {
             out.writeLong(stateA);
             out.writeLong(stateB);
@@ -279,7 +279,7 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
          * @param in the stream to read data from in order to restore the object
          * @throws IOException            if I/O errors occur
          */
-        @Override
+        @GwtIncompatible
         public void readExternal(ObjectInput in) throws IOException {
             stateA = in.readLong();
             stateB = in.readLong();

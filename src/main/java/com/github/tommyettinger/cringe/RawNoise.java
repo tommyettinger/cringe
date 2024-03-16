@@ -17,6 +17,7 @@
 package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -411,7 +412,7 @@ public abstract class RawNoise implements Json.Serializable{
      * registered using {@link #register(RawNoise)} (typically once, though registering multiple times isn't a problem).
      * This is a purely-static utility class.
      */
-    public static class Serializer {
+    public static final class Serializer {
         /**
          * Not instantiable.
          */
@@ -495,6 +496,20 @@ public abstract class RawNoise implements Json.Serializable{
             if (root == null)
                 throw new RuntimeException("Tag in given data is invalid or unknown.");
             return root.copy().stringDeserialize(data.substring(idx));
+        }
+
+        /**
+         * Creates and returns a libGDX Array filled with copies of the RawNoise instances this has registered.
+         * The Array will not contain any {@code null} items, nor will it contain the {@link ContinuousNoise} wrapper.
+         * @return a new Array containing each RawNoise instance this has registered, copied
+         */
+        public static Array<RawNoise> getAll() {
+            Array<RawNoise> noises = new Array<>(true, NOISE_BY_TAG.size);
+            for(RawNoise n : NOISE_BY_TAG.values()){
+                if(n == null || "ContinuousNoise".equals(n.getTag())) continue;
+                noises.add(n.copy());
+            }
+            return noises;
         }
     }
 }

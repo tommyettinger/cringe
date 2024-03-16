@@ -168,12 +168,12 @@ public class PerlinNoise extends RawNoise {
      */
     @Override
     public PerlinNoise stringDeserialize(String data) {
-        seed = MathSupport.intFromDec(data, 1, data.indexOf('`'));
+        seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 1));
         return this;
     }
 
     public static PerlinNoise recreateFromString(String data) {
-        return new PerlinNoise(MathSupport.intFromDec(data, 1, data.indexOf('`')));
+        return new PerlinNoise(MathSupport.intFromDec(data, 1, data.indexOf('`', 1)));
     }
 
     /**

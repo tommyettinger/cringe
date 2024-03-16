@@ -1,5 +1,6 @@
 package com.github.tommyettinger.cringe;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import io.fury.Fury;
 import io.fury.config.Language;
@@ -136,5 +137,32 @@ public class SerializationTest {
         dser = UniqueIdentifier.next();
         dser = UniqueIdentifier.next();
         Assert.assertEquals(orig, dser);
+    }
+
+    @Test
+    public void testRawNoiseString() {
+        Array<RawNoise> all = RawNoise.Serializer.getAll();
+        for (RawNoise r : all) {
+            String s = r.stringSerialize();
+            float rl = r.getNoise(0.2f, 0.3f, 0.5f);
+            RawNoise de = r.stringDeserialize(s);
+            System.out.println(s + "   " + de.stringSerialize());
+            float dl = de.getNoise(0.2f, 0.3f, 0.5f);
+            Assert.assertEquals("Failure with " + s, rl, dl, 0.0001f);
+        }
+    }
+
+    @Test
+    public void testRawNoiseJson() {
+        Json json = new Json();
+        Array<RawNoise> all = RawNoise.Serializer.getAll();
+        for (RawNoise r : all) {
+            String s = json.toJson(r);
+            float rl = r.getNoise(0.2f, 0.3f, 0.5f);
+            RawNoise de = json.fromJson(r.getClass(), s);
+            System.out.println(s + "   " + json.toJson(de));
+            float dl = de.getNoise(0.2f, 0.3f, 0.5f);
+            Assert.assertEquals("Failure with " + s, rl, dl, 0.0001f);
+        }
     }
 }

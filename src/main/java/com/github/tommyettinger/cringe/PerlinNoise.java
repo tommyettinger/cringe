@@ -19,6 +19,9 @@ package com.github.tommyettinger.cringe;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.Arrays;
 
 import static com.badlogic.gdx.math.MathUtils.floor;
@@ -147,33 +150,6 @@ public class PerlinNoise extends RawNoise {
     @Override
     public String getTag() {
         return "PerlinNoise";
-    }
-
-    /**
-     * Produces a String that describes everything needed to recreate this INoise in full. This String can be read back
-     * in by {@link #stringDeserialize(String)} to reassign the described state to another INoise.
-     * @return a String that describes this PerlinNoise for serialization
-     */
-    @Override
-    public String stringSerialize() {
-        return "`" + seed + "`";
-    }
-
-    /**
-     * Given a serialized String produced by {@link #stringSerialize()}, reassigns this PerlinNoise to have the
-     * described state from the given String. The serialized String must have been produced by a PerlinNoise.
-     *
-     * @param data a serialized String, typically produced by {@link #stringSerialize()}
-     * @return this PerlinNoise, after being modified (if possible)
-     */
-    @Override
-    public PerlinNoise stringDeserialize(String data) {
-        seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 1));
-        return this;
-    }
-
-    public static PerlinNoise recreateFromString(String data) {
-        return new PerlinNoise(MathSupport.intFromDec(data, 1, data.indexOf('`', 1)));
     }
 
     /**
@@ -621,6 +597,43 @@ public class PerlinNoise extends RawNoise {
                                         wa),
                                 ua),
                         va) * SCALE6, EQ_ADD_6, EQ_MUL_6);//1.61f);
+    }
+
+    /**
+     * Produces a String that describes everything needed to recreate this INoise in full. This String can be read back
+     * in by {@link #stringDeserialize(String)} to reassign the described state to another INoise.
+     * @return a String that describes this PerlinNoise for serialization
+     */
+    @Override
+    public String stringSerialize() {
+        return "`" + seed + "`";
+    }
+
+    /**
+     * Given a serialized String produced by {@link #stringSerialize()}, reassigns this PerlinNoise to have the
+     * described state from the given String. The serialized String must have been produced by a PerlinNoise.
+     *
+     * @param data a serialized String, typically produced by {@link #stringSerialize()}
+     * @return this PerlinNoise, after being modified (if possible)
+     */
+    @Override
+    public PerlinNoise stringDeserialize(String data) {
+        seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 1));
+        return this;
+    }
+
+    public static PerlinNoise recreateFromString(String data) {
+        return new PerlinNoise(MathSupport.intFromDec(data, 1, data.indexOf('`', 1)));
+    }
+
+    @GwtIncompatible
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(seed);
+    }
+
+    @GwtIncompatible
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setSeed(in.readInt());
     }
 
     @Override

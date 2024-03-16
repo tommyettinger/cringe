@@ -441,7 +441,7 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
      * @throws IOException            if I/O errors occur
      */
     @GwtIncompatible
-    public void readExternal(ObjectInput in) throws IOException {
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         stringDeserialize(in.readUTF());
     }
 

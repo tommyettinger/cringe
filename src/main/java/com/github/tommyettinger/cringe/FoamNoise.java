@@ -17,6 +17,10 @@ package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.utils.NumberUtils;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 import static com.github.tommyettinger.cringe.ValueNoise.valueNoise;
 
 /**
@@ -477,6 +481,16 @@ public class FoamNoise extends RawNoise {
 
     public static FoamNoise recreateFromString(String data) {
         return new FoamNoise(MathSupport.intFromDec(data, 1, data.length() - 1));
+    }
+
+    @GwtIncompatible
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(seed);
+    }
+
+    @GwtIncompatible
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setSeed(in.readInt());
     }
 
     @Override

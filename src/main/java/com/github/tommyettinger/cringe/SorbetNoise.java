@@ -16,6 +16,10 @@
 
 package com.github.tommyettinger.cringe;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 /**
  * A mix of {@link CyclicNoise} with {@link SimplexNoise}; much less periodic than CyclicNoise alone. Largely based upon
  * <a href="https://www.shadertoy.com/view/3tcyD7">this ShaderToy by jeyko</a>, which in turn is based on
@@ -24,6 +28,11 @@ package com.github.tommyettinger.cringe;
  * This is currently the slowest type of noise here, but it looks decent in 2D, unlike {@link CyclicNoise}.
  */
 public class SorbetNoise extends CyclicNoise {
+
+    @Override
+    public String getTag() {
+        return "SorbetNoise";
+    }
 
     public SorbetNoise() {
         this(0xBEEFD1CE, 3);
@@ -39,21 +48,6 @@ public class SorbetNoise extends CyclicNoise {
 
     public SorbetNoise(int seed, int octaves, float frequency) {
         super(seed, octaves, frequency);
-    }
-
-    public SorbetNoise stringDeserialize(String data) {
-        super.stringDeserialize(data);
-        return this;
-    }
-
-    public static SorbetNoise recreateFromString(String data) {
-        if(data == null || data.length() < 5)
-            return null;
-        int pos;
-        int seed =    MathSupport.intFromDec(data, 1, pos = data.indexOf('~'));
-        int octaves = MathSupport.intFromDec(data, pos+1, pos = data.indexOf('~', pos+1));
-        float freq  = MathSupport.floatFromDec(data, pos+1, data.indexOf('`', pos+1));
-        return new SorbetNoise(seed, octaves, freq);
     }
 
     public float getNoise(float x, float y) {
@@ -146,9 +140,19 @@ public class SorbetNoise extends CyclicNoise {
         return "SorbetNoise with seed: " + seed + ", octaves:" + octaves;
     }
 
-    @Override
-    public String getTag() {
-        return "SorbetNoise";
+    public SorbetNoise stringDeserialize(String data) {
+        super.stringDeserialize(data);
+        return this;
+    }
+
+    public static SorbetNoise recreateFromString(String data) {
+        if(data == null || data.length() < 5)
+            return null;
+        int pos;
+        int seed =    MathSupport.intFromDec(data, 1, pos = data.indexOf('~'));
+        int octaves = MathSupport.intFromDec(data, pos+1, pos = data.indexOf('~', pos+1));
+        float freq  = MathSupport.floatFromDec(data, pos+1, data.indexOf('`', pos+1));
+        return new SorbetNoise(seed, octaves, freq);
     }
 
     @Override

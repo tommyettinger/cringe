@@ -16,6 +16,10 @@
 
 package com.github.tommyettinger.cringe;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 import static com.github.tommyettinger.cringe.SimplexNoise.noise;
 import static com.github.tommyettinger.cringe.ValueNoise.valueNoise;
 
@@ -41,24 +45,6 @@ public class HoneyNoise extends RawNoise {
     @Override
     public String getTag() {
         return "HoneyNoise";
-    }
-
-    public String stringSerialize() {
-        return "`" + seed + '`';
-    }
-
-    public HoneyNoise stringDeserialize(String data) {
-        if (data == null || data.length() < 3)
-            return this;
-        seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 2));
-        return this;
-    }
-
-    public static HoneyNoise recreateFromString(String data) {
-        if (data == null || data.length() < 3)
-            return null;
-        int seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 2));
-        return new HoneyNoise(seed);
     }
 
     @Override
@@ -195,5 +181,32 @@ public class HoneyNoise extends RawNoise {
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
         float n = (valueNoise(x, y, z, w, u, v, seed) + noise(x, y, z, w, u, v, seed));
         return n / (MUL * Math.abs(n) + ADD);
+    }
+    public String stringSerialize() {
+        return "`" + seed + '`';
+    }
+
+    public HoneyNoise stringDeserialize(String data) {
+        if (data == null || data.length() < 3)
+            return this;
+        seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 2));
+        return this;
+    }
+
+    public static HoneyNoise recreateFromString(String data) {
+        if (data == null || data.length() < 3)
+            return null;
+        int seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 2));
+        return new HoneyNoise(seed);
+    }
+
+    @GwtIncompatible
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(seed);
+    }
+
+    @GwtIncompatible
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setSeed(in.readInt());
     }
 }

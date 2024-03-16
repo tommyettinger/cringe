@@ -19,6 +19,9 @@ package com.github.tommyettinger.cringe;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.Arrays;
 
 import static com.badlogic.gdx.math.MathUtils.cos;
@@ -93,6 +96,12 @@ float cyclicNoise(vec3 p){
     protected transient float[][] inputs = new float[][]{new float[2], new float[3], new float[4], new float[5], new float[6], new float[7]};
     protected transient float[][] outputs = new float[][]{new float[2], new float[3], new float[4], new float[5], new float[6], new float[7]};
     protected transient float[] gauss = new float[7], house = new float[49], large = new float[49], temp = new float[49];
+
+    @Override
+    public String getTag() {
+        return "CyclicNoise";
+    }
+
     public CyclicNoise() {
         this(3);
     }
@@ -183,39 +192,8 @@ float cyclicNoise(vec3 p){
     }
 
     @Override
-    public String getTag() {
-        return "CyclicNoise";
-    }
-
-    public String stringSerialize() {
-        return "`" + seed + '~' + octaves + '~' + frequency + '`';
-    }
-
-    @Override
     public CyclicNoise copy() {
         return new CyclicNoise(seed, octaves, frequency);
-    }
-
-    public CyclicNoise stringDeserialize(String data) {
-        if(data == null || data.length() < 5)
-            return this;
-        int pos;
-        int seed =    MathSupport.intFromDec(data, 1, pos = data.indexOf('~'));
-        int octaves = MathSupport.intFromDec(data, pos+1, pos = data.indexOf('~', pos+1));
-        float freq  = MathSupport.floatFromDec(data, pos+1, data.indexOf('`', pos+1));
-        setSeed(seed, freq);
-        setOctaves(octaves);
-        return this;
-    }
-
-    public static CyclicNoise recreateFromString(String data) {
-        if(data == null || data.length() < 5)
-            return null;
-        int pos;
-        int seed =    MathSupport.intFromDec(data, 1, pos = data.indexOf('~'));
-        int octaves = MathSupport.intFromDec(data, pos+1, pos = data.indexOf('~', pos+1));
-        float freq  = MathSupport.floatFromDec(data, pos+1, data.indexOf('`', pos+1));
-        return new CyclicNoise(seed, octaves, freq);
     }
 
     /**
@@ -561,6 +539,45 @@ float cyclicNoise(vec3 p){
     @Override
     public String toString() {
         return "CyclicNoise with seed: " + seed + ", octaves:" + octaves + ", frequency: " + frequency;
+    }
+
+    public String stringSerialize() {
+        return "`" + seed + '~' + octaves + '~' + frequency + '`';
+    }
+
+    public CyclicNoise stringDeserialize(String data) {
+        if(data == null || data.length() < 5)
+            return this;
+        int pos;
+        int seed =    MathSupport.intFromDec(data, 1, pos = data.indexOf('~'));
+        int octaves = MathSupport.intFromDec(data, pos+1, pos = data.indexOf('~', pos+1));
+        float freq  = MathSupport.floatFromDec(data, pos+1, data.indexOf('`', pos+1));
+        setSeed(seed, freq);
+        setOctaves(octaves);
+        return this;
+    }
+
+    public static CyclicNoise recreateFromString(String data) {
+        if(data == null || data.length() < 5)
+            return null;
+        int pos;
+        int seed =    MathSupport.intFromDec(data, 1, pos = data.indexOf('~'));
+        int octaves = MathSupport.intFromDec(data, pos+1, pos = data.indexOf('~', pos+1));
+        float freq  = MathSupport.floatFromDec(data, pos+1, data.indexOf('`', pos+1));
+        return new CyclicNoise(seed, octaves, freq);
+    }
+
+    @GwtIncompatible
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(seed);
+        out.writeFloat(frequency);
+        out.writeInt(octaves);
+    }
+
+    @GwtIncompatible
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setSeed(in.readInt(), in.readFloat());
+        setOctaves(in.readInt());
     }
 
     @Override

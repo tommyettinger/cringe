@@ -15,6 +15,10 @@
  */
 package com.github.tommyettinger.cringe;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 import static com.badlogic.gdx.math.MathUtils.floor;
 import static com.github.tommyettinger.cringe.PointHasher.hash256;
 import static com.github.tommyettinger.cringe.PointHasher.hash32;
@@ -762,6 +766,16 @@ public class SimplexNoise extends RawNoise {
 
     public static SimplexNoise recreateFromString(String data) {
         return new SimplexNoise(MathSupport.intFromDec(data, 1, data.length() - 1));
+    }
+
+    @GwtIncompatible
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(seed);
+    }
+
+    @GwtIncompatible
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setSeed(in.readInt());
     }
 
     @Override

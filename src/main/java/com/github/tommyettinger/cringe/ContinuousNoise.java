@@ -19,6 +19,10 @@ package com.github.tommyettinger.cringe;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 public class ContinuousNoise extends RawNoise {
 
     /**
@@ -201,6 +205,30 @@ public class ContinuousNoise extends RawNoise {
         setMode(MathSupport.intFromDec(data, pos+1, pos = data.indexOf('~', pos+2)));
         setOctaves(MathSupport.intFromDec(data, pos+1, pos = data.indexOf('`', pos+2)));
         return this;
+    }
+
+
+    /**
+     * Requires the type of the noise generator this wraps ({@link #wrapped}) to be registered.
+     * @param out the stream to write the object to
+     * @throws IOException
+     */
+    @GwtIncompatible
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeObject(wrapped);
+        out.writeInt(seed);
+        out.writeFloat(frequency);
+        out.writeInt(mode);
+        out.writeInt(octaves);
+    }
+
+    @GwtIncompatible
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setWrapped((RawNoise) in.readObject());
+        setSeed(in.readInt());
+        setFrequency(in.readFloat());
+        setMode(in.readInt());
+        setOctaves(in.readInt());
     }
 
     @Override

@@ -18,6 +18,10 @@ package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.math.MathUtils;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
 /**
  * A RawNoise type that produces blocky noise from 1D to 7D. Value noise is really only meant to be used as a building
  * block for better noise, be that with multiple octaves of value noise (and it takes more, typically, to get good
@@ -45,50 +49,9 @@ public class ValueNoise extends RawNoise {
         return "ValueNoise";
     }
 
-    public String stringSerialize() {
-        return "`" + seed + '`';
-    }
-
-    public ValueNoise stringDeserialize(String data) {
-        if(data == null || data.length() < 3)
-            return this;
-        this.seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 2));
-        return this;
-    }
-
-    public static ValueNoise recreateFromString(String data) {
-        if(data == null || data.length() < 3)
-            return null;
-        int seed =   MathSupport.intFromDec(data, 1, data.indexOf('`', 2));
-
-        return new ValueNoise(seed);
-    }
-
     @Override
     public ValueNoise copy() {
         return new ValueNoise(seed);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ValueNoise that = (ValueNoise) o;
-
-        return seed == that.seed;
-    }
-
-    @Override
-    public int hashCode() {
-        return seed;
-    }
-
-    @Override
-    public String toString() {
-        return "ValueNoise{" +
-                "seed=" + seed +
-                '}';
     }
 
     public static float valueNoise(float x, int seed) {
@@ -720,5 +683,56 @@ public class ValueNoise extends RawNoise {
 
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, float m, int seed) {
         return valueNoise(x, y, z, w, u, v, m, seed);
+    }
+
+    public String stringSerialize() {
+        return "`" + seed + '`';
+    }
+
+    public ValueNoise stringDeserialize(String data) {
+        if(data == null || data.length() < 3)
+            return this;
+        this.seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 2));
+        return this;
+    }
+
+    public static ValueNoise recreateFromString(String data) {
+        if(data == null || data.length() < 3)
+            return null;
+        int seed =   MathSupport.intFromDec(data, 1, data.indexOf('`', 2));
+
+        return new ValueNoise(seed);
+    }
+
+    @GwtIncompatible
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(seed);
+    }
+
+    @GwtIncompatible
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        setSeed(in.readInt());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ValueNoise that = (ValueNoise) o;
+
+        return seed == that.seed;
+    }
+
+    @Override
+    public int hashCode() {
+        return seed;
+    }
+
+    @Override
+    public String toString() {
+        return "ValueNoise{" +
+                "seed=" + seed +
+                '}';
     }
 }

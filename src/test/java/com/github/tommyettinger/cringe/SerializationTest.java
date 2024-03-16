@@ -165,4 +165,19 @@ public class SerializationTest {
             Assert.assertEquals("Failure with " + s, rl, dl, 0.0001f);
         }
     }
+
+    @Test
+    public void testRawNoiseFury() {
+        Fury fury = Fury.builder().withLanguage(Language.JAVA).build();
+        Array<RawNoise> all = RawNoise.Serializer.getAll();
+        for (RawNoise r : all) {
+            fury.register(r.getClass());
+            byte[] s = fury.serializeJavaObject(r);
+            float rl = r.getNoise(0.2f, 0.3f, 0.5f);
+            RawNoise de = fury.deserializeJavaObject(s, r.getClass());
+            System.out.println(r + "   " + de);
+            float dl = de.getNoise(0.2f, 0.3f, 0.5f);
+            Assert.assertEquals("Failure with " + s, rl, dl, 0.0001f);
+        }
+    }
 }

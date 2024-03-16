@@ -166,7 +166,7 @@ public class WeightedTable implements Json.Serializable, Externalizable {
         // This uses the MX3 algorithm to generate a random long given sequential states
         state = Scramblers.scramble(state);
         // get a random int (using half the bits of our previously-calculated state) that is less than size
-        int column = (int)((mixed.length * (state & 0xFFFFFFFFL)) >>> 32);
+        int column = (int)((mixed.length * (state & 0xFFFFFFFFL)) >>> 33);
         // use the other half of the bits of state to get a 31-bit int, compare to probability and choose either the
         // current column or the alias for that column based on that probability
         return ((state >>> 33) <= mixed[column & -2]) ? column : mixed[column | 1];
@@ -181,7 +181,7 @@ public class WeightedTable implements Json.Serializable, Externalizable {
     {
         final long state = random.nextLong();
         // get a random int (using half the bits of our previously-calculated state) that is less than size
-        int column = (int)((mixed.length * (state & 0xFFFFFFFFL)) >> 32);
+        int column = (int)((mixed.length * (state & 0xFFFFFFFFL)) >>> 33);
         // use the other half of the bits of state to get a 31-bit int, compare to probability and choose either the
         // current column or the alias for that column based on that probability
         return ((state >>> 33) <= mixed[column & -2]) ? column : mixed[column | 1];
@@ -281,7 +281,6 @@ public class WeightedTable implements Json.Serializable, Externalizable {
         json.writeValue("rng", random, null);
         json.writeValue("items", mixed, int[].class);
         json.writeObjectEnd();
-
     }
 
     @Override

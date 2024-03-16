@@ -177,6 +177,25 @@ public class SerializationTest {
     }
 
     @Test
+    public void testUniqueIdentifierFury() {
+        Fury fury = Fury.builder().withLanguage(Language.JAVA).build();
+        fury.register(UniqueIdentifier.class);
+        fury.register(UniqueIdentifier.Generator.class);
+        UniqueIdentifier orig = UniqueIdentifier.next();
+        byte[] ser = fury.serializeJavaObject(orig);
+        UniqueIdentifier dser = fury.deserializeJavaObject(ser, UniqueIdentifier.class);
+        System.out.println(orig + " deserializes to " + dser);
+        Assert.assertEquals("Failure with " + dser, orig, dser);
+        byte[] serG = fury.serializeJavaObject(UniqueIdentifier.GENERATOR);
+        UniqueIdentifier.next();
+        orig = UniqueIdentifier.next();
+        UniqueIdentifier.GENERATOR = fury.deserializeJavaObject(serG, UniqueIdentifier.Generator.class);
+        UniqueIdentifier.next();
+        dser = UniqueIdentifier.next();
+        Assert.assertEquals(orig, dser);
+    }
+
+    @Test
     public void testRawNoiseString() {
         Array<RawNoise> all = RawNoise.Serializer.getAll();
         for (RawNoise r : all) {

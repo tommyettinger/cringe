@@ -103,6 +103,20 @@ teh encarption is not 4 web tho :(
 
 but i think this new stuf is p. cool
 
+# cereal
+
+u can liek cerealize an decerealize stuffs in here
+
+with like
+
+`Json` from [libgdx](https://libgdx.com), out of teh box!!!
+
+or `Kryo` 4 bianry storaeg usign [kryo-more](https://github.com/tommyettinger/kryo-more)
+
+or `Fury` 4 moar bianry storaeg from [teh apache foudnatoin](https://fury.apache.org), but also liek, out of teh box!!!
+
+or sometimes stuff has codes that liek wriets 2 a String or reads frm 1
+
 # get
 
 The easiest way to use this library was to copy files from the source code.
@@ -172,11 +186,11 @@ and there's lots of other connections. To use the noise, you should probably hav
 
 You can depend on the library as a whole, using it as a normal Gradle or Maven dependency.
 
-`api "com.github.tommyettinger:cringe:0.1.0"`
+`api "com.github.tommyettinger:cringe:0.1.1"`
 
 If you use GWT, then your GWT module needs to depend on:
 
-`implementation "com.github.tommyettinger:cringe:0.1.0:sources"`
+`implementation "com.github.tommyettinger:cringe:0.1.1:sources"`
 
 GWT also needs this `inherits` line added to your `GdxDefinition.gwt.xml` file, with the other inherits lines:
 

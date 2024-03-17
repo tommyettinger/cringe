@@ -147,30 +147,30 @@ public class NoiseVisualizer extends ApplicationAdapter {
                             float cc = c * 0.2f;
                             for (int d = 4096; d < 10000; d++) {
                                 float da = d * 0.05f;
-                                float x = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) * da * width   * 0x1p-9f;
-                                float y = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) * da * height * 0x1p-9f;
                                 float bright = d / 9999f;
+                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) - 0.5f) * bright * width + width * 0.5f;
+                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) - 0.5f) * bright * height + height * 0.5f;
                                 ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f) * 0.3f, 1f);
                                 p.setColor(tempColor);
-                                p.drawCircle((int) x, (int)y, 3);
+                                p.drawCircle((int) x, (int) y, 3);
                             }
                             for (int d = 4096; d < 10000; d++) {
                                 float da = d * 0.05f;
-                                float x = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) * da * width   * 0x1p-9f;
-                                float y = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) * da * height * 0x1p-9f;
                                 float bright = d / 9999f;
+                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) - 0.5f) * bright * width + width * 0.5f;
+                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) - 0.5f) * bright * height + height * 0.5f;
                                 ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f) * 0.55f, 1f);
                                 p.setColor(tempColor);
-                                p.drawCircle((int) x, (int)y, 2);
+                                p.drawCircle((int) x, (int) y, 2);
                             }
                             for (int d = 4096; d < 10000; d++) {
                                 float da = d * 0.05f;
-                                float x = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) * da * width   * 0x1p-9f;
-                                float y = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) * da * height * 0x1p-9f;
                                 float bright = d / 9999f;
+                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) - 0.5f) * bright * width + width * 0.5f;
+                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) - 0.5f) * bright * height + height * 0.5f;
                                 ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f), 1f);
                                 p.setColor(tempColor);
-                                p.drawPixel((int) x, (int)y);
+                                p.drawPixel((int) x, (int) y);
                             }
                             frames.add(p);
                         }
@@ -195,9 +195,9 @@ public class NoiseVisualizer extends ApplicationAdapter {
                                 float cc = c * 0.2f;
                                 for (int d = 4096; d < 10000; d++) {
                                     float da = d * 0.05f;
-                                    float x = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) * da * width   * 0x1p-9f;
-                                    float y = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) * da * height * 0x1p-9f;
                                     float bright = d / 9999f;
+                                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) - 0.5f) * bright * width + width * 0.5f;
+                                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) - 0.5f) * bright * height + height * 0.5f;
                                     ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f), 1f);
                                     p.setColor(tempColor);
                                     p.drawCircle((int) x, (int)y, 2);
@@ -386,10 +386,10 @@ public class NoiseVisualizer extends ApplicationAdapter {
                 c *= 0.5f;
                 // c and ctr are both about the same counter, they advance by a tiny float every frame.
                 for (int d = 4096; d < 8192; d++) {
-                    float da = d * 0.0625f; // 1/16f
-                    float x = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + c, noise.seed)) * da * width   * 0x1p-9f;
-                    float y = prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.seed)) * da * height * 0x1p-9f;
                     bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
+                    float da = d * 0.0625f;
+                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + c, noise.seed)) - 0.5f) * bright * width + width * 0.5f;
+                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.seed)) - 0.5f) * bright * height + height * 0.5f;
                     // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
                     // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
                     ColorSupport.hsl2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright - 0.2f, 1f);

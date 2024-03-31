@@ -450,4 +450,28 @@ public final class RotationSupport {
         }
         return base;
     }
+
+    /**
+     * Appends the given square array {@code matrix}, treating it as a {@code dimension} by {@code dimension} matrix,
+     * to {@code sb}. {@code matrix} which should have at least {@code dimension * dimension} length, though if the
+     * length is lower or matrix is null, this will at least try to print something useful.
+     * @param sb a StringBuilder to append to
+     * @param matrix a square matrix as a 1D float array; should have length of at least {@code dimension * dimension}
+     * @param dimension the side length of the square matrix
+     * @return sb, for chaining
+     */
+    @GwtIncompatible
+    public static StringBuilder appendMatrix(StringBuilder sb, float[] matrix, int dimension) {
+        if(matrix == null) return sb.append("null");
+        Formatter fmt = new Formatter(sb);
+        sb.append("{\n  ");
+        for (int y = 0, i = 0; y < dimension && i < matrix.length; y++) {
+            for (int x = 0; x < dimension && i < matrix.length; x++) {
+                fmt.format("% 3.7f, ", matrix[i++]);
+            }
+            if(y + 1 == dimension) sb.append("\n}");
+            else sb.append("\n  ");
+        }
+        return sb;
+    }
 }

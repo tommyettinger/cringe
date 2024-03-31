@@ -19,6 +19,7 @@ package com.github.tommyettinger.cringe;
 import com.badlogic.gdx.math.MathUtils;
 
 import java.util.Arrays;
+import java.util.Formatter;
 
 /**
  * This has tools for generating and applying matrix rotations, potentially in higher dimensions than the typical 2 or
@@ -427,7 +428,9 @@ public final class RotationSupport {
 
     /**
      * Iteratively calculates a rotation matrix for the given {@code dimension}, randomly generating it with the given
-     * {@code seed}.
+     * {@code seed}. For dimensions 3 and higher, this allocates some temporary arrays once per call, but unlike methods
+     * such as {@link #randomRotation4D(long)}, this doesn't allocate per dimension. For dimension 2, this only
+     * allocates the array it returns.
      * @param seed any long; will be scrambled
      * @param dimension will be clamped to at minimum 2, but there is technically no maximum
      * @return a newly-allocated {@code dimension * dimension}-element float array, meant as effectively a
@@ -435,9 +438,15 @@ public final class RotationSupport {
      */
     public static float[] randomRotationArbitrary(long seed, int dimension) {
         dimension = Math.max(2, dimension);
-        float[] base = randomRotation2D(seed);
-        for (int d = 3; d <= dimension; d++) {
-            base = rotateStep(seed += d, base, d);
+        final int dimensionSq = dimension * dimension;
+        final float[] base = fillRandomRotation2D(seed, new float[dimensionSq]);
+        if(dimension > 2) {
+            final float[] gauss = new float[dimension], house = new float[dimensionSq],
+                    large = new float[dimensionSq], temp = new float[dimensionSq];
+            for (int d = 3; d <= dimension; d++) {
+                rotateStep(seed += d, base, d, gauss, house, large, temp);
+                System.arraycopy(temp, 0, base, 0, d * d);
+            }
         }
         return base;
     }

@@ -698,6 +698,33 @@ public class ContinuousNoise extends RawNoise {
         return sum / (amp * ((1 << octaves) - 1));
     }
 
+    protected float exo(float x, float y, float z, float w, int seed) {
+        float power = 0.5f;
+
+        float striation1 = wrapped.getNoiseWithSeed(x * 0.25f, y * 0.25f, z * 0.25f, w * 0.25f, seed + 1111) * 8f;
+        float distort1 = wrapped.getNoiseWithSeed(x * 2.5f, y * 2.5f, z * 2.5f, w * 2.5f, seed + 2222);
+        float noise1 = wrapped.getNoiseWithSeed(x + striation1 + distort1, y, z, w, seed) * power;
+        for (int i = 1; i < octaves; i++) {
+            float striation2 = wrapped.getNoiseWithSeed(x * 0.125f, y * 0.125f, z * 0.125f, w * 0.125f, seed + i + 3333) * 8f;
+            float distort2 = wrapped.getNoiseWithSeed(x * 1.25f, y * 1.25f, z * 1.25f, w * 1.25f, seed + i + 4444);
+            float noise2 = wrapped.getNoiseWithSeed(x * 0.5f + striation2 + distort2, y * 0.5f, z * 0.5f, w * 0.5f, seed + i) * 1.5f;
+            float roughness = wrapped.getNoiseWithSeed(x * 0.166f, y * 0.166f, z * 0.166f, w * 0.166f, seed + i + 5555) - 0.3f;
+            float bumpDistort = wrapped.getNoiseWithSeed(x * 5f, y * 5f, z * 5f, w * 5f, seed + i + 6666);
+            float bumpNoise = wrapped.getNoiseWithSeed((bumpDistort + x) * 2f, y * 2f, z * 2f, w * 2f, seed + i + 7777);
+            x *= 2f;
+            y *= 2f;
+            z *= 2f;
+            w *= 2f;
+            power *= 0.5f;
+            noise1 += (noise2 * noise2 * noise2 + roughness * bumpNoise) * power;
+        }
+
+        noise1 /= (0.5f * power * ((1 << octaves) - 1));
+        // tanhRougher, from digital.
+        // -1f + 2f / (1f + exp(-2f * noise1))
+        return -1.0f + 2.0f / (1.0f + Compatibility.intBitsToFloat( (int)(0x800000 * (Math.max(-126.0f, -2.885390043258667f * noise1) + 126.94269504f))));
+    }
+
     // 5D
 
     protected float fbm(float x, float y, float z, float w, float u, int seed) {
@@ -780,7 +807,35 @@ public class ContinuousNoise extends RawNoise {
         return sum / (amp * ((1 << octaves) - 1));
     }
 
-    // 5D
+    protected float exo(float x, float y, float z, float w, float u, int seed) {
+        float power = 0.5f;
+
+        float striation1 = wrapped.getNoiseWithSeed(x * 0.25f, y * 0.25f, z * 0.25f, w * 0.25f, u * 0.25f, seed + 1111) * 8f;
+        float distort1 = wrapped.getNoiseWithSeed(x * 2.5f, y * 2.5f, z * 2.5f, w * 2.5f, u * 2.5f, seed + 2222);
+        float noise1 = wrapped.getNoiseWithSeed(x + striation1 + distort1, y, z, w, u, seed) * power;
+        for (int i = 1; i < octaves; i++) {
+            float striation2 = wrapped.getNoiseWithSeed(x * 0.125f, y * 0.125f, z * 0.125f, w * 0.125f, u * 0.125f, seed + i + 3333) * 8f;
+            float distort2 = wrapped.getNoiseWithSeed(x * 1.25f, y * 1.25f, z * 1.25f, w * 1.25f, u * 1.25f, seed + i + 4444);
+            float noise2 = wrapped.getNoiseWithSeed(x * 0.5f + striation2 + distort2, y * 0.5f, z * 0.5f, w * 0.5f, u * 0.5f, seed + i) * 1.5f;
+            float roughness = wrapped.getNoiseWithSeed(x * 0.166f, y * 0.166f, z * 0.166f, w * 0.166f, u * 0.166f, seed + i + 5555) - 0.3f;
+            float bumpDistort = wrapped.getNoiseWithSeed(x * 5f, y * 5f, z * 5f, w * 5f, u * 5f, seed + i + 6666);
+            float bumpNoise = wrapped.getNoiseWithSeed((bumpDistort + x) * 2f, y * 2f, z * 2f, w * 2f, u * 2f, seed + i + 7777);
+            x *= 2f;
+            y *= 2f;
+            z *= 2f;
+            w *= 2f;
+            u *= 2f;
+            power *= 0.5f;
+            noise1 += (noise2 * noise2 * noise2 + roughness * bumpNoise) * power;
+        }
+
+        noise1 /= (0.5f * power * ((1 << octaves) - 1));
+        // tanhRougher, from digital.
+        // -1f + 2f / (1f + exp(-2f * noise1))
+        return -1.0f + 2.0f / (1.0f + Compatibility.intBitsToFloat( (int)(0x800000 * (Math.max(-126.0f, -2.885390043258667f * noise1) + 126.94269504f))));
+    }
+
+    // 6D
 
     protected float fbm(float x, float y, float z, float w, float u, float v, int seed) {
         float sum = wrapped.getNoiseWithSeed(x, y, z, w, u, v, seed);
@@ -870,22 +925,22 @@ public class ContinuousNoise extends RawNoise {
     protected float exo(float x, float y, float z, float w, float u, float v, int seed) {
         float power = 0.5f;
 
-        float striation1 = wrapped.getNoiseWithSeed(x * 0.25f, y * 0.25f, z * 0.25f, u * 0.25f, v * 0.25f, w * 0.25f, seed + 1111) * 8f;
-        float distort1 = wrapped.getNoiseWithSeed(x * 2.5f, y * 2.5f, z * 2.5f, u * 2.5f, v * 2.5f, w * 2.5f, seed + 2222);
-        float noise1 = wrapped.getNoiseWithSeed(x, y, z, u, v, w + striation1 + distort1, seed) * power;
+        float striation1 = wrapped.getNoiseWithSeed(x * 0.25f, y * 0.25f, z * 0.25f, w * 0.25f, u * 0.25f, v * 0.25f, seed + 1111) * 8f;
+        float distort1 = wrapped.getNoiseWithSeed(x * 2.5f, y * 2.5f, z * 2.5f, w * 2.5f, u * 2.5f, v * 2.5f, seed + 2222);
+        float noise1 = wrapped.getNoiseWithSeed(x + striation1 + distort1, y, z, w, u, v, seed) * power;
         for (int i = 1; i < octaves; i++) {
-            float striation2 = wrapped.getNoiseWithSeed(x * 0.125f, y * 0.125f, z * 0.125f, u * 0.125f, v * 0.125f, w * 0.125f, seed + i + 3333) * 8f;
-            float distort2 = wrapped.getNoiseWithSeed(x * 1.25f, y * 1.25f, z * 1.25f, u * 1.25f, v * 1.25f, w * 1.25f, seed + i + 4444);
-            float noise2 = wrapped.getNoiseWithSeed(x * 0.5f, y * 0.5f, z * 0.5f, u * 0.5f, v * 0.5f, w * 0.5f + striation2 + distort2, seed + i) * 1.5f;
-            float roughness = wrapped.getNoiseWithSeed(x * 0.166f, y * 0.166f, z * 0.166f, u * 0.166f, v * 0.166f, w * 0.166f, seed + i + 5555) - 0.3f;
-            float bumpDistort = wrapped.getNoiseWithSeed(x * 5f, y * 5f, z * 5f, u * 5f, v * 5f, w * 5f, seed + i + 6666);
-            float bumpNoise = wrapped.getNoiseWithSeed(x * 2f, y * 2f, z * 2f, u * 2f, v * 2f, w * 2f + 2f * bumpDistort, seed + i + 7777);
+            float striation2 = wrapped.getNoiseWithSeed(x * 0.125f, y * 0.125f, z * 0.125f, w * 0.125f, u * 0.125f, v * 0.125f, seed + i + 3333) * 8f;
+            float distort2 = wrapped.getNoiseWithSeed(x * 1.25f, y * 1.25f, z * 1.25f, w * 1.25f, u * 1.25f, v * 1.25f, seed + i + 4444);
+            float noise2 = wrapped.getNoiseWithSeed(x * 0.5f + striation2 + distort2, y * 0.5f, z * 0.5f, w * 0.5f, u * 0.5f, v * 0.5f, seed + i) * 1.5f;
+            float roughness = wrapped.getNoiseWithSeed(x * 0.166f, y * 0.166f, z * 0.166f, w * 0.166f, u * 0.166f, v * 0.166f, seed + i + 5555) - 0.3f;
+            float bumpDistort = wrapped.getNoiseWithSeed(x * 5f, y * 5f, z * 5f, w * 5f, u * 5f, v * 5f, seed + i + 6666);
+            float bumpNoise = wrapped.getNoiseWithSeed((bumpDistort + x) * 2f, y * 2f, z * 2f, w * 2f, u * 2f, v * 2f, seed + i + 7777);
             x *= 2f;
             y *= 2f;
             z *= 2f;
+            w *= 2f;
             u *= 2f;
             v *= 2f;
-            w *= 2f;
             power *= 0.5f;
             noise1 += (noise2 * noise2 * noise2 + roughness * bumpNoise) * power;
         }

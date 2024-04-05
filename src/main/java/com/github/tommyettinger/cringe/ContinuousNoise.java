@@ -288,6 +288,7 @@ public class ContinuousNoise extends RawNoise {
             case 1: return billow(x * frequency, seed);
             case 2: return ridged(x * frequency, seed);
             case 3: return warp(x * frequency, seed);
+            case 4: return exo(x * frequency, seed);
         }
     }
 
@@ -299,6 +300,7 @@ public class ContinuousNoise extends RawNoise {
             case 1: return billow(x * frequency, y * frequency, seed);
             case 2: return ridged(x * frequency, y * frequency, seed);
             case 3: return warp(x * frequency, y * frequency, seed);
+            case 4: return exo(x * frequency, y * frequency, seed);
         }
     }
 
@@ -310,6 +312,7 @@ public class ContinuousNoise extends RawNoise {
             case 1: return billow(x * frequency, y * frequency, z * frequency, seed);
             case 2: return ridged(x * frequency, y * frequency, z * frequency, seed);
             case 3: return warp(x * frequency, y * frequency, z * frequency, seed);
+            case 4: return exo(x * frequency, y * frequency, z * frequency, seed);
         }
     }
 
@@ -321,6 +324,7 @@ public class ContinuousNoise extends RawNoise {
             case 1: return billow(x * frequency, y * frequency, z * frequency, w * frequency, seed);
             case 2: return ridged(x * frequency, y * frequency, z * frequency, w * frequency, seed);
             case 3: return warp(x * frequency, y * frequency, z * frequency, w * frequency, seed);
+            case 4: return exo(x * frequency, y * frequency, z * frequency, w * frequency, seed);
         }
     }
 
@@ -332,6 +336,7 @@ public class ContinuousNoise extends RawNoise {
             case 1: return billow(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
             case 2: return ridged(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
             case 3: return warp(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
+            case 4: return exo(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
         }
     }
 
@@ -343,6 +348,7 @@ public class ContinuousNoise extends RawNoise {
             case 1: return billow(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, v * frequency, seed);
             case 2: return ridged(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, v * frequency, seed);
             case 3: return warp(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, v * frequency, seed);
+            case 4: return exo(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, v * frequency, seed);
         }
     }
 
@@ -365,6 +371,7 @@ public class ContinuousNoise extends RawNoise {
             case 1: return billow(x * frequency, seed);
             case 2: return ridged(x * frequency, seed);
             case 3: return warp(x * frequency, seed);
+            case 4: return exo(x * frequency, seed);
         }
     }
 
@@ -376,6 +383,7 @@ public class ContinuousNoise extends RawNoise {
             case 1: return billow(x * frequency, y * frequency, seed);
             case 2: return ridged(x * frequency, y * frequency, seed);
             case 3: return warp(x * frequency, y * frequency, seed);
+            case 4: return exo(x * frequency, y * frequency, seed);
         }
     }
 
@@ -387,6 +395,7 @@ public class ContinuousNoise extends RawNoise {
             case 1: return billow(x * frequency, y * frequency, z * frequency, seed);
             case 2: return ridged(x * frequency, y * frequency, z * frequency, seed);
             case 3: return warp(x * frequency, y * frequency, z * frequency, seed);
+            case 4: return exo(x * frequency, y * frequency, z * frequency, seed);
         }
     }
 
@@ -398,6 +407,7 @@ public class ContinuousNoise extends RawNoise {
             case 1: return billow(x * frequency, y * frequency, z * frequency, w * frequency, seed);
             case 2: return ridged(x * frequency, y * frequency, z * frequency, w * frequency, seed);
             case 3: return warp(x * frequency, y * frequency, z * frequency, w * frequency, seed);
+            case 4: return exo(x * frequency, y * frequency, z * frequency, w * frequency, seed);
         }
     }
 
@@ -409,6 +419,7 @@ public class ContinuousNoise extends RawNoise {
             case 1: return billow(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
             case 2: return ridged(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
             case 3: return warp(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
+            case 4: return exo(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
         }
     }
 
@@ -484,6 +495,30 @@ public class ContinuousNoise extends RawNoise {
         return sum / (amp * ((1 << octaves) - 1));
     }
 
+    protected float exo(float x, int seed) {
+        float power = 0.5f;
+
+        float striation1 = wrapped.getNoiseWithSeed(x * 0.25f, seed + 1111) * 8f;
+        float distort1 = wrapped.getNoiseWithSeed(x * 2.5f, seed + 2222);
+        float noise1 = wrapped.getNoiseWithSeed(x + striation1 + distort1, seed) * power;
+        for (int i = 1; i < octaves; i++) {
+            float striation2 = wrapped.getNoiseWithSeed(x * 0.125f, seed + i + 3333) * 8f;
+            float distort2 = wrapped.getNoiseWithSeed(x * 1.25f, seed + i + 4444);
+            float noise2 = wrapped.getNoiseWithSeed(x * 0.5f + striation2 + distort2, seed + i) * 1.5f;
+            float roughness = wrapped.getNoiseWithSeed(x * 0.166f, seed + i + 5555) - 0.3f;
+            float bumpDistort = wrapped.getNoiseWithSeed(x * 5f, seed + i + 6666);
+            float bumpNoise = wrapped.getNoiseWithSeed((bumpDistort + x) * 2f, seed + i + 7777);
+            x *= 2f;
+            power *= 0.5f;
+            noise1 += (noise2 * noise2 * noise2 + roughness * bumpNoise) * power;
+        }
+
+        noise1 /= (0.5f * power * ((1 << octaves) - 1));
+        // tanhRougher, from digital.
+        // -1f + 2f / (1f + exp(-2f * noise1))
+        return -1.0f + 2.0f / (1.0f + Compatibility.intBitsToFloat( (int)(0x800000 * (Math.max(-126.0f, -2.885390043258667f * noise1) + 126.94269504f))));
+    }
+
     // 2D
 
     protected float fbm(float x, float y, int seed) {
@@ -547,6 +582,31 @@ public class ContinuousNoise extends RawNoise {
         }
 
         return sum / (amp * ((1 << octaves) - 1));
+    }
+
+    protected float exo(float x, float y, int seed) {
+        float power = 0.5f;
+
+        float striation1 = wrapped.getNoiseWithSeed(x * 0.25f, y * 0.25f, seed + 1111) * 8f;
+        float distort1 = wrapped.getNoiseWithSeed(x * 2.5f, y * 2.5f, seed + 2222);
+        float noise1 = wrapped.getNoiseWithSeed(x + striation1 + distort1, y, seed) * power;
+        for (int i = 1; i < octaves; i++) {
+            float striation2 = wrapped.getNoiseWithSeed(x * 0.125f, y * 0.125f, seed + i + 3333) * 8f;
+            float distort2 = wrapped.getNoiseWithSeed(x * 1.25f, y * 1.25f, seed + i + 4444);
+            float noise2 = wrapped.getNoiseWithSeed(x * 0.5f + striation2 + distort2, y * 0.5f, seed + i) * 1.5f;
+            float roughness = wrapped.getNoiseWithSeed(x * 0.166f, y * 0.166f, seed + i + 5555) - 0.3f;
+            float bumpDistort = wrapped.getNoiseWithSeed(x * 5f, y * 5f, seed + i + 6666);
+            float bumpNoise = wrapped.getNoiseWithSeed((bumpDistort + x) * 2f, y * 2f, seed + i + 7777);
+            x *= 2f;
+            y *= 2f;
+            power *= 0.5f;
+            noise1 += (noise2 * noise2 * noise2 + roughness * bumpNoise) * power;
+        }
+
+        noise1 /= (0.5f * power * ((1 << octaves) - 1));
+        // tanhRougher, from digital.
+        // -1f + 2f / (1f + exp(-2f * noise1))
+        return -1.0f + 2.0f / (1.0f + Compatibility.intBitsToFloat( (int)(0x800000 * (Math.max(-126.0f, -2.885390043258667f * noise1) + 126.94269504f))));
     }
 
     // 3D
@@ -619,6 +679,32 @@ public class ContinuousNoise extends RawNoise {
         }
 
         return sum / (amp * ((1 << octaves) - 1));
+    }
+
+    protected float exo(float x, float y, float z, int seed) {
+        float power = 0.5f;
+
+        float striation1 = wrapped.getNoiseWithSeed(x * 0.25f, y * 0.25f, z * 0.25f, seed + 1111) * 8f;
+        float distort1 = wrapped.getNoiseWithSeed(x * 2.5f, y * 2.5f, z * 2.5f, seed + 2222);
+        float noise1 = wrapped.getNoiseWithSeed(x + striation1 + distort1, y, z, seed) * power;
+        for (int i = 1; i < octaves; i++) {
+            float striation2 = wrapped.getNoiseWithSeed(x * 0.125f, y * 0.125f, z * 0.125f, seed + i + 3333) * 8f;
+            float distort2 = wrapped.getNoiseWithSeed(x * 1.25f, y * 1.25f, z * 1.25f, seed + i + 4444);
+            float noise2 = wrapped.getNoiseWithSeed(x * 0.5f + striation2 + distort2, y * 0.5f, z * 0.5f, seed + i) * 1.5f;
+            float roughness = wrapped.getNoiseWithSeed(x * 0.166f, y * 0.166f, z * 0.166f, seed + i + 5555) - 0.3f;
+            float bumpDistort = wrapped.getNoiseWithSeed(x * 5f, y * 5f, z * 5f, seed + i + 6666);
+            float bumpNoise = wrapped.getNoiseWithSeed((bumpDistort + x) * 2f, y * 2f, z * 2f, seed + i + 7777);
+            x *= 2f;
+            y *= 2f;
+            z *= 2f;
+            power *= 0.5f;
+            noise1 += (noise2 * noise2 * noise2 + roughness * bumpNoise) * power;
+        }
+
+        noise1 /= (0.5f * power * ((1 << octaves) - 1));
+        // tanhRougher, from digital.
+        // -1f + 2f / (1f + exp(-2f * noise1))
+        return -1.0f + 2.0f / (1.0f + Compatibility.intBitsToFloat( (int)(0x800000 * (Math.max(-126.0f, -2.885390043258667f * noise1) + 126.94269504f))));
     }
 
     // 4D

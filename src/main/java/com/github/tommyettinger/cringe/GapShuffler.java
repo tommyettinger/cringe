@@ -38,7 +38,7 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T>, Json.Serializab
     public GdxRandom random;
     protected Array<T> elements;
     protected int index;
-    protected GapShuffler() {
+    public GapShuffler() {
         random = new RandomAce320();
         elements = new Array<>();
         index = 0;

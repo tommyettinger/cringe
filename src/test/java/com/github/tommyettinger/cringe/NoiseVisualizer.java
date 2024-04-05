@@ -65,14 +65,14 @@ public class NoiseVisualizer extends ApplicationAdapter {
             new SnakeNoise(1),
             new WigglyNoise(1, 3),
     };
-    int noiseIndex = noises.length - 1;
-    private int dim = 0; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
+    int noiseIndex = 2;
+    private int dim = 5; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
     private int octaves = 1; // starts at 1
     private float freq = 0x1p-4f;
     private float mulRaw = 1f, mul = RoughMath.pow2Rough(mulRaw);
     private float mixRaw = 0f, mix = RoughMath.logisticRough(mixRaw);
     private float biasRaw = 0f, bias = RoughMath.pow2Rough(mixRaw);
-    private final ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, 0, octaves);
+    private final ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, 4, octaves);
     private ImmediateModeRenderer20 renderer;
 
     private static final int width = 512, height = 512;
@@ -107,7 +107,6 @@ public class NoiseVisualizer extends ApplicationAdapter {
     public void create() {
         renderer = new ImmediateModeRenderer20(width * height, false, true, 0);
         view = new ScreenViewport();
-        noise.setFractalType(FBM);
         int[] gray256 = new int[256];
         for (int i = 0; i < 256; i++) {
             gray256[i] = i * 0x01010100 + 0xFF;
@@ -290,7 +289,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                         System.out.println("Frequency is now " + freq);
                         break;
                     case R: // fRactal type/mode
-                        noise.setFractalType((noise.getFractalType() + (UIUtils.shift() ? 3 : 1)) % 4);
+                        noise.setFractalType((noise.getFractalType() + (UIUtils.shift() ? 4 : 1)) % 5);
                         switch (noise.getFractalType()) {
                             case FBM:
                                 System.out.println("Fractal Type/Mode is now FBM");
@@ -303,6 +302,9 @@ public class NoiseVisualizer extends ApplicationAdapter {
                                 break;
                             case WARP:
                                 System.out.println("Fractal Type/Mode is now WARP");
+                                break;
+                            case EXO:
+                                System.out.println("Fractal Type/Mode is now EXO");
                                 break;
                         }
                         break;

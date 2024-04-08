@@ -197,7 +197,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                                     float bright = d / 9999f;
                                     float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) - 0.5f) * bright * width + width * 0.5f;
                                     float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) - 0.5f) * bright * height + height * 0.5f;
-                                    ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f), 1f);
+                                    ColorSupport.hsb2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright * 1.2f - 0.2f, 1f);
                                     p.setColor(tempColor);
                                     p.drawCircle((int) x, (int)y, 2);
                                 }
@@ -394,7 +394,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.seed)) - 0.5f) * bright * height + height * 0.5f;
                     // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
                     // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
-                    ColorSupport.hsl2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright - 0.2f, 1f);
+                    ColorSupport.hsb2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright * 1.2f - 0.2f, 1f);
                     renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
                     renderer.vertex(x, y, 0);
                 }

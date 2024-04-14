@@ -454,7 +454,8 @@ public final class RotationSupport {
     /**
      * Appends the given square array {@code matrix}, treating it as a {@code dimension} by {@code dimension} matrix,
      * to {@code sb}. {@code matrix} which should have at least {@code dimension * dimension} length, though if the
-     * length is lower or matrix is null, this will at least try to print something useful.
+     * length is lower or matrix is null, this will at least try to print something useful. Not compatible with GWT
+     * because this uses {@code Formatter}.
      * @param sb a StringBuilder to append to
      * @param matrix a square matrix as a 1D float array; should have length of at least {@code dimension * dimension}
      * @param dimension the side length of the square matrix

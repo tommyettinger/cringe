@@ -2,6 +2,7 @@ package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import io.fury.Fury;
 import io.fury.config.Language;
 import org.junit.Assert;
@@ -9,6 +10,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class SerializationTest {
     @Test
@@ -236,4 +238,31 @@ public class SerializationTest {
             Assert.assertEquals("Failure with " + s, rl, dl, 0.0001f);
         }
     }
+
+    @Test
+    public void testUUIDJson() {
+        Json json = new Json();
+        json.setSerializer(UUID.class, new Json.Serializer<UUID>() {
+            @Override
+            public void write(Json json, UUID uuid, Class aClass) {
+                json.writeObjectStart();
+                json.writeValue("id", uuid.toString(), String.class);
+                json.writeObjectEnd();
+            }
+
+            @Override
+            public UUID read(Json json, JsonValue jsonValue, Class aClass) {
+                return UUID.fromString(json.readValue("id", String.class, jsonValue));
+            }
+        });
+        for (int i = 0; i < 10; i++) {
+            UUID orig = UUID.randomUUID();
+            String ser = json.toJson(orig);
+            System.out.println(ser);
+            UUID dser = json.fromJson(UUID.class, ser);
+            System.out.println(ser + "   " + json.toJson(dser));
+            Assert.assertEquals("Failure with " + ser, orig, dser);
+        }
+    }
+
 }

@@ -175,7 +175,7 @@ public class PerlinNoise extends RawNoise {
     }
     protected static float gradCoord4D(int seed, int x, int y, int z, int w,
                                         float xd, float yd, float zd, float wd) {
-        final int hash = PointHasher.hash256(x, y, z, w, seed) & -4;
+        final int hash = PointHasher.hash256(x, y, z, w, seed) << 2;
         return xd * GRADIENTS_4D[hash] + yd * GRADIENTS_4D[hash + 1] + zd * GRADIENTS_4D[hash + 2] + wd * GRADIENTS_4D[hash + 3];
     }
     protected static float gradCoord5D(int seed, int x, int y, int z, int w, int u,

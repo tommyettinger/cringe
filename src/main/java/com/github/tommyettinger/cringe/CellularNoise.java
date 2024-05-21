@@ -177,8 +177,8 @@ public class CellularNoise extends RawNoise {
         for (int xi = xr - 1; xi <= xr + 1; xi++) {
             for (int yi = yr - 1; yi <= yr + 1; yi++) {
                 int hash = PointHasher.hash256(xi, yi, seed) << 1;
-                float vecX = xi - x + gradients[hash];
-                float vecY = yi - y + gradients[hash+1];
+                float vecX = xi - x + gradients[hash] * 0.45f;
+                float vecY = yi - y + gradients[hash+1] * 0.45f;
 
                 float newDistance = vecX * vecX + vecY * vecY;
 

@@ -16,6 +16,8 @@
 
 package com.github.tommyettinger.cringe;
 
+import com.badlogic.gdx.math.MathUtils;
+
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -24,32 +26,39 @@ import static com.github.tommyettinger.cringe.SimplexNoise.noise;
 import static com.github.tommyettinger.cringe.ValueNoise.valueNoise;
 
 /**
- * An INoise implementation that combines and accentuates {@link SimplexNoise} and {@link ValueNoise}. This tends to be
- * faster than {@link FoamNoise} but slower than {@link SimplexNoise}, with quality a bit better than SimplexNoise.
+ * An INoise implementation that divides space up into cells, and has configurable ways to get values from cells.
  */
-public class HoneyNoise extends RawNoise {
+public class CellularNoise extends RawNoise {
 
-    public static final HoneyNoise instance = new HoneyNoise();
+    public enum CellularReturnType {
+        CELL_VALUE, NOISE_LOOKUP,
+        DISTANCE, DISTANCE_2,
+        DISTANCE_2_ADD, DISTANCE_2_SUB, DISTANCE_2_MUL, DISTANCE_2_DIV, DISTANCE_VALUE;
+
+        public static final CellularReturnType[] ALL = values();
+
+    }
+    public static final CellularNoise instance = new CellularNoise();
 
     public int seed = 0xBEEFD1CE;
 
-    private static final float MUL = 0.2f, ADD = (1f - MUL) * 2f;
+    public CellularReturnType cellularReturnType = CellularReturnType.DISTANCE;
 
-    public HoneyNoise() {
+    public CellularNoise() {
     }
 
-    public HoneyNoise(int seed) {
+    public CellularNoise(int seed) {
         this.seed = seed;
     }
 
     @Override
     public String getTag() {
-        return "HoneyNoise";
+        return "CellularNoise";
     }
 
     @Override
-    public HoneyNoise copy() {
-        return new HoneyNoise(seed);
+    public CellularNoise copy() {
+        return new CellularNoise(seed);
     }
 
     @Override
@@ -57,7 +66,7 @@ public class HoneyNoise extends RawNoise {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        HoneyNoise that = (HoneyNoise) o;
+        CellularNoise that = (CellularNoise) o;
 
         return seed == that.seed;
     }
@@ -69,7 +78,7 @@ public class HoneyNoise extends RawNoise {
 
     @Override
     public String toString() {
-        return "HoneyNoise{" +
+        return "CellularNoise{" +
                 "seed=" + seed +
                 '}';
     }
@@ -81,7 +90,7 @@ public class HoneyNoise extends RawNoise {
 
     @Override
     public int getMaxDimension() {
-        return 6;
+        return 2;
     }
 
     @Override
@@ -103,32 +112,27 @@ public class HoneyNoise extends RawNoise {
 
     @Override
     public float getNoise(float x, float y) {
-        float n = (valueNoise(x, y, seed) + noise(x, y, seed));
-        return n / (MUL * Math.abs(n) + ADD);
+        return getNoiseWithSeed(x, y, seed);
     }
 
     @Override
     public float getNoise(float x, float y, float z) {
-        float n = (valueNoise(x, y, z, seed) + noise(x, y, z, seed));
-        return n / (MUL * Math.abs(n) + ADD);
+        return getNoiseWithSeed(x, y, z, seed);
     }
 
     @Override
     public float getNoise(float x, float y, float z, float w) {
-        float n = (valueNoise(x, y, z, w, seed) + noise(x, y, z, w, seed));
-        return n / (MUL * Math.abs(n) + ADD);
+        return getNoiseWithSeed(x, y, z, w, seed);
     }
 
     @Override
     public float getNoise(float x, float y, float z, float w, float u) {
-        float n = (valueNoise(x, y, z, w, u, seed) + noise(x, y, z, w, u, seed));
-        return n / (MUL * Math.abs(n) + ADD);
+        return getNoiseWithSeed(x, y, z, w, u, seed);
     }
 
     @Override
     public float getNoise(float x, float y, float z, float w, float u, float v) {
-        float n = (valueNoise(x, y, z, w, u, v, seed) + noise(x, y, z, w, u, v, seed));
-        return n / (MUL * Math.abs(n) + ADD);
+        return getNoiseWithSeed(x, y, z, w, u, v, seed);
     }
 
     @Override
@@ -139,6 +143,15 @@ public class HoneyNoise extends RawNoise {
     @Override
     public int getSeed() {
         return seed;
+    }
+
+    public CellularReturnType getCellularReturnType() {
+        return cellularReturnType;
+    }
+
+    public void setCellularReturnType(CellularReturnType cellularReturnType) {
+        // temporary, to avoid setting to an unhandled type.
+        this.cellularReturnType = CellularReturnType.ALL[(cellularReturnType.ordinal() % 3 + 3) % 3];
     }
 
     /**
@@ -155,58 +168,92 @@ public class HoneyNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, float y, int seed) {
-        float n = (valueNoise(x, y, seed) + noise(x, y, seed));
-        return n / (MUL * Math.abs(n) + ADD);
+        int xr = MathUtils.round(x);
+        int yr = MathUtils.round(y);
+
+        final float[] gradients = GradientVectors.GRADIENTS_2D;
+        float distance = 999999;
+        int xc = 0, yc = 0;
+        for (int xi = xr - 1; xi <= xr + 1; xi++) {
+            for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                int hash = PointHasher.hash256(xi, yi, seed) << 1;
+                float vecX = xi - x + gradients[hash];
+                float vecY = yi - y + gradients[hash+1];
+
+                float newDistance = vecX * vecX + vecY * vecY;
+
+                if (newDistance < distance) {
+                    distance = newDistance;
+                    xc = xi;
+                    yc = yi;
+                }
+            }
+        }
+        switch (cellularReturnType) {
+            case CELL_VALUE:
+                return PointHasher.hashAll(xc, yc, seed) * 0x1.0p-31f;
+
+            case NOISE_LOOKUP:
+                int hash = PointHasher.hash256(xc, yc, seed) << 1;
+                return SimplexNoise.instance.getNoiseWithSeed(xc + gradients[hash], yc + gradients[hash + 1], 123);
+
+            case DISTANCE:
+                return Math.min(Math.max(distance - 1, -1), 1);
+
+            default:
+                return 0f;
+        }
+
     }
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, int seed) {
-        float n = (valueNoise(x, y, z, seed) + noise(x, y, z, seed));
-        return n / (MUL * Math.abs(n) + ADD);
+        return 0f;
     }
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, int seed) {
-        float n = (valueNoise(x, y, z, w, seed) + noise(x, y, z, w, seed));
-        return n / (MUL * Math.abs(n) + ADD);
+        return 0f;
     }
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, int seed) {
-        float n = (valueNoise(x, y, z, w, u, seed) + noise(x, y, z, w, u, seed));
-        return n / (MUL * Math.abs(n) + ADD);
+        return 0f;
     }
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
-        float n = (valueNoise(x, y, z, w, u, v, seed) + noise(x, y, z, w, u, v, seed));
-        return n / (MUL * Math.abs(n) + ADD);
+        return 0f;
     }
     public String stringSerialize() {
         return "`" + seed + '`';
     }
 
-    public HoneyNoise stringDeserialize(String data) {
+    public CellularNoise stringDeserialize(String data) {
         if (data == null || data.length() < 3)
             return this;
         seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 2));
         return this;
     }
 
-    public static HoneyNoise recreateFromString(String data) {
+    public static CellularNoise recreateFromString(String data) {
         if (data == null || data.length() < 3)
             return null;
         int seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 2));
-        return new HoneyNoise(seed);
+        return new CellularNoise(seed);
     }
 
     @GwtIncompatible
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(seed);
+        out.writeInt(cellularReturnType.ordinal());
     }
 
     @GwtIncompatible
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         setSeed(in.readInt());
+        cellularReturnType = CellularReturnType.ALL[in.readInt()];
     }
+
+
 }

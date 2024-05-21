@@ -64,6 +64,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             new BadgerNoise(1),
             new SnakeNoise(1),
             new WigglyNoise(1, 3),
+            new CellularNoise(1),
     };
     int noiseIndex = 2;
     private int dim = 5; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions

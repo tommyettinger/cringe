@@ -486,6 +486,7 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
             register(new SimplexNoise(1));
             register(new SorbetNoise(1, 1));
             register(new ValueNoise(1));
+            register(new CellularNoise(1));
 
             register(new ContinuousNoise(new ValueNoise(1)));
         }

@@ -145,39 +145,18 @@ public class CellularNoise extends RawNoise {
         return seed;
     }
 
-    public NoiseType getCellularReturnType() {
+    public NoiseType getNoiseType() {
         return noiseType;
     }
 
-    public void setCellularReturnType(NoiseType noiseType) {
-        // temporary, to avoid setting to an unhandled type.
-        this.noiseType = NoiseType.ALL[(noiseType.ordinal() % 3 + 3) % 3];
+    public void setNoiseType(NoiseType noiseType) {
+        this.noiseType = NoiseType.ALL[(noiseType.ordinal() % 9 + 9) % 9];
     }
 
-    /**
-     * Gets 1D noise with using a specific seed.
-     * Delegates to {@link LineWobble#bicubicWobble(float, int)}.
-     *
-     * @param x x position; can be any finite float
-     * @return a noise value between -1.0f and 1.0f, both inclusive
-     */
-    @Override
-    public float getNoiseWithSeed(float x, int seed) {
-        return LineWobble.bicubicWobble(x, seed);
+    public void setNoiseType(int noiseType) {
+        this.noiseType = NoiseType.ALL[(noiseType % 9 + 9) % 9];
     }
 
-    @Override
-    public float getNoiseWithSeed(float x, float y, int seed) {
-        switch (noiseType) {
-            case CELL_VALUE:
-            case NOISE_LOOKUP:
-            case DISTANCE:
-                return basicCellular(x, y, seed);
-            case DISTANCE_VALUE:
-            default:
-                return mergingCellular(x, y, seed);
-        }
-    }
     public float basicCellular(float x, float y, int seed) {
         int xr = MathUtils.round(x);
         int yr = MathUtils.round(y);
@@ -205,8 +184,7 @@ public class CellularNoise extends RawNoise {
                 return PointHasher.hashAll(xc, yc, seed) * 0x1.0p-31f;
 
             case NOISE_LOOKUP:
-                int hash = PointHasher.hash256(xc, yc, seed) << 1;
-                return SimplexNoise.instance.getNoiseWithSeed(xc + gradients[hash], yc + gradients[hash + 1], 123);
+                return SimplexNoise.instance.getNoiseWithSeed(xc * 0.0625f, yc * 0.0625f, seed);
 
             case DISTANCE:
                 return Math.min(Math.max(distance - 1, -1), 1);
@@ -239,6 +217,68 @@ public class CellularNoise extends RawNoise {
         }
         return sum / (64f + Math.abs(sum));
 //        return RoughMath.tanhRougher(0x1p-6f * sum);
+    }
+
+    public float edgePairCellular(float x, float y, int seed) {
+        int xr = MathUtils.round(x);
+        int yr = MathUtils.round(y);
+
+        float distance = 999999;
+        float distance2 = 999999;
+        final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_2D;
+
+                for (int xi = xr - 1; xi <= xr + 1; xi++) {
+                    for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                        int hash = PointHasher.hash256(xi, yi, seed) << 1;
+                        float vecX = xi - x + gradients[hash];
+                        float vecY = yi - y + gradients[hash + 1];
+
+                        float newDistance = vecX * vecX + vecY * vecY;
+
+                        distance2 = Math.max(Math.min(distance2, newDistance), distance);
+                        distance = Math.min(distance, newDistance);
+                    }
+                }
+
+        switch (noiseType) {
+            case DISTANCE_2:
+                return distance2 - 1;
+            case DISTANCE_2_ADD:
+                return Math.min(Math.max(distance2 + distance - 1, -1), 1);
+            case DISTANCE_2_SUB:
+                return Math.min(Math.max(distance2 - distance - 1, -1), 1);
+            case DISTANCE_2_MUL:
+                return Math.min(Math.max(distance2 * distance - 1, -1), 1);
+            case DISTANCE_2_DIV:
+                return Math.min(Math.max(distance / distance2 - 1, -1), 1);
+            default:
+                return 0;
+        }
+    }
+    /**
+     * Gets 1D noise with using a specific seed.
+     * Delegates to {@link LineWobble#bicubicWobble(float, int)}.
+     *
+     * @param x x position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     */
+    @Override
+    public float getNoiseWithSeed(float x, int seed) {
+        return LineWobble.bicubicWobble(x, seed);
+    }
+
+    @Override
+    public float getNoiseWithSeed(float x, float y, int seed) {
+        switch (noiseType) {
+            case CELL_VALUE:
+            case NOISE_LOOKUP:
+            case DISTANCE:
+                return basicCellular(x, y, seed);
+            case DISTANCE_VALUE:
+                return mergingCellular(x, y, seed);
+            default:
+                return edgePairCellular(x, y, seed);
+        }
     }
 
     @Override

@@ -66,14 +66,14 @@ public class NoiseVisualizer extends ApplicationAdapter {
             new WigglyNoise(1, 3),
             new CellularNoise(1),
     };
-    int noiseIndex = 2;
-    private int dim = 5; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
+    int noiseIndex = noises.length - 1;
+    private int dim = 1; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
     private int octaves = 1; // starts at 1
     private float freq = 0x1p-4f;
     private float mulRaw = 1f, mul = RoughMath.pow2Rough(mulRaw);
     private float mixRaw = 0f, mix = RoughMath.logisticRough(mixRaw);
     private float biasRaw = 0f, bias = RoughMath.pow2Rough(mixRaw);
-    private final ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, 4, octaves);
+    private final ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, FBM, octaves);
     private ImmediateModeRenderer20 renderer;
 
     private static final int width = 512, height = 512;
@@ -328,6 +328,13 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     case K: // sKip
                         ctr += 1000;
                         System.out.println("Skipping ahead so ctr is " + ctr);
+                        break;
+                    case BACKSLASH:
+                        if(noises[noiseIndex] instanceof CellularNoise){
+                            CellularNoise cn = (CellularNoise) noises[noiseIndex];
+                            cn.setNoiseType(cn.getNoiseType().ordinal() + (UIUtils.shift() ? -1 : 1));
+                            System.out.println("Using CellularNoise.NoiseType: " + cn.getNoiseType());
+                        }
                         break;
                     case Q:
                     case ESCAPE: {

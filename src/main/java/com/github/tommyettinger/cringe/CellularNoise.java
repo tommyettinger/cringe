@@ -30,19 +30,19 @@ import static com.github.tommyettinger.cringe.ValueNoise.valueNoise;
  */
 public class CellularNoise extends RawNoise {
 
-    public enum CellularReturnType {
+    public enum NoiseType {
         CELL_VALUE, NOISE_LOOKUP,
         DISTANCE, DISTANCE_2,
         DISTANCE_2_ADD, DISTANCE_2_SUB, DISTANCE_2_MUL, DISTANCE_2_DIV, DISTANCE_VALUE;
 
-        public static final CellularReturnType[] ALL = values();
+        public static final NoiseType[] ALL = values();
 
     }
     public static final CellularNoise instance = new CellularNoise();
 
     public int seed = 0xBEEFD1CE;
 
-    public CellularReturnType cellularReturnType = CellularReturnType.DISTANCE;
+    public NoiseType noiseType = NoiseType.DISTANCE;
 
     public CellularNoise() {
     }
@@ -145,13 +145,13 @@ public class CellularNoise extends RawNoise {
         return seed;
     }
 
-    public CellularReturnType getCellularReturnType() {
-        return cellularReturnType;
+    public NoiseType getCellularReturnType() {
+        return noiseType;
     }
 
-    public void setCellularReturnType(CellularReturnType cellularReturnType) {
+    public void setCellularReturnType(NoiseType noiseType) {
         // temporary, to avoid setting to an unhandled type.
-        this.cellularReturnType = CellularReturnType.ALL[(cellularReturnType.ordinal() % 3 + 3) % 3];
+        this.noiseType = NoiseType.ALL[(noiseType.ordinal() % 3 + 3) % 3];
     }
 
     /**
@@ -168,17 +168,28 @@ public class CellularNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, float y, int seed) {
+        switch (noiseType) {
+            case CELL_VALUE:
+            case NOISE_LOOKUP:
+            case DISTANCE:
+                return basicCellular(x, y, seed);
+            case DISTANCE_VALUE:
+            default:
+                return mergingCellular(x, y, seed);
+        }
+    }
+    public float basicCellular(float x, float y, int seed) {
         int xr = MathUtils.round(x);
         int yr = MathUtils.round(y);
 
-        final float[] gradients = GradientVectors.GRADIENTS_2D;
+        final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_2D;
         float distance = 999999;
         int xc = 0, yc = 0;
         for (int xi = xr - 1; xi <= xr + 1; xi++) {
             for (int yi = yr - 1; yi <= yr + 1; yi++) {
                 int hash = PointHasher.hash256(xi, yi, seed) << 1;
-                float vecX = xi - x + gradients[hash] * 0.45f;
-                float vecY = yi - y + gradients[hash+1] * 0.45f;
+                float vecX = xi - x + gradients[hash];
+                float vecY = yi - y + gradients[hash+1];
 
                 float newDistance = vecX * vecX + vecY * vecY;
 
@@ -189,7 +200,7 @@ public class CellularNoise extends RawNoise {
                 }
             }
         }
-        switch (cellularReturnType) {
+        switch (noiseType) {
             case CELL_VALUE:
                 return PointHasher.hashAll(xc, yc, seed) * 0x1.0p-31f;
 
@@ -203,7 +214,31 @@ public class CellularNoise extends RawNoise {
             default:
                 return 0f;
         }
+    }
 
+    public float mergingCellular(float x, float y, int seed) {
+        int xr = MathUtils.round(x);
+        int yr = MathUtils.round(y);
+
+        float sum = 0f;
+        final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_2D;
+
+        for (int xi = xr - 1; xi <= xr + 1; xi++) {
+            for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                int hash = PointHasher.hash256(xi, yi, seed) << 1;
+                float vecX = xi - x + gradients[hash];
+                float vecY = yi - y + gradients[hash + 1];
+
+                float distance = 1f - (vecX * vecX + vecY * vecY);
+
+                if (distance > 0f) {
+                    distance *= 3f;
+                    sum += ((hash >>> 28) - (hash >>> 24 & 15)) * distance * distance * distance;
+                }
+            }
+        }
+        return sum / (64f + Math.abs(sum));
+//        return RoughMath.tanhRougher(0x1p-6f * sum);
     }
 
     @Override
@@ -246,13 +281,13 @@ public class CellularNoise extends RawNoise {
     @GwtIncompatible
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(seed);
-        out.writeInt(cellularReturnType.ordinal());
+        out.writeInt(noiseType.ordinal());
     }
 
     @GwtIncompatible
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         setSeed(in.readInt());
-        cellularReturnType = CellularReturnType.ALL[in.readInt()];
+        noiseType = NoiseType.ALL[in.readInt()];
     }
 
 

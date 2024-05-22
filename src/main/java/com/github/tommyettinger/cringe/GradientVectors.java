@@ -1408,7 +1408,28 @@ public final class GradientVectors {
             +0.7756626606f, -0.3521449566f, +0.1992188394f, +0.4065485597f, +0.2126327157f, -0.1554318368f, 0.0f, 0.0f,
             +0.2094173431f, +0.3208656609f, -0.0221391916f, -0.1584120095f, -0.4314405322f, +0.8009146452f, 0.0f, 0.0f,
     };
-//
+
+    /**
+     * The same vectors as {@link #GRADIENTS_2D}, but scaled by a factor of 0.45f so that they can be used by
+     * {@link CellularNoise}.
+     */
+    public static final float[] CELLULAR_GRADIENTS_2D = new float[GRADIENTS_2D.length];
+    
+    /**
+     * The same vectors as {@link #GRADIENTS_3D}, but scaled by a factor of 0.45f so that they can be used by
+     * {@link CellularNoise}.
+     */
+    public static final float[] CELLULAR_GRADIENTS_3D = new float[GRADIENTS_3D.length];
+
+    static {
+        for (int i = 0; i < GRADIENTS_2D.length; i++) {
+            CELLULAR_GRADIENTS_2D[i] = GRADIENTS_2D[i] * 0.45f;
+        }
+        for (int i = 0; i < GRADIENTS_3D.length; i++) {
+            CELLULAR_GRADIENTS_3D[i] = GRADIENTS_3D[i] * 0.45f;
+        }
+    }
+
 //    // TEMPORARY BLOCK
 //
 //    private static void shuffleBlocks(final EnhancedRandom random, final float[] items, final int blockSize) {

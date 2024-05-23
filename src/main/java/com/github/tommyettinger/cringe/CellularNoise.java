@@ -203,9 +203,10 @@ public class CellularNoise extends RawNoise {
 
         for (int xi = xr - 1; xi <= xr + 1; xi++) {
             for (int yi = yr - 1; yi <= yr + 1; yi++) {
-                int hash = PointHasher.hash256(xi, yi, seed) << 1;
-                float vecX = xi - x + gradients[hash];
-                float vecY = yi - y + gradients[hash + 1];
+                int hash = PointHasher.hashAll(xi, yi, seed);
+                int h = (hash & 255) << 1;
+                float vecX = xi - x + gradients[h];
+                float vecY = yi - y + gradients[h + 1];
 
                 float distance = 1f - (vecX * vecX + vecY * vecY);
 
@@ -297,6 +298,78 @@ public class CellularNoise extends RawNoise {
                 return 0f;
         }
     }
+    public float mergingCellular(float x, float y, float z, int seed) {
+        int xr = MathUtils.round(x);
+        int yr = MathUtils.round(y);
+        int zr = MathUtils.round(z);
+
+        float sum = 0f;
+        final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_3D;
+
+        for (int xi = xr - 1; xi <= xr + 1; xi++) {
+            for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                for (int zi = zr - 1; zi <= zr + 1; zi++) {
+                    int hash = PointHasher.hashAll(xi, yi, zi, seed);
+                    int h = (hash & 255) << 2;
+                    float vecX = xi - x + gradients[h];
+                    float vecY = yi - y + gradients[h + 1];
+                    float vecZ = zi - z + gradients[h + 2];
+
+                    float distance = 1f - (vecX * vecX + vecY * vecY + vecZ * vecZ);
+
+                    if (distance > 0f) {
+                        distance *= 3f;
+                        sum += ((hash >>> 28) - (hash >>> 24 & 15)) * distance * distance * distance;
+                    }
+                }
+            }
+        }
+        return sum / (64f + Math.abs(sum));
+//        return RoughMath.tanhRougher(0x1p-6f * sum);
+    }
+
+    public float edgePairCellular(float x, float y, float z, int seed) {
+        int xr = MathUtils.round(x);
+        int yr = MathUtils.round(y);
+        int zr = MathUtils.round(z);
+
+        final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_3D;
+
+        float distance = 999999;
+        float distance2 = 999999;
+
+        for (int xi = xr - 1; xi <= xr + 1; xi++) {
+            for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                for (int zi = zr - 1; zi <= zr + 1; zi++) {
+                    int hash = PointHasher.hash256(xi, yi, zi, seed) << 2;
+                    float vecX = xi - x + gradients[hash];
+                    float vecY = yi - y + gradients[hash + 1];
+                    float vecZ = zi - z + gradients[hash + 2];
+
+                    float newDistance = vecX * vecX + vecY * vecY + vecZ * vecZ;
+
+                    distance2 = Math.max(Math.min(distance2, newDistance), distance);
+                    distance = Math.min(distance, newDistance);
+                }
+            }
+        }
+
+        switch (noiseType) {
+            case DISTANCE_2:
+                return distance2 - 1;
+            case DISTANCE_2_ADD:
+                return Math.min(Math.max(distance2 + distance - 1, -1), 1);
+            case DISTANCE_2_SUB:
+                return Math.min(Math.max(distance2 - distance - 1, -1), 1);
+            case DISTANCE_2_MUL:
+                return Math.min(Math.max(distance2 * distance - 1, -1), 1);
+            case DISTANCE_2_DIV:
+                return Math.min(Math.max(distance / distance2 - 1, -1), 1);
+            default:
+                return 0;
+        }
+    }
+
 
 
     /**
@@ -333,11 +406,9 @@ public class CellularNoise extends RawNoise {
             case DISTANCE:
                 return basicCellular(x, y, z, seed);
             case DISTANCE_VALUE:
-                return 0f;
-//                return mergingCellular(x, y, seed);
+                return mergingCellular(x, y, z, seed);
             default:
-                return 0f;
-//                return edgePairCellular(x, y, seed);
+                return edgePairCellular(x, y, z, seed);
         }
     }
 

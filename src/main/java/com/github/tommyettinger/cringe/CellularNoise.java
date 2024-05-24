@@ -68,7 +68,7 @@ public class CellularNoise extends RawNoise {
 
     @Override
     public CellularNoise copy() {
-        return new CellularNoise(seed);
+        return new CellularNoise(seed, noiseType);
     }
 
     @Override
@@ -78,18 +78,19 @@ public class CellularNoise extends RawNoise {
 
         CellularNoise that = (CellularNoise) o;
 
-        return seed == that.seed;
+        return seed == that.seed && noiseType == that.noiseType;
     }
 
     @Override
     public int hashCode() {
-        return seed;
+        return seed + noiseType.ordinal();
     }
 
     @Override
     public String toString() {
         return "CellularNoise{" +
                 "seed=" + seed +
+                ", noiseType=" + noiseType +
                 '}';
     }
 

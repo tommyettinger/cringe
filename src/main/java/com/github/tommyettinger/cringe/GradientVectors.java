@@ -1421,12 +1421,21 @@ public final class GradientVectors {
      */
     public static final float[] CELLULAR_GRADIENTS_3D = new float[GRADIENTS_3D.length];
 
+    /**
+     * The same vectors as {@link #GRADIENTS_4D}, but scaled by a factor of 0.45f so that they can be used by
+     * {@link CellularNoise}.
+     */
+    public static final float[] CELLULAR_GRADIENTS_4D = new float[GRADIENTS_4D.length];
+
     static {
         for (int i = 0; i < GRADIENTS_2D.length; i++) {
             CELLULAR_GRADIENTS_2D[i] = GRADIENTS_2D[i] * 0.45f;
         }
         for (int i = 0; i < GRADIENTS_3D.length; i++) {
             CELLULAR_GRADIENTS_3D[i] = GRADIENTS_3D[i] * 0.45f;
+        }
+        for (int i = 0; i < GRADIENTS_4D.length; i++) {
+            CELLULAR_GRADIENTS_4D[i] = GRADIENTS_4D[i] * 0.45f;
         }
     }
 

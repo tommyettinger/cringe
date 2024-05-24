@@ -90,7 +90,7 @@ public class CellularNoise extends RawNoise {
 
     @Override
     public int getMaxDimension() {
-        return 2;
+        return 4;
     }
 
     @Override
@@ -211,8 +211,7 @@ public class CellularNoise extends RawNoise {
                 float distance = 1f - (vecX * vecX + vecY * vecY);
 
                 if (distance > 0f) {
-                    distance *= 3f;
-                    sum += ((hash >>> 28) - (hash >>> 24 & 15)) * distance * distance * distance;
+                    sum += ((hash >>> 28) - (hash >>> 24 & 15)) * distance * distance * distance * 27f;
                 }
             }
         }
@@ -266,26 +265,26 @@ public class CellularNoise extends RawNoise {
         float distance = 999999;
         int xc = 0, yc = 0, zc = 0;
 
-                for (int xi = xr - 1; xi <= xr + 1; xi++) {
-                    for (int yi = yr - 1; yi <= yr + 1; yi++) {
-                        for (int zi = zr - 1; zi <= zr + 1; zi++) {
+        for (int xi = xr - 1; xi <= xr + 1; xi++) {
+            for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                for (int zi = zr - 1; zi <= zr + 1; zi++) {
 
-                            int hash = PointHasher.hash256(xi, yi, zi, seed) << 2;
-                            float vecX = xi - x + gradients[hash];
-                            float vecY = yi - y + gradients[hash+1];
-                            float vecZ = zi - z + gradients[hash+2];
+                    int hash = PointHasher.hash256(xi, yi, zi, seed) << 2;
+                    float vecX = xi - x + gradients[hash];
+                    float vecY = yi - y + gradients[hash + 1];
+                    float vecZ = zi - z + gradients[hash + 2];
 
-                            float newDistance = vecX * vecX + vecY * vecY + vecZ * vecZ;
+                    float newDistance = vecX * vecX + vecY * vecY + vecZ * vecZ;
 
-                            if (newDistance < distance) {
-                                distance = newDistance;
-                                xc = xi;
-                                yc = yi;
-                                zc = zi;
-                            }
-                        }
+                    if (newDistance < distance) {
+                        distance = newDistance;
+                        xc = xi;
+                        yc = yi;
+                        zc = zi;
                     }
                 }
+            }
+        }
 
         switch (noiseType) {
             case CELL_VALUE:
@@ -318,8 +317,7 @@ public class CellularNoise extends RawNoise {
                     float distance = 1f - (vecX * vecX + vecY * vecY + vecZ * vecZ);
 
                     if (distance > 0f) {
-                        distance *= 3f;
-                        sum += ((hash >>> 28) - (hash >>> 24 & 15)) * distance * distance * distance;
+                        sum += ((hash >>> 28) - (hash >>> 24 & 15)) * distance * distance * distance * 27f;
                     }
                 }
             }
@@ -370,7 +368,127 @@ public class CellularNoise extends RawNoise {
         }
     }
 
+    public float basicCellular(float x, float y, float z, float w, int seed) {
+        int xr = MathUtils.round(x);
+        int yr = MathUtils.round(y);
+        int zr = MathUtils.round(z);
+        int wr = MathUtils.round(w);
 
+        final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_4D;
+        float distance = 999999;
+        int xc = 0, yc = 0, zc = 0, wc = 0;
+        for (int xi = xr - 1; xi <= xr + 1; xi++) {
+            for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                for (int zi = zr - 1; zi <= zr + 1; zi++) {
+                    for (int wi = wr - 1; wi <= wr + 1; wi++) {
+                        int hash = PointHasher.hash256(xi, yi, zi, wi, seed) << 2;
+                        float vecX = xi - x + gradients[hash];
+                        float vecY = yi - y + gradients[hash + 1];
+                        float vecZ = zi - z + gradients[hash + 2];
+                        float vecW = wi - w + gradients[hash + 3];
+
+                        float newDistance = vecX * vecX + vecY * vecY + vecZ * vecZ + vecW * vecW;
+
+                        if (newDistance < distance) {
+                            distance = newDistance;
+                            xc = xi;
+                            yc = yi;
+                            zc = zi;
+                            wc = wi;
+                        }
+                    }
+                }
+            }
+        }
+        switch (noiseType) {
+            case CELL_VALUE:
+                return PointHasher.hashAll(xc, yc, zc, wc, seed) * 0x1p-31f;
+            case NOISE_LOOKUP:
+                return SimplexNoise.instance.getNoiseWithSeed(xc * 0.0625f, yc * 0.0625f, zc * 0.0625f, wc * 0.0625f, seed);
+            case DISTANCE:
+                return distance - 1;
+            default:
+                return 0f;
+        }
+    }
+    public float mergingCellular(float x, float y, float z, float w, int seed) {
+        int xr = MathUtils.round(x);
+        int yr = MathUtils.round(y);
+        int zr = MathUtils.round(z);
+        int wr = MathUtils.round(w);
+
+        final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_4D;
+        float sum = 0f;
+
+        for (int xi = xr - 1; xi <= xr + 1; xi++) {
+            for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                for (int zi = zr - 1; zi <= zr + 1; zi++) {
+                    for (int wi = wr - 1; wi <= wr + 1; wi++) {
+                        int hash = PointHasher.hashAll(xi, yi, zi, wi, seed);
+                        int h = (hash & 255) << 2;
+                        float vecX = xi - x + gradients[h];
+                        float vecY = yi - y + gradients[h + 1];
+                        float vecZ = zi - z + gradients[h + 2];
+                        float vecW = wi - w + gradients[h + 3];
+
+                        float distance = 1f - (vecX * vecX + vecY * vecY + vecZ * vecZ + vecW * vecW);
+
+                        if (distance > 0f) {
+                            sum += ((hash >>> 28) - (hash >>> 24 & 15)) * distance * distance * distance * 27f;
+                        }
+                    }
+                }
+            }
+        }
+        return sum / (64f + Math.abs(sum));
+//        return RoughMath.tanhRougher(0x1p-6f * sum);
+    }
+
+    public float edgePairCellular(float x, float y, float z, float w, int seed) {
+        int xr = MathUtils.round(x);
+        int yr = MathUtils.round(y);
+        int zr = MathUtils.round(z);
+        int wr = MathUtils.round(w);
+
+        final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_4D;
+
+        float distance = 999999;
+        float distance2 = 999999;
+
+        for (int xi = xr - 1; xi <= xr + 1; xi++) {
+            for (int yi = yr - 1; yi <= yr + 1; yi++) {
+                for (int zi = zr - 1; zi <= zr + 1; zi++) {
+                    for (int wi = wr - 1; wi <= wr + 1; wi++) {
+                        int hash = PointHasher.hash256(xi, yi, zi, wi, seed) << 2;
+                        float vecX = xi - x + gradients[hash];
+                        float vecY = yi - y + gradients[hash + 1];
+                        float vecZ = zi - z + gradients[hash + 2];
+                        float vecW = wi - w + gradients[hash + 3];
+
+                        float newDistance = vecX * vecX + vecY * vecY + vecZ * vecZ + vecW * vecW;
+
+                        distance2 = Math.max(Math.min(distance2, newDistance), distance);
+                        distance = Math.min(distance, newDistance);
+                    }
+                }
+            }
+        }
+
+        switch (noiseType) {
+            case DISTANCE_2:
+                return distance2 - 1;
+            case DISTANCE_2_ADD:
+                return Math.min(Math.max(distance2 + distance - 1, -1), 1);
+            case DISTANCE_2_SUB:
+                return Math.min(Math.max(distance2 - distance - 1, -1), 1);
+            case DISTANCE_2_MUL:
+                return Math.min(Math.max(distance2 * distance - 1, -1), 1);
+            case DISTANCE_2_DIV:
+                return Math.min(Math.max(distance / distance2 - 1, -1), 1);
+            default:
+                return 0;
+        }
+    }
 
     /**
      * Gets 1D noise with using a specific seed.
@@ -414,7 +532,16 @@ public class CellularNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, int seed) {
-        return 0f;
+        switch (noiseType) {
+            case CELL_VALUE:
+            case NOISE_LOOKUP:
+            case DISTANCE:
+                return basicCellular(x, y, z, w, seed);
+            case DISTANCE_VALUE:
+                return mergingCellular(x, y, z, w, seed);
+            default:
+                return edgePairCellular(x, y, z, w, seed);
+        }
     }
 
     @Override

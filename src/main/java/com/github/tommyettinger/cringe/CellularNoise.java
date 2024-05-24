@@ -51,6 +51,16 @@ public class CellularNoise extends RawNoise {
         this.seed = seed;
     }
 
+    public CellularNoise(int seed, NoiseType noiseType) {
+        this.seed = seed;
+        this.noiseType = noiseType;
+    }
+
+    public CellularNoise(int seed, int noiseTypeIndex) {
+        this.seed = seed;
+        setNoiseType(noiseTypeIndex);
+    }
+
     @Override
     public String getTag() {
         return "CellularNoise";
@@ -554,21 +564,26 @@ public class CellularNoise extends RawNoise {
         return 0f;
     }
     public String stringSerialize() {
-        return "`" + seed + '`';
+        return "`" + seed + "~" + noiseType.ordinal() + '`';
     }
 
     public CellularNoise stringDeserialize(String data) {
-        if (data == null || data.length() < 3)
+        if (data == null || data.length() < 5)
             return this;
-        seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 2));
+        int middle;
+        seed = MathSupport.intFromDec(data, 1, middle = data.indexOf('~', 2));
+        int index = MathSupport.intFromDec(data, middle + 1, data.indexOf('`', middle+1));
+        setNoiseType(index);
         return this;
     }
 
     public static CellularNoise recreateFromString(String data) {
-        if (data == null || data.length() < 3)
+        if (data == null || data.length() < 5)
             return null;
-        int seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 2));
-        return new CellularNoise(seed);
+        int middle;
+        int seed = MathSupport.intFromDec(data, 1, middle = data.indexOf('`', 2));
+        int index = MathSupport.intFromDec(data, middle + 1, data.indexOf('`', middle+1));
+        return new CellularNoise(seed, index);
     }
 
     @GwtIncompatible
@@ -580,7 +595,7 @@ public class CellularNoise extends RawNoise {
     @GwtIncompatible
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         setSeed(in.readInt());
-        noiseType = NoiseType.ALL[in.readInt()];
+        setNoiseType(in.readInt());
     }
 
 

@@ -478,7 +478,8 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
 
         static {
             NOISE_BY_TAG.put("(NO)", null); // for classes that cannot be serialized
-            // TODO: register every type of raw noise generator here
+            // TODO: register every type of raw noise generator here, alphabetically
+            register(new CellularNoise(1));
             register(new CyclicNoise(1, 1));
             register(new FoamNoise(1));
             register(new HoneyNoise(1));
@@ -486,7 +487,6 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
             register(new SimplexNoise(1));
             register(new SorbetNoise(1, 1));
             register(new ValueNoise(1));
-            register(new CellularNoise(1));
 
             register(new ContinuousNoise(new ValueNoise(1)));
         }

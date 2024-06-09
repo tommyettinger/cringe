@@ -10,12 +10,11 @@ import java.io.*;
 /**
  * A basic way to encrypt a {@link FileHandle} using the <a href="https://en.wikipedia.org/wiki/Speck_(cipher)">Speck
  * Cipher</a>. This operates by treating files as byte arrays, which this always keeps in memory as unencrypted bytes
- * and writes to disk as encrypted bytes. All FileHandle operations are supported on at least some platforms. Note that
- * GWT is entirely unsupported for encryption, though the class will still compile without encryption. This can read and
- * write {@link com.badlogic.gdx.graphics.Pixmap} and {@link com.badlogic.gdx.graphics.Texture} objects with encryption.
- * You can also use {@link #writeString(String, boolean, String)} and {@link #readString(String)} to read and write
- * Strings, but you must be careful to avoid version control (such as Git) changing line endings in encrypted text
- * files. For those, using a file extension like {@code .dat} can help avoid your data being changed irreversibly.
+ * and writes to disk as encrypted bytes. All FileHandle operations are supported on at least some platforms. This can
+ * read and write {@link com.badlogic.gdx.graphics.Pixmap} and {@link com.badlogic.gdx.graphics.Texture} objects with
+ * encryption. You can also use {@link #writeString(String, boolean, String)} and {@link #readString(String)} to read
+ * and write Strings, but you must be careful to avoid version control (such as Git) changing line endings in encrypted
+ * text files. For those, using a file extension like {@code .dat} can help avoid your data being changed irreversibly.
  * <br>
  * You may want to use this class to encrypt or decrypt files on platforms that don't have the javax.crypto package,
  * such as GWT. This is maybe technically compatible with GWT, but the libGDX Preloader generally makes using this code
@@ -25,7 +24,7 @@ import java.io.*;
  * problems with images (and, in all likelihood, any other file types). Images are read in as binary during some of the
  * process, but they also seem to be checked for validity and, if valid, added to a map of loaded files. The encrypted
  * images produced here are not valid when read as PNG, JPG, or any other image format. So, sigh, GWT won't work yet.
- * This class is marked as {@link GwtIncompatible}, which affects the GWT compiler so it ignores this class there.
+ * This class is marked as {@link GwtIncompatible}, which affects the GWT compiler so that it ignores this class there.
  * <br>
  * This uses 34 {@code long} items as its full key, and additionally generates one long nonce from the key and some
  * unique String, such as the relative path of the given FileHandle. Don't expect much meaningful security out of this,

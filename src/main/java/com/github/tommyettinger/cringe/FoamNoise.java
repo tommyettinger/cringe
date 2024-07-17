@@ -417,11 +417,6 @@ public class FoamNoise extends RawNoise {
 
     // OTHER
 
-    /**
-     * Returns the String "FoaN", to be used as a unique tag for this generator.
-     *
-     * @return the String "FoaN"
-     */
     @Override
     public String getTag() {
         return "FoamNoise";

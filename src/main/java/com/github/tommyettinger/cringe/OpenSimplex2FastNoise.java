@@ -24,7 +24,7 @@ package com.github.tommyettinger.cringe;
 /**
  * K.jpg's OpenSimplex 2, faster variant.
  * This is a variant on the Simplex Noise algorithm in 2D, and a subtly different algorithm in 3D and 4D. This does not
- * support 5D or 6D noise. This is very similar to {@code OpenSimplex2Smooth}, but has more separate "spots" or
+ * support 5D or 6D noise. This is very similar to {@link OpenSimplex2SmoothNoise}, but has more separate "spots" or
  * "surflets" with noticeable gaps between areas of similar results. It is faster than OpenSimplex2Smooth, though.
  * <br>
  * OpenSimplex2.java was originally by KdotJPG, who released it into the public domain.

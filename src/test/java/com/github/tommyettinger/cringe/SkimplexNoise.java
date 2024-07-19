@@ -282,10 +282,10 @@ public class SkimplexNoise extends RawNoise {
     public static float noise(final float x, final float y, final float z, final float w, final int seed) {
         final float[] GRADIENTS_4D = GradientVectors.GRADIENTS_4D;
         float t = (x + y + z + w) * F4;
-        int i = floor(x + t);
-        int j = floor(y + t);
-        int k = floor(z + t);
-        int l = floor(w + t);
+        int i = floor(x + t), im = i * X_4;
+        int j = floor(y + t), jm = j * Y_4;
+        int k = floor(z + t), km = k * Z_4;
+        int l = floor(w + t), lm = l * W_4;
         t = (i + j + k + l) * G4;
         float X0 = i - t;
         float Y0 = j - t;
@@ -312,20 +312,20 @@ public class SkimplexNoise extends RawNoise {
         if (z0 > w0) rankz++; else rankw++;
         // @formatter:on
 
-        int i1 = 2 - rankx >>> 31;
-        int j1 = 2 - ranky >>> 31;
-        int k1 = 2 - rankz >>> 31;
-        int l1 = 2 - rankw >>> 31;
+        int i1 = 2 - rankx >>> 31, im1 = im + (X_4 & -i1);
+        int j1 = 2 - ranky >>> 31, jm1 = jm + (Y_4 & -j1);
+        int k1 = 2 - rankz >>> 31, km1 = km + (Z_4 & -k1);
+        int l1 = 2 - rankw >>> 31, lm1 = lm + (W_4 & -l1);
 
-        int i2 = 1 - rankx >>> 31;
-        int j2 = 1 - ranky >>> 31;
-        int k2 = 1 - rankz >>> 31;
-        int l2 = 1 - rankw >>> 31;
+        int i2 = 1 - rankx >>> 31, im2 = im + (X_4 & -i2);
+        int j2 = 1 - ranky >>> 31, jm2 = jm + (Y_4 & -j2);
+        int k2 = 1 - rankz >>> 31, km2 = km + (Z_4 & -k2);
+        int l2 = 1 - rankw >>> 31, lm2 = lm + (W_4 & -l2);
 
-        int i3 = -rankx >>> 31;
-        int j3 = -ranky >>> 31;
-        int k3 = -rankz >>> 31;
-        int l3 = -rankw >>> 31;
+        int i3 = -rankx >>> 31, im3 = im + (X_4 & -i3);
+        int j3 = -ranky >>> 31, jm3 = jm + (Y_4 & -j3);
+        int k3 = -rankz >>> 31, km3 = km + (Z_4 & -k3);
+        int l3 = -rankw >>> 31, lm3 = lm + (W_4 & -l3);
 
         float x1 = x0 - i1 + G4;
         float y1 = y0 - j1 + G4;
@@ -347,39 +347,39 @@ public class SkimplexNoise extends RawNoise {
         float z4 = z0 - 1 + 4 * G4;
         float w4 = w0 - 1 + 4 * G4;
 
-        float n = 0f;
+        float vert0, vert1, vert2, vert3, vert4;
         float t0 = LIMIT4 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0;
         if(t0 > 0) {
-            final int h0 = (hash256(i, j, k, l, seed) << 2);
+            final int h0 = hash256(im, jm, km, lm, seed);
             t0 *= t0;
-            n += t0 * t0 * (x0 * GRADIENTS_4D[h0] + y0 * GRADIENTS_4D[h0 + 1] + z0 * GRADIENTS_4D[h0 + 2] + w0 * GRADIENTS_4D[h0 + 3]);
-        }
+            vert0 = t0 * t0 * (x0 * GRADIENTS_4D[h0] + y0 * GRADIENTS_4D[h0 + 1] + z0 * GRADIENTS_4D[h0 + 2] + w0 * GRADIENTS_4D[h0 + 3]);
+        } else vert0 = 0;
         float t1 = LIMIT4 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1;
         if (t1 > 0) {
-            final int h1 = (hash256(i + i1, j + j1, k + k1, l + l1, seed) << 2);
+            final int h1 = hash256(im1, jm1, km1, lm1, seed);
             t1 *= t1;
-            n += t1 * t1 * (x1 * GRADIENTS_4D[h1] + y1 * GRADIENTS_4D[h1 + 1] + z1 * GRADIENTS_4D[h1 + 2] + w1 * GRADIENTS_4D[h1 + 3]);
-        }
+            vert1 = t1 * t1 * (x1 * GRADIENTS_4D[h1] + y1 * GRADIENTS_4D[h1 + 1] + z1 * GRADIENTS_4D[h1 + 2] + w1 * GRADIENTS_4D[h1 + 3]);
+        } else vert1 = 0;
         float t2 = LIMIT4 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2;
         if (t2 > 0) {
-            final int h2 = (hash256(i + i2, j + j2, k + k2, l + l2, seed) << 2);
+            final int h2 = hash256(im2, jm2, km2, lm2, seed);
             t2 *= t2;
-            n += t2 * t2 * (x2 * GRADIENTS_4D[h2] + y2 * GRADIENTS_4D[h2 + 1] + z2 * GRADIENTS_4D[h2 + 2] + w2 * GRADIENTS_4D[h2 + 3]);
-        }
+            vert2 = t2 * t2 * (x2 * GRADIENTS_4D[h2] + y2 * GRADIENTS_4D[h2 + 1] + z2 * GRADIENTS_4D[h2 + 2] + w2 * GRADIENTS_4D[h2 + 3]);
+        } else vert2 = 0;
         float t3 = LIMIT4 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3;
         if (t3 > 0) {
-            final int h3 = (hash256(i + i3, j + j3, k + k3, l + l3, seed) << 2);
+            final int h3 = hash256(im3, jm3, km3, lm3, seed);
             t3 *= t3;
-            n += t3 * t3 * (x3 * GRADIENTS_4D[h3] + y3 * GRADIENTS_4D[h3 + 1] + z3 * GRADIENTS_4D[h3 + 2] + w3 * GRADIENTS_4D[h3 + 3]);
-        }
+            vert3 = t3 * t3 * (x3 * GRADIENTS_4D[h3] + y3 * GRADIENTS_4D[h3 + 1] + z3 * GRADIENTS_4D[h3 + 2] + w3 * GRADIENTS_4D[h3 + 3]);
+        } else vert3 = 0;
         float t4 = LIMIT4 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4;
         if (t4 > 0) {
-            final int h4 = (hash256(i + 1, j + 1, k + 1, l + 1, seed) << 2);
+            final int h4 = hash256(im + X_4, jm + Y_4, km + Z_4, lm + W_4, seed);
             t4 *= t4;
-            n += t4 * t4 * (x4 * GRADIENTS_4D[h4] + y4 * GRADIENTS_4D[h4 + 1] + z4 * GRADIENTS_4D[h4 + 2] + w4 * GRADIENTS_4D[h4 + 3]);
-        }
+            vert4 = t4 * t4 * (x4 * GRADIENTS_4D[h4] + y4 * GRADIENTS_4D[h4 + 1] + z4 * GRADIENTS_4D[h4 + 2] + w4 * GRADIENTS_4D[h4 + 3]);
+        } else vert4 = 0;
 
-        n *= 37.20266f;
+        float n = (vert0 + vert1 + vert2 + vert3 + vert4) * 37.20266f;
         return n / (0.3f * Math.abs(n) + (1f - 0.3f));
     }
 
@@ -840,11 +840,11 @@ public class SkimplexNoise extends RawNoise {
      * @param z z position, as an int pre-multiplied by {@link #Z_4}
      * @param w w position, as an int pre-multiplied by {@link #W_4}
      * @param s any int, a seed to be able to produce many hashes for a given point
-     * @return 8-bit hash of the x,y,z,w point with the given state s
+     * @return 8-bit hash of the x,y,z,w point with the given state s, shifted for {@link GradientVectors#GRADIENTS_4D}
      */
     public static int hash256(int x, int y, int z, int w, int s) {
-        s ^= x ^ y ^ z ^ w;
-        return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27)) * 0x125493 >>> 24;
+        final int h = (s ^ x ^ y ^ z ^ w) * 0x125493;
+        return (h ^ h >>> 22) & (255 << 2);
     }
     /**
      * An 8-bit point hash that needs 5 dimensions pre-multiplied by constants {@link #X_5} through {@link #U_5}, as

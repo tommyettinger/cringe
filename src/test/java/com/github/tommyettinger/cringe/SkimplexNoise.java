@@ -396,13 +396,12 @@ public class SkimplexNoise extends RawNoise {
      */
     public static float noise(final float x, final float y, final float z, final float w, final float u, final int seed) {
         final float[] GRADIENTS_5D = GradientVectors.GRADIENTS_5D;
-        float n = 0f;
         float t = (x + y + z + w + u) * F5;
-        int i = floor(x + t);
-        int j = floor(y + t);
-        int k = floor(z + t);
-        int l = floor(w + t);
-        int h = floor(u + t);
+        int i = floor(x + t), im = i * X_5;
+        int j = floor(y + t), jm = j * Y_5;
+        int k = floor(z + t), km = k * Z_5;
+        int l = floor(w + t), lm = l * W_5;
+        int h = floor(u + t), hm = h * U_5;
         t = (i + j + k + l + h) * G5;
         float X0 = i - t;
         float Y0 = j - t;
@@ -437,29 +436,29 @@ public class SkimplexNoise extends RawNoise {
         if (w0 > u0) rankw++; else ranku++;
         // @formatter:on
 
-        int i1 = 3 - rankx >>> 31;
-        int j1 = 3 - ranky >>> 31;
-        int k1 = 3 - rankz >>> 31;
-        int l1 = 3 - rankw >>> 31;
-        int h1 = 3 - ranku >>> 31;
+        int i1 = 3 - rankx >>> 31, im1 = im + (X_5 & -i1);
+        int j1 = 3 - ranky >>> 31, jm1 = jm + (Y_5 & -j1);
+        int k1 = 3 - rankz >>> 31, km1 = km + (Z_5 & -k1);
+        int l1 = 3 - rankw >>> 31, lm1 = lm + (W_5 & -l1);
+        int h1 = 3 - ranku >>> 31, hm1 = hm + (U_5 & -h1);
 
-        int i2 = 2 - rankx >>> 31;
-        int j2 = 2 - ranky >>> 31;
-        int k2 = 2 - rankz >>> 31;
-        int l2 = 2 - rankw >>> 31;
-        int h2 = 2 - ranku >>> 31;
+        int i2 = 2 - rankx >>> 31, im2 = im + (X_5 & -i2);
+        int j2 = 2 - ranky >>> 31, jm2 = jm + (Y_5 & -j2);
+        int k2 = 2 - rankz >>> 31, km2 = km + (Z_5 & -k2);
+        int l2 = 2 - rankw >>> 31, lm2 = lm + (W_5 & -l2);
+        int h2 = 2 - ranku >>> 31, hm2 = hm + (U_5 & -h2);
 
-        int i3 = 1 - rankx >>> 31;
-        int j3 = 1 - ranky >>> 31;
-        int k3 = 1 - rankz >>> 31;
-        int l3 = 1 - rankw >>> 31;
-        int h3 = 1 - ranku >>> 31;
+        int i3 = 1 - rankx >>> 31, im3 = im + (X_5 & -i3);
+        int j3 = 1 - ranky >>> 31, jm3 = jm + (Y_5 & -j3);
+        int k3 = 1 - rankz >>> 31, km3 = km + (Z_5 & -k3);
+        int l3 = 1 - rankw >>> 31, lm3 = lm + (W_5 & -l3);
+        int h3 = 1 - ranku >>> 31, hm3 = hm + (U_5 & -h3);
 
-        int i4 = -rankx >>> 31;
-        int j4 = -ranky >>> 31;
-        int k4 = -rankz >>> 31;
-        int l4 = -rankw >>> 31;
-        int h4 = -ranku >>> 31;
+        int i4 = -rankx >>> 31, im4 = im + (X_5 & -i4);
+        int j4 = -ranky >>> 31, jm4 = jm + (Y_5 & -j4);
+        int k4 = -rankz >>> 31, km4 = km + (Z_5 & -k4);
+        int l4 = -rankw >>> 31, lm4 = lm + (W_5 & -l4);
+        int h4 = -ranku >>> 31, hm4 = hm + (U_5 & -h4);
 
         float x1 = x0 - i1 + G5;
         float y1 = y0 - j1 + G5;
@@ -491,49 +490,50 @@ public class SkimplexNoise extends RawNoise {
         float w5 = w0 - 1 + 5 * G5;
         float u5 = u0 - 1 + 5 * G5;
 
-        t = LIMIT5 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0 - u0 * u0;
-        if (t > 0) {
-            t *= t;
-            final int hash = hash256(i, j, k, l, h, seed) << 3;
-            n += t * t * (x0 * GRADIENTS_5D[hash] + y0 * GRADIENTS_5D[hash + 1] + z0 * GRADIENTS_5D[hash + 2] + w0 * GRADIENTS_5D[hash + 3] + u0 * GRADIENTS_5D[hash + 4]);
-        }
+        float vert0, vert1, vert2, vert3, vert4, vert5;
+        float t0 = LIMIT5 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0 - u0 * u0;
+        if (t0 > 0) {
+            t0 *= t0;
+            final int hash = hash256(im, jm, km, lm, hm, seed);
+            vert0 = t0 * t0 * (x0 * GRADIENTS_5D[hash] + y0 * GRADIENTS_5D[hash + 1] + z0 * GRADIENTS_5D[hash + 2] + w0 * GRADIENTS_5D[hash + 3] + u0 * GRADIENTS_5D[hash + 4]);
+        } else vert0 = 0;
 
-        t = LIMIT5 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1 - u1 * u1;
-        if (t > 0) {
-            t *= t;
-            final int hash = hash256(i + i1, j + j1, k + k1, l + l1, h + h1, seed) << 3;
-            n += t * t * (x1 * GRADIENTS_5D[hash] + y1 * GRADIENTS_5D[hash + 1] + z1 * GRADIENTS_5D[hash + 2] + w1 * GRADIENTS_5D[hash + 3] + u1 * GRADIENTS_5D[hash + 4]);
-        }
+        float t1 = LIMIT5 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1 - u1 * u1;
+        if (t1 > 0) {
+            t1 *= t1;
+            final int hash = hash256(im1, jm1, km1, lm1, hm1, seed);
+            vert1 = t1 * t1 * (x1 * GRADIENTS_5D[hash] + y1 * GRADIENTS_5D[hash + 1] + z1 * GRADIENTS_5D[hash + 2] + w1 * GRADIENTS_5D[hash + 3] + u1 * GRADIENTS_5D[hash + 4]);
+        } else vert1 = 0;
 
-        t = LIMIT5 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2 - u2 * u2;
-        if (t > 0) {
-            t *= t;
-            final int hash = hash256(i + i2, j + j2, k + k2, l + l2, h + h2, seed) << 3;
-            n += t * t * (x2 * GRADIENTS_5D[hash] + y2 * GRADIENTS_5D[hash + 1] + z2 * GRADIENTS_5D[hash + 2] + w2 * GRADIENTS_5D[hash + 3] + u2 * GRADIENTS_5D[hash + 4]);
-        }
+        float t2 = LIMIT5 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2 - u2 * u2;
+        if (t2 > 0) {
+            t2 *= t2;
+            final int hash = hash256(im2, jm2, km2, lm2, hm2, seed);
+            vert2 = t2 * t2 * (x2 * GRADIENTS_5D[hash] + y2 * GRADIENTS_5D[hash + 1] + z2 * GRADIENTS_5D[hash + 2] + w2 * GRADIENTS_5D[hash + 3] + u2 * GRADIENTS_5D[hash + 4]);
+        } else vert2 = 0;
 
-        t = LIMIT5 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3 - u3 * u3;
-        if (t > 0) {
-            t *= t;
-            final int hash = hash256(i + i3, j + j3, k + k3, l + l3, h + h3, seed) << 3;
-            n += t * t * (x3 * GRADIENTS_5D[hash] + y3 * GRADIENTS_5D[hash + 1] + z3 * GRADIENTS_5D[hash + 2] + w3 * GRADIENTS_5D[hash + 3] + u3 * GRADIENTS_5D[hash + 4]);
-        }
+        float t3 = LIMIT5 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3 - u3 * u3;
+        if (t3 > 0) {
+            t3 *= t3;
+            final int hash = hash256(im3, jm3, km3, lm3, hm3, seed);
+            vert3 = t3 * t3 * (x3 * GRADIENTS_5D[hash] + y3 * GRADIENTS_5D[hash + 1] + z3 * GRADIENTS_5D[hash + 2] + w3 * GRADIENTS_5D[hash + 3] + u3 * GRADIENTS_5D[hash + 4]);
+        } else vert3 = 0;
 
-        t = LIMIT5 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4 - u4 * u4;
-        if (t > 0) {
-            t *= t;
-            final int hash = hash256(i + i4, j + j4, k + k4, l + l4, h + h4, seed) << 3;
-            n += t * t * (x4 * GRADIENTS_5D[hash] + y4 * GRADIENTS_5D[hash + 1] + z4 * GRADIENTS_5D[hash + 2] + w4 * GRADIENTS_5D[hash + 3] + u4 * GRADIENTS_5D[hash + 4]);
-        }
+        float t4 = LIMIT5 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4 - u4 * u4;
+        if (t4 > 0) {
+            t4 *= t4;
+            final int hash = hash256(im4, jm4, km4, lm4, hm4, seed);
+            vert4 = t4 * t4 * (x4 * GRADIENTS_5D[hash] + y4 * GRADIENTS_5D[hash + 1] + z4 * GRADIENTS_5D[hash + 2] + w4 * GRADIENTS_5D[hash + 3] + u4 * GRADIENTS_5D[hash + 4]);
+        } else vert4 = 0;
 
-        t = LIMIT5 - x5 * x5 - y5 * y5 - z5 * z5 - w5 * w5 - u5 * u5;
-        if (t > 0) {
-            t *= t;
-            final int hash = hash256(i + 1, j + 1, k + 1, l + 1, h + 1, seed) << 3;
-            n += t * t * (x5 * GRADIENTS_5D[hash] + y5 * GRADIENTS_5D[hash + 1] + z5 * GRADIENTS_5D[hash + 2] + w5 * GRADIENTS_5D[hash + 3] + u5 * GRADIENTS_5D[hash + 4]);
-        }
+        float t5 = LIMIT5 - x5 * x5 - y5 * y5 - z5 * z5 - w5 * w5 - u5 * u5;
+        if (t5 > 0) {
+            t5 *= t5;
+            final int hash = hash256(im + X_5, jm + Y_5, km + Z_5, lm + W_5, hm + U_5, seed);
+            vert5 = t5 * t5 * (x5 * GRADIENTS_5D[hash] + y5 * GRADIENTS_5D[hash + 1] + z5 * GRADIENTS_5D[hash + 2] + w5 * GRADIENTS_5D[hash + 3] + u5 * GRADIENTS_5D[hash + 4]);
+        } else vert5 = 0;
 
-        n *= 20.0f;
+        float n = (vert0 + vert1 + vert2 + vert3 + vert4 + vert5) * 20.0f;
         return n / (0.5f * Math.abs(n) + (1f - 0.5f));
     }
 
@@ -855,11 +855,11 @@ public class SkimplexNoise extends RawNoise {
      * @param w w position, as an int pre-multiplied by {@link #W_5}
      * @param u u position, as an int pre-multiplied by {@link #U_5}
      * @param s any int, a seed to be able to produce many hashes for a given point
-     * @return 8-bit hash of the x,y,z,w,u point with the given state s
+     * @return 8-bit hash of the x,y,z,w,u point with the given state s, shifted for {@link GradientVectors#GRADIENTS_5D}
      */
     public static int hash256(int x, int y, int z, int w, int u, int s) {
-        s ^= x ^ y ^ z ^ w ^ u;
-        return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27)) * 0x125493 >>> 24;
+        final int h = (s ^ x ^ y ^ z ^ w ^ u) * 0x125493;
+        return (h ^ h >>> 21) & (255 << 3);
     }
 
     /**

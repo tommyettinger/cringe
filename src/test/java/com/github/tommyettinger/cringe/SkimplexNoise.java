@@ -148,21 +148,21 @@ public class SkimplexNoise extends RawNoise {
         float t0 = 0.5f - x0 * x0 - y0 * y0;
         if (t0 > 0) {
             t0 *= t0;
-            final int h = hash256(im, jm, seed) << 1;
+            final int h = hash256(im, jm, seed);
             vert0 = t0 * t0 * (x0 * GRADIENTS_2D[h] + y0 * GRADIENTS_2D[h+1]);
         } else vert0 = 0;
 
         float t1 = 0.5f - x1 * x1 - y1 * y1;
         if (t1 > 0) {
             t1 *= t1;
-            final int h = hash256(im1, jm1, seed) << 1;
+            final int h = hash256(im1, jm1, seed);
             vert1 = t1 * t1 * (x1 * GRADIENTS_2D[h] + y1 * GRADIENTS_2D[h+1]);
         } else vert1 = 0;
 
         float t2 = 0.5f - x2 * x2 - y2 * y2;
         if (t2 > 0)  {
             t2 *= t2;
-            final int h = hash256(im + X_2, jm + Y_2, seed) << 1;
+            final int h = hash256(im + X_2, jm + Y_2, seed);
             vert2 = t2 * t2 * (x2 * GRADIENTS_2D[h] + y2 * GRADIENTS_2D[h+1]);
         } else vert2 = 0;
 
@@ -173,66 +173,66 @@ public class SkimplexNoise extends RawNoise {
         final float[] GRADIENTS_3D = GradientVectors.GRADIENTS_3D;
 
         float t = (x + y + z) * F3;
-        int i = floor(x + t);
-        int j = floor(y + t);
-        int k = floor(z + t);
+        int i = floor(x + t), im = i * X_3;
+        int j = floor(y + t), jm = j * Y_3;
+        int k = floor(z + t), km = k * Z_3;
 
         t = (i + j + k) * G3;
         float x0 = x - (i - t);
         float y0 = y - (j - t);
         float z0 = z - (k - t);
 
-        int i1, j1, k1;
-        int i2, j2, k2;
+        int i1, j1, k1, im1, jm1, km1;
+        int i2, j2, k2, im2, jm2, km2;
 
         if (x0 >= y0) {
             if (y0 >= z0) {
-                i1 = 1;
-                j1 = 0;
-                k1 = 0;
-                i2 = 1;
-                j2 = 1;
-                k2 = 0;
+                i1 = 1; im1 = im + X_3;
+                j1 = 0; jm1 = jm;
+                k1 = 0; km1 = km;
+                i2 = 1; im2 = im + X_3;
+                j2 = 1; jm2 = jm + Y_3;
+                k2 = 0; km2 = km;
             } else if (x0 >= z0) {
-                i1 = 1;
-                j1 = 0;
-                k1 = 0;
-                i2 = 1;
-                j2 = 0;
-                k2 = 1;
+                i1 = 1; im1 = im + X_3;
+                j1 = 0; jm1 = jm;
+                k1 = 0; km1 = km;
+                i2 = 1; im2 = im + X_3;
+                j2 = 0; jm2 = jm;
+                k2 = 1; km2 = km + Z_3;
             } else // x0 < z0
             {
-                i1 = 0;
-                j1 = 0;
-                k1 = 1;
-                i2 = 1;
-                j2 = 0;
-                k2 = 1;
+                i1 = 0; im1 = im;
+                j1 = 0; jm1 = jm;
+                k1 = 1; km1 = km + Z_3;
+                i2 = 1; im2 = im + X_3;
+                j2 = 0; jm2 = jm;
+                k2 = 1; km2 = km + Z_3;
             }
         } else // x0 < y0
         {
             if (y0 < z0) {
-                i1 = 0;
-                j1 = 0;
-                k1 = 1;
-                i2 = 0;
-                j2 = 1;
-                k2 = 1;
+                i1 = 0; im1 = im;
+                j1 = 0; jm1 = jm;
+                k1 = 1; km1 = km + Z_3;
+                i2 = 0; im2 = im;
+                j2 = 1; jm2 = jm + Y_3;
+                k2 = 1; km2 = km + Z_3;
             } else if (x0 < z0) {
-                i1 = 0;
-                j1 = 1;
-                k1 = 0;
-                i2 = 0;
-                j2 = 1;
-                k2 = 1;
+                i1 = 0; im1 = im;
+                j1 = 1; jm1 = jm + Y_3;
+                k1 = 0; km1 = km;
+                i2 = 0; im2 = im;
+                j2 = 1; jm2 = jm + Y_3;
+                k2 = 1; km2 = km + Z_3;
             } else // x0 >= z0
             {
-                i1 = 0;
-                j1 = 1;
-                k1 = 0;
-                i2 = 1;
-                j2 = 1;
-                k2 = 0;
+                i1 = 0; im1 = im;
+                j1 = 1; jm1 = jm + Y_3;
+                k1 = 0; km1 = km;
+                i2 = 1; im2 = im + X_3;
+                j2 = 1; jm2 = jm + Y_3;
+                k2 = 0; km2 = km;
             }
         }
 
@@ -246,37 +246,37 @@ public class SkimplexNoise extends RawNoise {
         float y3 = y0 - 0.5f;
         float z3 = z0 - 0.5f;
 
-        float n = 0;
+        float vert0, vert1, vert2, vert3;
 
-        t = LIMIT3 - x0 * x0 - y0 * y0 - z0 * z0;
-        if (t > 0) {
-            t *= t;
-            final int h = hash256(i, j, k, seed) << 2;
-            n += t * t * (x0 * GRADIENTS_3D[h] + y0 * GRADIENTS_3D[h + 1] + z0 * GRADIENTS_3D[h + 2]);
-        }
+        float t0 = LIMIT3 - x0 * x0 - y0 * y0 - z0 * z0;
+        if (t0 > 0) {
+            t0 *= t0;
+            final int h = hash256(im, jm, km, seed);
+            vert0 = t0 * t0 * (x0 * GRADIENTS_3D[h] + y0 * GRADIENTS_3D[h + 1] + z0 * GRADIENTS_3D[h + 2]);
+        } else vert0 = 0;
 
-        t = LIMIT3 - x1 * x1 - y1 * y1 - z1 * z1;
-        if (t > 0) {
-            t *= t;
-            final int h = hash256(i + i1, j + j1, k + k1, seed) << 2;
-            n += t * t * (x1 * GRADIENTS_3D[h] + y1 * GRADIENTS_3D[h + 1] + z1 * GRADIENTS_3D[h + 2]);
-        }
+        float t1 = LIMIT3 - x1 * x1 - y1 * y1 - z1 * z1;
+        if (t1 > 0) {
+            t1 *= t1;
+            final int h = hash256(im1, jm1, km1, seed);
+            vert1 = t1 * t1 * (x1 * GRADIENTS_3D[h] + y1 * GRADIENTS_3D[h + 1] + z1 * GRADIENTS_3D[h + 2]);
+        } else vert1 = 0;
 
-        t = LIMIT3 - x2 * x2 - y2 * y2 - z2 * z2;
-        if (t > 0) {
-            t *= t;
-            final int h = hash256(i + i2, j + j2, k + k2, seed) << 2;
-            n += t * t * (x2 * GRADIENTS_3D[h] + y2 * GRADIENTS_3D[h + 1] + z2 * GRADIENTS_3D[h + 2]);
-        }
+        float t2 = LIMIT3 - x2 * x2 - y2 * y2 - z2 * z2;
+        if (t2 > 0) {
+            t2 *= t2;
+            final int h = hash256(im2, jm2, km2, seed);
+            vert2 = t2 * t2 * (x2 * GRADIENTS_3D[h] + y2 * GRADIENTS_3D[h + 1] + z2 * GRADIENTS_3D[h + 2]);
+        } else vert2 = 0;
 
-        t = LIMIT3 - x3 * x3 - y3 * y3 - z3 * z3;
-        if (t > 0)  {
-            t *= t;
-            final int h = hash256(i + 1, j + 1, k + 1, seed) << 2;
-            n += t * t * (x3 * GRADIENTS_3D[h] + y3 * GRADIENTS_3D[h + 1] + z3 * GRADIENTS_3D[h + 2]);
-        }
+        float t3 = LIMIT3 - x3 * x3 - y3 * y3 - z3 * z3;
+        if (t3 > 0)  {
+            t3 *= t3;
+            final int h = hash256(im + X_3, jm + Y_3, km + Z_3, seed);
+            vert3 = t3 * t3 * (x3 * GRADIENTS_3D[h] + y3 * GRADIENTS_3D[h + 1] + z3 * GRADIENTS_3D[h + 2]);
+        } else vert3 = 0;
 
-        return 39.59758f * n;
+        return 39.59758f * (vert0 + vert1 + vert2 + vert3);
     }
 
     public static float noise(final float x, final float y, final float z, final float w, final int seed) {
@@ -755,7 +755,7 @@ public class SkimplexNoise extends RawNoise {
 
     @Override
     public String getTag() {
-        return "SimplexNoise";
+        return "SkimplexNoise";
     }
 
     public String stringSerialize() {
@@ -812,11 +812,11 @@ public class SkimplexNoise extends RawNoise {
      * @param x x position, as an int pre-multiplied by {@link #X_2}
      * @param y y position, as an int pre-multiplied by {@link #Y_2}
      * @param s any int, a seed to be able to produce many hashes for a given point
-     * @return 8-bit hash of the x,y point with the given state s
+     * @return 8-bit hash of the x,y point with the given state s, shifted for {@link GradientVectors#GRADIENTS_2D}
      */
     public static int hash256(int x, int y, int s) {
-        s ^= x ^ y;
-        return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27)) * 0x125493 >>> 24;
+        final int h = (s ^ x ^ y) * 0x125493;
+        return (h ^ h >>> 23) & (255 << 1);
     }
     /**
      * An 8-bit point hash that needs 3 dimensions pre-multiplied by constants {@link #X_3} through {@link #Z_3}, as
@@ -825,11 +825,11 @@ public class SkimplexNoise extends RawNoise {
      * @param y y position, as an int pre-multiplied by {@link #Y_3}
      * @param z z position, as an int pre-multiplied by {@link #Z_3}
      * @param s any int, a seed to be able to produce many hashes for a given point
-     * @return 8-bit hash of the x,y,z point with the given state s
+     * @return 8-bit hash of the x,y,z point with the given state s, shifted for {@link GradientVectors#GRADIENTS_3D}
      */
     public static int hash256(int x, int y, int z, int s) {
-        s ^= x ^ y ^ z;
-        return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27)) * 0x125493 >>> 24;
+        final int h = (s ^ x ^ y ^ z) * 0x125493;
+        return (h ^ h >>> 22) & (255 << 2);
     }
 
     /**

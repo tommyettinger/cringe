@@ -68,6 +68,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             new OpenSimplex2SmoothNoise(1),
             new OpenSimplex2FastNoise(1),
             new SkimplexNoise(1),
+            new PerklinNoise(1),
     };
     int noiseIndex = noises.length - 1;
     private int dim = 1; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions

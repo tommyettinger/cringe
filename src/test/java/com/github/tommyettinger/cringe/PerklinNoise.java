@@ -159,7 +159,6 @@ public class PerklinNoise extends RawNoise {
         return new PerklinNoise(this.seed);
     }
 
-    //0xE60E2B722B53AEEBL, 0xCEBD76D9EDB6A8EFL, 0xB9C9AA3A51D00B65L, 0xA6F5777F6F88983FL, 0x9609C71EB7D03F7BL, 0x86D516E50B04AB1BL
     protected static float gradCoord2D(int seed, int x, int y,
                                         float xd, float yd) {
         final int hash = hash256(x, y, seed);
@@ -299,11 +298,11 @@ public class PerklinNoise extends RawNoise {
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, final int seed) {
         final int
-                x0 = floor(x),
-                y0 = floor(y),
-                z0 = floor(z),
-                w0 = floor(w);
-        final float xf = x - x0, yf = y - y0, zf = z - z0, wf = w - w0;
+                xi = floor(x), x0 = xi * X_4,
+                yi = floor(y), y0 = yi * Y_4,
+                zi = floor(z), z0 = zi * Z_4,
+                wi = floor(w), w0 = wi * W_4;
+        final float xf = x - xi, yf = y - yi, zf = z - zi, wf = w - wi;
 
         final float xa = xf * xf * xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
         final float ya = yf * yf * yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
@@ -316,43 +315,43 @@ public class PerklinNoise extends RawNoise {
                                         lerp(
                                                 lerp(
                                                         gradCoord4D(seed, x0, y0, z0, w0, xf, yf, zf, wf),
-                                                        gradCoord4D(seed, x0+1, y0, z0, w0, xf - 1, yf, zf, wf),
+                                                        gradCoord4D(seed, x0+X_4, y0, z0, w0, xf - 1, yf, zf, wf),
                                                         xa),
                                                 lerp(
-                                                        gradCoord4D(seed, x0, y0+1, z0, w0, xf, yf-1, zf, wf),
-                                                        gradCoord4D(seed, x0+1, y0+1, z0, w0, xf - 1, yf - 1, zf, wf),
+                                                        gradCoord4D(seed, x0, y0+Y_4, z0, w0, xf, yf-1, zf, wf),
+                                                        gradCoord4D(seed, x0+X_4, y0+Y_4, z0, w0, xf - 1, yf - 1, zf, wf),
                                                         xa),
                                                 ya),
                                         lerp(
                                                 lerp(
-                                                        gradCoord4D(seed, x0, y0, z0+1, w0, xf, yf, zf-1, wf),
-                                                        gradCoord4D(seed, x0+1, y0, z0+1, w0, xf - 1, yf, zf-1, wf),
+                                                        gradCoord4D(seed, x0, y0, z0+Z_4, w0, xf, yf, zf-1, wf),
+                                                        gradCoord4D(seed, x0+X_4, y0, z0+Z_4, w0, xf - 1, yf, zf-1, wf),
                                                         xa),
                                                 lerp(
-                                                        gradCoord4D(seed, x0, y0+1, z0+1, w0, xf, yf-1, zf-1, wf),
-                                                        gradCoord4D(seed, x0+1, y0+1, z0+1, w0, xf - 1, yf - 1, zf-1, wf),
+                                                        gradCoord4D(seed, x0, y0+Y_4, z0+Z_4, w0, xf, yf-1, zf-1, wf),
+                                                        gradCoord4D(seed, x0+X_4, y0+Y_4, z0+Z_4, w0, xf - 1, yf - 1, zf-1, wf),
                                                         xa),
                                                 ya),
                                         za),
                                 lerp(
                                         lerp(
                                                 lerp(
-                                                        gradCoord4D(seed, x0, y0, z0, w0+1, xf, yf, zf, wf - 1),
-                                                        gradCoord4D(seed, x0+1, y0, z0, w0+1, xf - 1, yf, zf, wf - 1),
+                                                        gradCoord4D(seed, x0, y0, z0, w0+W_4, xf, yf, zf, wf - 1),
+                                                        gradCoord4D(seed, x0+X_4, y0, z0, w0+W_4, xf - 1, yf, zf, wf - 1),
                                                         xa),
                                                 lerp(
-                                                        gradCoord4D(seed, x0, y0+1, z0, w0+1, xf, yf-1, zf, wf - 1),
-                                                        gradCoord4D(seed, x0+1, y0+1, z0, w0+1, xf - 1, yf - 1, zf, wf - 1),
+                                                        gradCoord4D(seed, x0, y0+Y_4, z0, w0+W_4, xf, yf-1, zf, wf - 1),
+                                                        gradCoord4D(seed, x0+X_4, y0+Y_4, z0, w0+W_4, xf - 1, yf - 1, zf, wf - 1),
                                                         xa),
                                                 ya),
                                         lerp(
                                                 lerp(
-                                                        gradCoord4D(seed, x0, y0, z0+1, w0+1, xf, yf, zf-1, wf - 1),
-                                                        gradCoord4D(seed, x0+1, y0, z0+1, w0+1, xf - 1, yf, zf-1, wf - 1),
+                                                        gradCoord4D(seed, x0, y0, z0+Z_4, w0+W_4, xf, yf, zf-1, wf - 1),
+                                                        gradCoord4D(seed, x0+X_4, y0, z0+Z_4, w0+W_4, xf - 1, yf, zf-1, wf - 1),
                                                         xa),
                                                 lerp(
-                                                        gradCoord4D(seed, x0, y0+1, z0+1, w0+1, xf, yf-1, zf-1, wf - 1),
-                                                        gradCoord4D(seed, x0+1, y0+1, z0+1, w0+1, xf - 1, yf - 1, zf-1, wf - 1),
+                                                        gradCoord4D(seed, x0, y0+Y_4, z0+Z_4, w0+W_4, xf, yf-1, zf-1, wf - 1),
+                                                        gradCoord4D(seed, x0+X_4, y0+Y_4, z0+Z_4, w0+W_4, xf - 1, yf - 1, zf-1, wf - 1),
                                                         xa),
                                                 ya),
                                         za),

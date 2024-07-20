@@ -367,12 +367,12 @@ public class PerklinNoise extends RawNoise {
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, final int seed) {
         final int
-                x0 = floor(x),
-                y0 = floor(y),
-                z0 = floor(z),
-                w0 = floor(w),
-                u0 = floor(u);
-        final float xf = x - x0, yf = y - y0, zf = z - z0, wf = w - w0, uf = u - u0;
+                xi = floor(x), x0 = xi * X_5,
+                yi = floor(y), y0 = yi * Y_5,
+                zi = floor(z), z0 = zi * Z_5,
+                wi = floor(w), w0 = wi * W_5,
+                ui = floor(u), u0 = ui * U_5;
+        final float xf = x - xi, yf = y - yi, zf = z - zi, wf = w - wi, uf = u - ui;
 
         final float xa = xf * xf * xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
         final float ya = yf * yf * yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
@@ -385,59 +385,59 @@ public class PerklinNoise extends RawNoise {
                         lerp(
                                 lerp(
                                         lerp(gradCoord5D(seed, x0, y0, z0, w0, u0, xf, yf, zf, wf, uf),
-                                                gradCoord5D(seed, x0+1, y0, z0, w0, u0, xf-1, yf, zf, wf, uf), xa),
-                                        lerp(gradCoord5D(seed, x0, y0+1, z0, w0, u0, xf, yf-1, zf, wf, uf),
-                                                gradCoord5D(seed, x0+1, y0+1, z0, w0, u0, xf-1, yf-1, zf, wf, uf), xa),
+                                                gradCoord5D(seed, x0+ X_5, y0, z0, w0, u0, xf-1, yf, zf, wf, uf), xa),
+                                        lerp(gradCoord5D(seed, x0, y0+ Y_5, z0, w0, u0, xf, yf-1, zf, wf, uf),
+                                                gradCoord5D(seed, x0+ X_5, y0+ Y_5, z0, w0, u0, xf-1, yf-1, zf, wf, uf), xa),
                                         ya),
                                 lerp(
-                                        lerp(gradCoord5D(seed, x0, y0, z0+1, w0, u0, xf, yf, zf-1, wf, uf),
-                                                gradCoord5D(seed, x0+1, y0, z0+1, w0, u0, xf-1, yf, zf-1, wf, uf), xa),
-                                        lerp(gradCoord5D(seed, x0, y0+1, z0+1, w0, u0, xf, yf-1, zf-1, wf, uf),
-                                                gradCoord5D(seed, x0+1, y0+1, z0+1, w0, u0, xf-1, yf-1, zf-1, wf, uf), xa),
+                                        lerp(gradCoord5D(seed, x0, y0, z0+ Z_5, w0, u0, xf, yf, zf-1, wf, uf),
+                                                gradCoord5D(seed, x0+ X_5, y0, z0+ Z_5, w0, u0, xf-1, yf, zf-1, wf, uf), xa),
+                                        lerp(gradCoord5D(seed, x0, y0+ Y_5, z0+ Z_5, w0, u0, xf, yf-1, zf-1, wf, uf),
+                                                gradCoord5D(seed, x0+ X_5, y0+ Y_5, z0+ Z_5, w0, u0, xf-1, yf-1, zf-1, wf, uf), xa),
                                         ya),
                                 za),
                         lerp(
                                 lerp(
-                                        lerp(gradCoord5D(seed, x0, y0, z0, w0+1, u0, xf, yf, zf, wf-1, uf),
-                                                gradCoord5D(seed, x0+1, y0, z0, w0+1, u0, xf-1, yf, zf, wf-1, uf), xa),
-                                        lerp(gradCoord5D(seed, x0, y0+1, z0, w0+1, u0, xf, yf-1, zf, wf-1, uf),
-                                                gradCoord5D(seed, x0+1, y0+1, z0, w0+1, u0, xf-1, yf-1, zf, wf-1, uf), xa),
+                                        lerp(gradCoord5D(seed, x0, y0, z0, w0+ W_5, u0, xf, yf, zf, wf-1, uf),
+                                                gradCoord5D(seed, x0+ X_5, y0, z0, w0+ W_5, u0, xf-1, yf, zf, wf-1, uf), xa),
+                                        lerp(gradCoord5D(seed, x0, y0+ Y_5, z0, w0+ W_5, u0, xf, yf-1, zf, wf-1, uf),
+                                                gradCoord5D(seed, x0+ X_5, y0+ Y_5, z0, w0+ W_5, u0, xf-1, yf-1, zf, wf-1, uf), xa),
                                         ya),
                                 lerp(
-                                        lerp(gradCoord5D(seed, x0, y0, z0+1, w0+1, u0, xf, yf, zf-1, wf-1, uf),
-                                                gradCoord5D(seed, x0+1, y0, z0+1, w0+1, u0, xf-1, yf, zf-1, wf-1, uf), xa),
-                                        lerp(gradCoord5D(seed, x0, y0+1, z0+1, w0+1, u0, xf, yf-1, zf-1, wf-1, uf),
-                                                gradCoord5D(seed, x0+1, y0+1, z0+1, w0+1, u0, xf-1, yf-1, zf-1, wf-1, uf), xa),
+                                        lerp(gradCoord5D(seed, x0, y0, z0+ Z_5, w0+ W_5, u0, xf, yf, zf-1, wf-1, uf),
+                                                gradCoord5D(seed, x0+ X_5, y0, z0+ Z_5, w0+ W_5, u0, xf-1, yf, zf-1, wf-1, uf), xa),
+                                        lerp(gradCoord5D(seed, x0, y0+ Y_5, z0+ Z_5, w0+ W_5, u0, xf, yf-1, zf-1, wf-1, uf),
+                                                gradCoord5D(seed, x0+ X_5, y0+ Y_5, z0+ Z_5, w0+ W_5, u0, xf-1, yf-1, zf-1, wf-1, uf), xa),
                                         ya),
                                 za),
                         wa),
                         lerp(
                                 lerp(
                                         lerp(
-                                                lerp(gradCoord5D(seed, x0, y0, z0, w0, u0+1, xf, yf, zf, wf, uf-1),
-                                                        gradCoord5D(seed, x0+1, y0, z0, w0, u0+1, xf-1, yf, zf, wf, uf-1), xa),
-                                                lerp(gradCoord5D(seed, x0, y0+1, z0, w0, u0+1, xf, yf-1, zf, wf, uf-1),
-                                                        gradCoord5D(seed, x0+1, y0+1, z0, w0, u0+1, xf-1, yf-1, zf, wf, uf-1), xa),
+                                                lerp(gradCoord5D(seed, x0, y0, z0, w0, u0+ U_5, xf, yf, zf, wf, uf-1),
+                                                        gradCoord5D(seed, x0+ X_5, y0, z0, w0, u0+ U_5, xf-1, yf, zf, wf, uf-1), xa),
+                                                lerp(gradCoord5D(seed, x0, y0+ Y_5, z0, w0, u0+ U_5, xf, yf-1, zf, wf, uf-1),
+                                                        gradCoord5D(seed, x0+ X_5, y0+ Y_5, z0, w0, u0+ U_5, xf-1, yf-1, zf, wf, uf-1), xa),
                                                 ya),
                                         lerp(
-                                                lerp(gradCoord5D(seed, x0, y0, z0+1, w0, u0+1, xf, yf, zf-1, wf, uf-1),
-                                                        gradCoord5D(seed, x0+1, y0, z0+1, w0, u0+1, xf-1, yf, zf-1, wf, uf-1), xa),
-                                                lerp(gradCoord5D(seed, x0, y0+1, z0+1, w0, u0+1, xf, yf-1, zf-1, wf, uf-1),
-                                                        gradCoord5D(seed, x0+1, y0+1, z0+1, w0, u0+1, xf-1, yf-1, zf-1, wf, uf-1), xa),
+                                                lerp(gradCoord5D(seed, x0, y0, z0+ Z_5, w0, u0+ U_5, xf, yf, zf-1, wf, uf-1),
+                                                        gradCoord5D(seed, x0+ X_5, y0, z0+ Z_5, w0, u0+ U_5, xf-1, yf, zf-1, wf, uf-1), xa),
+                                                lerp(gradCoord5D(seed, x0, y0+ Y_5, z0+ Z_5, w0, u0+ U_5, xf, yf-1, zf-1, wf, uf-1),
+                                                        gradCoord5D(seed, x0+ X_5, y0+ Y_5, z0+ Z_5, w0, u0+ U_5, xf-1, yf-1, zf-1, wf, uf-1), xa),
                                                 ya),
                                         za),
                                 lerp(
                                         lerp(
-                                                lerp(gradCoord5D(seed, x0, y0, z0, w0+1, u0+1, xf, yf, zf, wf-1, uf-1),
-                                                        gradCoord5D(seed, x0+1, y0, z0, w0+1, u0+1, xf-1, yf, zf, wf-1, uf-1), xa),
-                                                lerp(gradCoord5D(seed, x0, y0+1, z0, w0+1, u0+1, xf, yf-1, zf, wf-1, uf-1),
-                                                        gradCoord5D(seed, x0+1, y0+1, z0, w0+1, u0+1, xf-1, yf-1, zf, wf-1, uf-1), xa),
+                                                lerp(gradCoord5D(seed, x0, y0, z0, w0+ W_5, u0+ U_5, xf, yf, zf, wf-1, uf-1),
+                                                        gradCoord5D(seed, x0+ X_5, y0, z0, w0+ W_5, u0+ U_5, xf-1, yf, zf, wf-1, uf-1), xa),
+                                                lerp(gradCoord5D(seed, x0, y0+ Y_5, z0, w0+ W_5, u0+ U_5, xf, yf-1, zf, wf-1, uf-1),
+                                                        gradCoord5D(seed, x0+ X_5, y0+ Y_5, z0, w0+ W_5, u0+ U_5, xf-1, yf-1, zf, wf-1, uf-1), xa),
                                                 ya),
                                         lerp(
-                                                lerp(gradCoord5D(seed, x0, y0, z0+1, w0+1, u0+1, xf, yf, zf-1, wf-1, uf-1),
-                                                        gradCoord5D(seed, x0+1, y0, z0+1, w0+1, u0+1, xf-1, yf, zf-1, wf-1, uf-1), xa),
-                                                lerp(gradCoord5D(seed, x0, y0+1, z0+1, w0+1, u0+1, xf, yf-1, zf-1, wf-1, uf-1),
-                                                        gradCoord5D(seed, x0+1, y0+1, z0+1, w0+1, u0+1, xf-1, yf-1, zf-1, wf-1, uf-1), xa),
+                                                lerp(gradCoord5D(seed, x0, y0, z0+ Z_5, w0+ W_5, u0+ U_5, xf, yf, zf-1, wf-1, uf-1),
+                                                        gradCoord5D(seed, x0+ X_5, y0, z0+ Z_5, w0+ W_5, u0+ U_5, xf-1, yf, zf-1, wf-1, uf-1), xa),
+                                                lerp(gradCoord5D(seed, x0, y0+ Y_5, z0+ Z_5, w0+ W_5, u0+ U_5, xf, yf-1, zf-1, wf-1, uf-1),
+                                                        gradCoord5D(seed, x0+ X_5, y0+ Y_5, z0+ Z_5, w0+ W_5, u0+ U_5, xf-1, yf-1, zf-1, wf-1, uf-1), xa),
                                                 ya),
                                         za),
                                 wa),
@@ -724,10 +724,10 @@ public class PerklinNoise extends RawNoise {
         return (h ^ h >>> 21) & (255 << 3);
     }
 
-    public static final int X_2 = 0x1827F5, Y_2 = 0x123C21;
-    public static final int X_3 = 0x1A36A9, Y_3 = 0x157931, Z_3 = 0x119725;
-    public static final int X_4 = 0x1B69E1, Y_4 = 0x177C0B, Z_4 = 0x141E5D, W_4 = 0x113C31;
-    public static final int X_5 = 0x1C3361, Y_5 = 0x18DA39, Z_5 = 0x15E6DB, W_5 = 0x134D29, U_5 = 0x110281;
-    public static final int X_6 = 0x1CC1C5, Y_6 = 0x19D7AF, Z_6 = 0x173935, W_6 = 0x14DEAF, U_6 = 0x12C139, V_6 = 0x10DAA3;
+    private static final int X_2 = 0x1827F5, Y_2 = 0x123C21;
+    private static final int X_3 = 0x1A36A9, Y_3 = 0x157931, Z_3 = 0x119725;
+    private static final int X_4 = 0x1B69E1, Y_4 = 0x177C0B, Z_4 = 0x141E5D, W_4 = 0x113C31;
+    private static final int X_5 = 0x1C3361, Y_5 = 0x18DA39, Z_5 = 0x15E6DB, W_5 = 0x134D29, U_5 = 0x110281;
+    private static final int X_6 = 0x1CC1C5, Y_6 = 0x19D7AF, Z_6 = 0x173935, W_6 = 0x14DEAF, U_6 = 0x12C139, V_6 = 0x10DAA3;
 
 }

@@ -25,23 +25,14 @@ import static com.badlogic.gdx.math.MathUtils.lerp;
 import static com.github.tommyettinger.cringe.GradientVectors.*;
 
 /**
- * "Classic" Perlin noise, written by Ken Perlin before he created Simplex Noise, with minor
- * adjustments. This uses quintic interpolation throughout (which was an improvement found in Simplex Noise), and has a
- * single {@code long} seed. Perlin Noise can have significant grid-aligned and 45-degree-diagonal artifacts when too
- * few octaves are used, but sometimes this is irrelevant, such as when sampling 3D noise on the surface of a sphere.
- * <br>
- * This variant also uses different {@link GradientVectors gradient vectors} than the
- * ones used in "Improved Perlin Noise." Here all the gradient vectors are unit vectors, like in the original Perlin
- * Noise, which makes some calculations regarding the range the functions can return easier... in theory. In practice,
- * the somewhat-flawed gradient vectors used in earlier iterations of this PerlinNoise permitted a very different range
- * calculation, and so this class uses a carefully-crafted sigmoid function to move around the most frequent values to
- * roughly match earlier Perlin Noise results, but without risking going out-of-range.
- * <br>
- * Perlin noise is rather fast, especially in 2D and 3D, and keeps a decent quality in higher dimensions. It tends to
- * look drastically better if you use it with 2 or more octaves than if you only use 1 octave.
+ * A mix of "Classic" Perlin noise, written by Ken Perlin before he created Simplex Noise, with value noise calculated
+ * at the same time. This uses quintic interpolation throughout (which was an improvement found in Simplex Noise), and
+ * has a single {@code int} seed. Perlue Noise can have significant grid-aligned and 45-degree-diagonal artifacts when
+ * too few octaves are used, but sometimes this is irrelevant, such as when sampling 3D noise on the surface of a
+ * sphere.
  */
-public class PerlinNoise extends RawNoise {
-    public static final PerlinNoise instance = new PerlinNoise();
+public class PerlueNoise extends RawNoise {
+    public static final PerlueNoise instance = new PerlueNoise();
 
     public static final float SCALE2 = 1.41421330f; //towardsZero(1f/ (float) Math.sqrt(2f / 4f));
     public static final float SCALE3 = 1.15470030f; //towardsZero(1f/ (float) Math.sqrt(3f / 4f));
@@ -49,42 +40,29 @@ public class PerlinNoise extends RawNoise {
     public static final float SCALE5 = 0.89442706f; //towardsZero(1f/ (float) Math.sqrt(5f / 4f));
     public static final float SCALE6 = 0.81649643f; //towardsZero(1f/ (float) Math.sqrt(6f / 4f));
 
-    public static final float EQ_ADD_2 = 1.0f/1.75f;
-    public static final float EQ_ADD_3 = 0.8f/1.75f;
-    public static final float EQ_ADD_4 = 0.6f/1.75f;
-    public static final float EQ_ADD_5 = 0.4f/1.75f;
-    public static final float EQ_ADD_6 = 0.2f/1.75f;
+    public static final float EQ_ADD_2 = 1.0f / 1.75f;
+    public static final float EQ_ADD_3 = 0.8f / 1.75f;
+    public static final float EQ_ADD_4 = 0.6f / 1.75f;
+    public static final float EQ_ADD_5 = 0.4f / 1.75f;
+    public static final float EQ_ADD_6 = 0.2f / 1.75f;
 
-    public static final float EQ_MUL_2 = 1.2535664f;
-    public static final float EQ_MUL_3 = 1.2071217f;
-    public static final float EQ_MUL_4 = 1.1588172f;
-    public static final float EQ_MUL_5 = 1.1084094f;
-    public static final float EQ_MUL_6 = 1.0555973f;
+    public static final float EQ_MUL_2 = 0.5f * 1.2535664f;
+    public static final float EQ_MUL_3 = 0.5f * 1.2071217f;
+    public static final float EQ_MUL_4 = 0.5f * 1.1588172f;
+    public static final float EQ_MUL_5 = 0.5f * 1.1084094f;
+    public static final float EQ_MUL_6 = 0.5f * 1.0555973f;
 
     public int seed;
 
-//    private final float[] eqMul = {
-//            calculateEqualizeAdjustment(eqAdd0),
-//            calculateEqualizeAdjustment(eqAdd1),
-//            calculateEqualizeAdjustment(eqAdd2),
-//            calculateEqualizeAdjustment(eqAdd3),
-//            calculateEqualizeAdjustment(eqAdd4),
-//    };
-
-//    public static float towardsZero(float x) {
-//        final int bits = NumberUtils.floatToIntBits(x), sign = bits & 0x80000000;
-//        return NumberUtils.intBitsToFloat(Math.max(0, (bits ^ sign) - 2) | sign);
-//    }
-
-    public PerlinNoise() {
+    public PerlueNoise() {
         this(0x1337BEEF);
     }
 
-    public PerlinNoise(final int seed) {
+    public PerlueNoise(final int seed) {
         this.seed = seed;
     }
 
-    public PerlinNoise(PerlinNoise other) {
+    public PerlueNoise(PerlueNoise other) {
         this.seed = other.seed;
     }
 
@@ -139,51 +117,56 @@ public class PerlinNoise extends RawNoise {
     }
 
     /**
-     * Returns the constant String {@code "PerlinNoise"} that identifies this in serialized Strings.
+     * Returns the constant String {@code "PerlueNoise"} that identifies this in serialized Strings.
      *
-     * @return a short String constant that identifies this INoise type, {@code "PerlinNoise"}
+     * @return a short String constant that identifies this INoise type, {@code "PerlueNoise"}
      */
     @Override
     public String getTag() {
-        return "PerlinNoise";
+        return "PerlueNoise";
     }
 
     /**
-     * Creates a copy of this PerlinNoise, which should be a deep copy for any mutable state but can be shallow for immutable
+     * Creates a copy of this PerlueNoise, which should be a deep copy for any mutable state but can be shallow for immutable
      * types such as functions. This almost always just calls a copy constructor.
      *
-     * @return a copy of this PerlinNoise
+     * @return a copy of this PerlueNoise
      */
     @Override
-    public PerlinNoise copy() {
-        return new PerlinNoise(this.seed);
+    public PerlueNoise copy() {
+        return new PerlueNoise(this.seed);
     }
 
     protected static float gradCoord2D(int seed, int x, int y,
-                                        float xd, float yd) {
-        final int hash = hash256(x, y, seed);
-        return xd * GRADIENTS_2D[hash] + yd * GRADIENTS_2D[hash + 1];
+                                       float xd, float yd) {
+        final int h = hashAll(x, y, seed);
+        final int hash = h & (255 << 1);
+        return xd * GRADIENTS_2D[hash] + yd * GRADIENTS_2D[hash + 1] + h * 0x1p-31f;
     }
     protected static float gradCoord3D(int seed, int x, int y, int z, float xd, float yd, float zd) {
-        final int hash = hash256(x, y, z, seed);
-        return (xd * GRADIENTS_3D[hash] + yd * GRADIENTS_3D[hash + 1] + zd * GRADIENTS_3D[hash + 2]);
+        final int h = hashAll(x, y, z, seed);
+        final int hash = h & (255 << 2);
+        return xd * GRADIENTS_3D[hash] + yd * GRADIENTS_3D[hash + 1] + zd * GRADIENTS_3D[hash + 2] + h * 0x1p-31f;
     }
     protected static float gradCoord4D(int seed, int x, int y, int z, int w,
-                                        float xd, float yd, float zd, float wd) {
-        final int hash = hash256(x, y, z, w, seed);
-        return xd * GRADIENTS_4D[hash] + yd * GRADIENTS_4D[hash + 1] + zd * GRADIENTS_4D[hash + 2] + wd * GRADIENTS_4D[hash + 3];
+                                       float xd, float yd, float zd, float wd) {
+        final int h = hashAll(x, y, z, w, seed);
+        final int hash = h & (255 << 2);
+        return xd * GRADIENTS_4D[hash] + yd * GRADIENTS_4D[hash + 1] + zd * GRADIENTS_4D[hash + 2] + wd * GRADIENTS_4D[hash + 3] + h * 0x1p-31f;
     }
     protected static float gradCoord5D(int seed, int x, int y, int z, int w, int u,
-                                        float xd, float yd, float zd, float wd, float ud) {
-        final int hash = hash256(x, y, z, w, u, seed);
+                                       float xd, float yd, float zd, float wd, float ud) {
+        final int h = hashAll(x, y, z, w, u, seed);
+        final int hash = h & (255 << 3);
         return xd * GRADIENTS_5D[hash] + yd * GRADIENTS_5D[hash + 1] + zd * GRADIENTS_5D[hash + 2]
-                + wd * GRADIENTS_5D[hash + 3] + ud * GRADIENTS_5D[hash + 4];
+                + wd * GRADIENTS_5D[hash + 3] + ud * GRADIENTS_5D[hash + 4] + h * 0x1p-31f;
     }
     protected static float gradCoord6D(int seed, int x, int y, int z, int w, int u, int v,
-                                        float xd, float yd, float zd, float wd, float ud, float vd) {
-        final int hash = hash256(x, y, z, w, u, v, seed);
+                                       float xd, float yd, float zd, float wd, float ud, float vd) {
+        final int h = hashAll(x, y, z, w, u, v, seed);
+        final int hash = h & (255 << 3);
         return xd * GRADIENTS_6D[hash] + yd * GRADIENTS_6D[hash + 1] + zd * GRADIENTS_6D[hash + 2]
-                + wd * GRADIENTS_6D[hash + 3] + ud * GRADIENTS_6D[hash + 4] + vd * GRADIENTS_6D[hash + 5];
+                + wd * GRADIENTS_6D[hash + 3] + ud * GRADIENTS_6D[hash + 4] + vd * GRADIENTS_6D[hash + 5] + h * 0x1p-31f;
     }
 
     /**
@@ -597,7 +580,7 @@ public class PerlinNoise extends RawNoise {
     /**
      * Produces a String that describes everything needed to recreate this INoise in full. This String can be read back
      * in by {@link #stringDeserialize(String)} to reassign the described state to another INoise.
-     * @return a String that describes this PerlinNoise for serialization
+     * @return a String that describes this PerlueNoise for serialization
      */
     @Override
     public String stringSerialize() {
@@ -605,20 +588,20 @@ public class PerlinNoise extends RawNoise {
     }
 
     /**
-     * Given a serialized String produced by {@link #stringSerialize()}, reassigns this PerlinNoise to have the
-     * described state from the given String. The serialized String must have been produced by a PerlinNoise.
+     * Given a serialized String produced by {@link #stringSerialize()}, reassigns this PerlueNoise to have the
+     * described state from the given String. The serialized String must have been produced by a PerlueNoise.
      *
      * @param data a serialized String, typically produced by {@link #stringSerialize()}
-     * @return this PerlinNoise, after being modified (if possible)
+     * @return this PerlueNoise, after being modified (if possible)
      */
     @Override
-    public PerlinNoise stringDeserialize(String data) {
+    public PerlueNoise stringDeserialize(String data) {
         seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 1));
         return this;
     }
 
-    public static PerlinNoise recreateFromString(String data) {
-        return new PerlinNoise(MathSupport.intFromDec(data, 1, data.indexOf('`', 1)));
+    public static PerlueNoise recreateFromString(String data) {
+        return new PerlueNoise(MathSupport.intFromDec(data, 1, data.indexOf('`', 1)));
     }
 
     @GwtIncompatible
@@ -636,7 +619,7 @@ public class PerlinNoise extends RawNoise {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PerlinNoise that = (PerlinNoise) o;
+        PerlueNoise that = (PerlueNoise) o;
 
         return (seed == that.seed);
     }
@@ -648,23 +631,23 @@ public class PerlinNoise extends RawNoise {
 
     @Override
     public String toString() {
-        return "PerlinNoise{seed=" + seed + '}';
+        return "PerlueNoise{seed=" + seed + '}';
     }
 
     /**
-     * An 8-bit point hash that needs 2 dimensions pre-multiplied by constants {@link #X_2} and {@link #Y_2}, as
+     * A 32-bit point hash that needs 2 dimensions pre-multiplied by constants {@link #X_2} and {@link #Y_2}, as
      * well as an int seed.
      * @param x x position, as an int pre-multiplied by {@link #X_2}
      * @param y y position, as an int pre-multiplied by {@link #Y_2}
      * @param s any int, a seed to be able to produce many hashes for a given point
      * @return 8-bit hash of the x,y point with the given state s, shifted for {@link GradientVectors#GRADIENTS_2D}
      */
-    public static int hash256(int x, int y, int s) {
+    public static int hashAll(int x, int y, int s) {
         final int h = (s ^ x ^ y) * 0x125493;
-        return (h ^ h >>> 23) & (255 << 1);
+        return (h ^ (h << 11 | h >>> 21) ^ (h << 23 | h >>> 9));
     }
     /**
-     * An 8-bit point hash that needs 3 dimensions pre-multiplied by constants {@link #X_3} through {@link #Z_3}, as
+     * A 32-bit point hash that needs 3 dimensions pre-multiplied by constants {@link #X_3} through {@link #Z_3}, as
      * well as an int seed.
      * @param x x position, as an int pre-multiplied by {@link #X_3}
      * @param y y position, as an int pre-multiplied by {@link #Y_3}
@@ -672,13 +655,13 @@ public class PerlinNoise extends RawNoise {
      * @param s any int, a seed to be able to produce many hashes for a given point
      * @return 8-bit hash of the x,y,z point with the given state s, shifted for {@link GradientVectors#GRADIENTS_3D}
      */
-    public static int hash256(int x, int y, int z, int s) {
+    public static int hashAll(int x, int y, int z, int s) {
         final int h = (s ^ x ^ y ^ z) * 0x125493;
-        return (h ^ h >>> 22) & (255 << 2);
+        return (h ^ (h << 11 | h >>> 21) ^ (h << 23 | h >>> 9));
     }
 
     /**
-     * An 8-bit point hash that needs 4 dimensions pre-multiplied by constants {@link #X_4} through {@link #W_4}, as
+     * A 32-bit point hash that needs 4 dimensions pre-multiplied by constants {@link #X_4} through {@link #W_4}, as
      * well as an int seed.
      * @param x x position, as an int pre-multiplied by {@link #X_4}
      * @param y y position, as an int pre-multiplied by {@link #Y_4}
@@ -687,12 +670,12 @@ public class PerlinNoise extends RawNoise {
      * @param s any int, a seed to be able to produce many hashes for a given point
      * @return 8-bit hash of the x,y,z,w point with the given state s, shifted for {@link GradientVectors#GRADIENTS_4D}
      */
-    public static int hash256(int x, int y, int z, int w, int s) {
+    public static int hashAll(int x, int y, int z, int w, int s) {
         final int h = (s ^ x ^ y ^ z ^ w) * 0x125493;
-        return (h ^ h >>> 22) & (255 << 2);
+        return (h ^ (h << 11 | h >>> 21) ^ (h << 23 | h >>> 9));
     }
     /**
-     * An 8-bit point hash that needs 5 dimensions pre-multiplied by constants {@link #X_5} through {@link #U_5}, as
+     * A 32-bit point hash that needs 5 dimensions pre-multiplied by constants {@link #X_5} through {@link #U_5}, as
      * well as an int seed.
      * @param x x position, as an int pre-multiplied by {@link #X_5}
      * @param y y position, as an int pre-multiplied by {@link #Y_5}
@@ -702,13 +685,13 @@ public class PerlinNoise extends RawNoise {
      * @param s any int, a seed to be able to produce many hashes for a given point
      * @return 8-bit hash of the x,y,z,w,u point with the given state s, shifted for {@link GradientVectors#GRADIENTS_5D}
      */
-    public static int hash256(int x, int y, int z, int w, int u, int s) {
+    public static int hashAll(int x, int y, int z, int w, int u, int s) {
         final int h = (s ^ x ^ y ^ z ^ w ^ u) * 0x125493;
-        return (h ^ h >>> 21) & (255 << 3);
+        return (h ^ (h << 11 | h >>> 21) ^ (h << 23 | h >>> 9));
     }
 
     /**
-     * An 8-bit point hash that needs 6 dimensions pre-multiplied by constants {@link #X_6} through {@link #V_6}, as
+     * A 32-bit point hash that needs 6 dimensions pre-multiplied by constants {@link #X_6} through {@link #V_6}, as
      * well as an int seed.
      * @param x x position, as an int pre-multiplied by {@link #X_6}
      * @param y y position, as an int pre-multiplied by {@link #Y_6}
@@ -717,11 +700,11 @@ public class PerlinNoise extends RawNoise {
      * @param u u position, as an int pre-multiplied by {@link #U_6}
      * @param v v position, as an int pre-multiplied by {@link #V_6}
      * @param s any int, a seed to be able to produce many hashes for a given point
-     * @return 8-bit hash of the x,y,z,w,u,v point with the given state s, shifted for {@link GradientVectors#GRADIENTS_6D}
+     * @return 8-bit hash of the x,y,z,w,u,v point with the given state s
      */
-    public static int hash256(int x, int y, int z, int w, int u, int v, int s) {
+    public static int hashAll(int x, int y, int z, int w, int u, int v, int s) {
         final int h = (s ^ x ^ y ^ z ^ w ^ u ^ v) * 0x125493;
-        return (h ^ h >>> 21) & (255 << 3);
+        return (h ^ (h << 11 | h >>> 21) ^ (h << 23 | h >>> 9));
     }
 
     private static final int X_2 = 0x1827F5, Y_2 = 0x123C21;

@@ -141,31 +141,31 @@ public class PerlueNoise extends RawNoise {
                                        float xd, float yd) {
         final int h = hashAll(x, y, seed);
         final int hash = h & (255 << 1);
-        return (xd + h * 0x1p-32f) * GRADIENTS_2D[hash] + yd * GRADIENTS_2D[hash + 1];
+        return (h * 0x1p-32f) + xd * GRADIENTS_2D[hash] + yd * GRADIENTS_2D[hash + 1];
     }
     protected static float gradCoord3D(int seed, int x, int y, int z, float xd, float yd, float zd) {
         final int h = hashAll(x, y, z, seed);
         final int hash = h & (255 << 2);
-        return (xd + h * 0x1p-32f) * GRADIENTS_3D[hash] + yd * GRADIENTS_3D[hash + 1] + zd * GRADIENTS_3D[hash + 2];
+        return (h * 0x1p-32f) + xd * GRADIENTS_3D[hash] + yd * GRADIENTS_3D[hash + 1] + zd * GRADIENTS_3D[hash + 2];
     }
     protected static float gradCoord4D(int seed, int x, int y, int z, int w,
                                        float xd, float yd, float zd, float wd) {
         final int h = hashAll(x, y, z, w, seed);
         final int hash = h & (255 << 2);
-        return (xd + h * 0x1p-32f) * GRADIENTS_4D[hash] + yd * GRADIENTS_4D[hash + 1] + zd * GRADIENTS_4D[hash + 2] + wd * GRADIENTS_4D[hash + 3];
+        return (h * 0x1p-32f) + xd * GRADIENTS_4D[hash] + yd * GRADIENTS_4D[hash + 1] + zd * GRADIENTS_4D[hash + 2] + wd * GRADIENTS_4D[hash + 3];
     }
     protected static float gradCoord5D(int seed, int x, int y, int z, int w, int u,
                                        float xd, float yd, float zd, float wd, float ud) {
         final int h = hashAll(x, y, z, w, u, seed);
         final int hash = h & (255 << 3);
-        return (xd + h * 0x1p-32f) * GRADIENTS_5D[hash] + yd * GRADIENTS_5D[hash + 1] + zd * GRADIENTS_5D[hash + 2]
+        return (h * 0x1p-32f) + xd * GRADIENTS_5D[hash] + yd * GRADIENTS_5D[hash + 1] + zd * GRADIENTS_5D[hash + 2]
                 + wd * GRADIENTS_5D[hash + 3] + ud * GRADIENTS_5D[hash + 4];
     }
     protected static float gradCoord6D(int seed, int x, int y, int z, int w, int u, int v,
                                        float xd, float yd, float zd, float wd, float ud, float vd) {
         final int h = hashAll(x, y, z, w, u, v, seed);
         final int hash = h & (255 << 3);
-        return (xd + h * 0x1p-32f) * GRADIENTS_6D[hash] + yd * GRADIENTS_6D[hash + 1] + zd * GRADIENTS_6D[hash + 2]
+        return (h * 0x1p-32f) + xd * GRADIENTS_6D[hash] + yd * GRADIENTS_6D[hash + 1] + zd * GRADIENTS_6D[hash + 2]
                 + wd * GRADIENTS_6D[hash + 3] + ud * GRADIENTS_6D[hash + 4] + vd * GRADIENTS_6D[hash + 5];
     }
 

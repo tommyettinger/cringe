@@ -29,7 +29,12 @@ import static com.github.tommyettinger.cringe.GradientVectors.*;
  * at the same time. This uses quintic interpolation throughout (which was an improvement found in Simplex Noise), and
  * has a single {@code int} seed. Perlue Noise can have significant grid-aligned and 45-degree-diagonal artifacts when
  * too few octaves are used, but sometimes this is irrelevant, such as when sampling 3D noise on the surface of a
- * sphere.
+ * sphere. These artifacts sometimes manifest as "waves" of quickly-changing and then slowly-changing noise, when 3D
+ * noise uses time as the z axis.
+ * <br>
+ * This tends to look fairly different from vanilla PerlinNoise or ValueNoise; it is capable of more chaotic
+ * arrangements of high and low values than either of those, but it still tends to have clusters of values of a specific
+ * size more often than clusters with very different sizes.
  */
 public class PerlueNoise extends RawNoise {
     public static final PerlueNoise instance = new PerlueNoise();
@@ -119,7 +124,7 @@ public class PerlueNoise extends RawNoise {
     /**
      * Returns the constant String {@code "PerlueNoise"} that identifies this in serialized Strings.
      *
-     * @return a short String constant that identifies this INoise type, {@code "PerlueNoise"}
+     * @return a short String constant that identifies this RawNoise type, {@code "PerlueNoise"}
      */
     @Override
     public String getTag() {
@@ -578,8 +583,8 @@ public class PerlueNoise extends RawNoise {
     }
 
     /**
-     * Produces a String that describes everything needed to recreate this INoise in full. This String can be read back
-     * in by {@link #stringDeserialize(String)} to reassign the described state to another INoise.
+     * Produces a String that describes everything needed to recreate this RawNoise in full. This String can be read back
+     * in by {@link #stringDeserialize(String)} to reassign the described state to another RawNoise.
      * @return a String that describes this PerlueNoise for serialization
      */
     @Override

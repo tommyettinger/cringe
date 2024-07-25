@@ -72,9 +72,9 @@ public class PerlueNoise extends RawNoise {
     }
 
     /**
-     * Gets the minimum dimension supported by this generator, which is 2.
+     * Gets the minimum dimension supported by this generator, which is 1.
      *
-     * @return the minimum supported dimension, 2
+     * @return the minimum supported dimension, 1
      */
     @Override
     public int getMinDimension() {

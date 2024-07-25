@@ -564,10 +564,13 @@ public class CellularNoise extends RawNoise {
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
         return 0f;
     }
+
+    @Override
     public String stringSerialize() {
         return "`" + seed + "~" + noiseType.ordinal() + '`';
     }
 
+    @Override
     public CellularNoise stringDeserialize(String data) {
         if (data == null || data.length() < 5)
             return this;

@@ -48,14 +48,15 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
         float applyAsFloat(float f);
     }
     RawNoise[] noises = new RawNoise[]{
-            new ValueNoise(1),
-            new FoamNoise(1),
-            new PerlinNoise(1),
-            new SimplexNoise(1),
-            new HoneyNoise(1),
-            new CyclicNoise(1, 3),
-            new SorbetNoise(1, 3),
             new CellularNoise(1),
+            new CyclicNoise(1, 3),
+            new FoamNoise(1),
+            new HoneyNoise(1),
+            new PerlinNoise(1),
+            new PerlueNoise(1),
+            new SimplexNoise(1),
+            new SorbetNoise(1, 3),
+            new ValueNoise(1),
     };
     int noiseIndex = noises.length - 1;
     private int dim = 1; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
@@ -113,7 +114,7 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
             Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
             for (int x = 0; x < w; x++) {
                 for (int y = 0; y < h; y++) {
-                    float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, time, noise.seed));
+                    float color = prepare.applyAsFloat(noise.getNoise(x, y, time));
                     // fisheye-like effect:
 //                                    float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, c - inv * ((x - halfW) * (x - halfW) + (y - halfH) * (y - halfH)), noise.seed));
                     p.setColor(color, color, color, 1f);
@@ -146,7 +147,7 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
 
     public static void main(String[] arg) {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        config.setTitle("SquidSquad Test: Noise Visualization");
+        config.setTitle("Noise Preview Generator");
         config.useVsync(false);
         config.setResizable(false);
         config.setWindowedMode(width, height);

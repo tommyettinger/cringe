@@ -72,7 +72,6 @@ public class ContinuousNoise extends RawNoise {
 
 
     public RawNoise wrapped;
-    protected int seed;
     public float frequency;
     public int mode;
     protected int octaves;
@@ -198,7 +197,6 @@ public class ContinuousNoise extends RawNoise {
     @Override
     public String stringSerialize() {
         return "`" + Serializer.serialize(wrapped) + '~' +
-                seed + '~' +
                 frequency + '~' +
                 mode + '~' +
                 octaves + '`';
@@ -208,13 +206,11 @@ public class ContinuousNoise extends RawNoise {
     public ContinuousNoise stringDeserialize(String data) {
         int pos = data.indexOf('`', data.indexOf('`', 2) + 1)+1;
         setWrapped(Serializer.deserialize(data.substring(1, pos)));
-        setSeed(MathSupport.intFromDec(data, pos+1, pos = data.indexOf('~', pos+2)));
         setFrequency(MathSupport.floatFromDec(data, pos+1, pos = data.indexOf('~', pos+2)));
         setMode(MathSupport.intFromDec(data, pos+1, pos = data.indexOf('~', pos+2)));
         setOctaves(MathSupport.intFromDec(data, pos+1, pos = data.indexOf('`', pos+2)));
         return this;
     }
-
 
     /**
      * Requires the type of the noise generator this wraps ({@link #wrapped}) to be registered.
@@ -224,7 +220,6 @@ public class ContinuousNoise extends RawNoise {
     @GwtIncompatible
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(wrapped);
-        out.writeInt(seed);
         out.writeFloat(frequency);
         out.writeInt(mode);
         out.writeInt(octaves);
@@ -233,7 +228,6 @@ public class ContinuousNoise extends RawNoise {
     @GwtIncompatible
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         setWrapped((RawNoise) in.readObject());
-        setSeed(in.readInt());
         setFrequency(in.readFloat());
         setMode(in.readInt());
         setOctaves(in.readInt());
@@ -248,7 +242,6 @@ public class ContinuousNoise extends RawNoise {
     public String toString() {
         return "ContinuousNoise{" +
                 "wrapped=" + wrapped +
-                ", seed=" + seed +
                 ", frequency=" + frequency +
                 ", mode=" + mode +
                 ", octaves=" + octaves +
@@ -262,7 +255,6 @@ public class ContinuousNoise extends RawNoise {
 
         ContinuousNoise that = (ContinuousNoise) o;
 
-        if (seed != that.seed) return false;
         if (Float.compare(that.frequency, frequency) != 0) return false;
         if (mode != that.mode) return false;
         if (octaves != that.octaves) return false;
@@ -272,7 +264,6 @@ public class ContinuousNoise extends RawNoise {
     @Override
     public int hashCode() {
         int result = wrapped.hashCode();
-        result = 31 * result + seed;
         result = 31 * result + (frequency != +0.0f ? NumberUtils.floatToIntBits(frequency) : 0);
         result = 31 * result + mode;
         result = 31 * result + octaves;
@@ -283,6 +274,7 @@ public class ContinuousNoise extends RawNoise {
 
     @Override
     public float getNoise(float x) {
+        final int seed = wrapped.getSeed();
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, seed);
@@ -295,6 +287,7 @@ public class ContinuousNoise extends RawNoise {
 
     @Override
     public float getNoise(float x, float y) {
+        final int seed = wrapped.getSeed();
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, seed);
@@ -307,6 +300,7 @@ public class ContinuousNoise extends RawNoise {
 
     @Override
     public float getNoise(float x, float y, float z) {
+        final int seed = wrapped.getSeed();
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, seed);
@@ -319,6 +313,7 @@ public class ContinuousNoise extends RawNoise {
 
     @Override
     public float getNoise(float x, float y, float z, float w) {
+        final int seed = wrapped.getSeed();
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, seed);
@@ -331,6 +326,7 @@ public class ContinuousNoise extends RawNoise {
 
     @Override
     public float getNoise(float x, float y, float z, float w, float u) {
+        final int seed = wrapped.getSeed();
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
@@ -343,6 +339,7 @@ public class ContinuousNoise extends RawNoise {
 
     @Override
     public float getNoise(float x, float y, float z, float w, float u, float v) {
+        final int seed = wrapped.getSeed();
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, v * frequency, seed);
@@ -355,13 +352,12 @@ public class ContinuousNoise extends RawNoise {
 
     @Override
     public void setSeed(int seed) {
-        this.seed = seed;
         wrapped.setSeed(seed);
     }
 
     @Override
     public int getSeed() {
-        return seed;
+        return wrapped.getSeed();
     }
 
     @Override

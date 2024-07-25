@@ -152,8 +152,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
                             for (int d = 4096; d < 10000; d++) {
                                 float da = d * 0.05f;
                                 float bright = d / 9999f;
-                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) - 0.5f) * bright * width + width * 0.5f;
-                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) - 0.5f) * bright * height + height * 0.5f;
+                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                                 ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f) * 0.3f, 1f);
                                 p.setColor(tempColor);
                                 p.drawCircle((int) x, (int) y, 3);
@@ -161,8 +161,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
                             for (int d = 4096; d < 10000; d++) {
                                 float da = d * 0.05f;
                                 float bright = d / 9999f;
-                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) - 0.5f) * bright * width + width * 0.5f;
-                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) - 0.5f) * bright * height + height * 0.5f;
+                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                                 ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f) * 0.55f, 1f);
                                 p.setColor(tempColor);
                                 p.drawCircle((int) x, (int) y, 2);
@@ -170,8 +170,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
                             for (int d = 4096; d < 10000; d++) {
                                 float da = d * 0.05f;
                                 float bright = d / 9999f;
-                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) - 0.5f) * bright * width + width * 0.5f;
-                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) - 0.5f) * bright * height + height * 0.5f;
+                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                                 ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f), 1f);
                                 p.setColor(tempColor);
                                 p.drawPixel((int) x, (int) y);
@@ -200,8 +200,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
                                 for (int d = 4096; d < 10000; d++) {
                                     float da = d * 0.05f;
                                     float bright = d / 9999f;
-                                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.seed)) - 0.5f) * bright * width + width * 0.5f;
-                                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.seed)) - 0.5f) * bright * height + height * 0.5f;
+                                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+                                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                                     ColorSupport.hsb2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright * 1.2f - 0.2f, 1f);
                                     p.setColor(tempColor);
                                     p.drawCircle((int) x, (int)y, 2);
@@ -232,7 +232,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                                 Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                                 for (int x = 0; x < w; x++) {
                                     for (int y = 0; y < h; y++) {
-                                        float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, cSin, cCos, noise.seed));
+                                        float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, cSin, cCos, noise.getSeed()));
                                         // fisheye-like effect:
 //                                    float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, c - inv * ((x - halfW) * (x - halfW) + (y - halfH) * (y - halfH)), noise.seed));
                                         p.setColor(color, color, color, 1f);
@@ -402,8 +402,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
                 for (int d = 4096; d < 8192; d++) {
                     bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
                     float da = d * 0.0625f;
-                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + c, noise.seed)) - 0.5f) * bright * width + width * 0.5f;
-                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.seed)) - 0.5f) * bright * height + height * 0.5f;
+                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + c, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                     // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
                     // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
                     ColorSupport.hsb2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright * 1.2f - 0.2f, 1f);
@@ -421,7 +421,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             case 1:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(x + c, y + c, noise.seed));
+                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(x + c, y + c, noise.getSeed()));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -430,7 +430,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             case 2:
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
-                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, c, noise.seed));
+                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, c, noise.getSeed()));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -441,7 +441,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     float xc = MathUtils.cosDeg(360 * x * iWidth) * 64 + c, xs = MathUtils.sinDeg(360 * x * iWidth) * 64 + c;
                     for (int y = 0; y < height; y++) {
                         float yc = MathUtils.cosDeg(360 * y * iHeight) * 64 + c, ys = MathUtils.sinDeg(360 * y * iHeight) * 64 + c;
-                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(xc, yc, xs, ys, noise.seed));
+                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(xc, yc, xs, ys, noise.getSeed()));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -452,7 +452,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     float xc = MathUtils.cosDeg(360 * x * iWidth) * 64, xs = MathUtils.sinDeg(360 * x * iWidth) * 64;
                     for (int y = 0; y < height; y++) {
                         float yc = MathUtils.cosDeg(360 * y * iHeight) * 64, ys = MathUtils.sinDeg(360 * y * iHeight) * 64;
-                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(xc, yc, xs, ys, c, noise.seed));
+                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(xc, yc, xs, ys, c, noise.getSeed()));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }
@@ -465,7 +465,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     for (int y = 0; y < height; y++) {
                         float yc = MathUtils.cosDeg(360 * y * iHeight) * 64 + c, ys = MathUtils.sinDeg(360 * y * iHeight) * 64 + c,
                                 zc = MathUtils.cosDeg(360 * (x - y) * 0.5f * iWidth) * 64 - c, zs = MathUtils.sinDeg(360 * (x - y) * 0.5f * iWidth) * 64 - c;
-                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(xc, yc, zc, xs, ys, zs, noise.seed));
+                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(xc, yc, zc, xs, ys, zs, noise.getSeed()));
                         renderer.color(color.r * bright, color.g * bright, color.b * bright, 1f);
                         renderer.vertex(x, y, 0);
                     }

@@ -70,6 +70,10 @@ public class ContinuousNoise extends RawNoise {
      */
     public static final int EXO = 4;
 
+    /**
+     * The names that correspond to the numerical mode constants, with the constant value matching the index here.
+     */
+    public static final String[] MODES = {"FBM", "Billow", "Ridged", "Warp", "Exo"};
 
     public RawNoise wrapped;
     public float frequency;
@@ -246,6 +250,12 @@ public class ContinuousNoise extends RawNoise {
                 ", mode=" + mode +
                 ", octaves=" + octaves +
                 '}';
+    }
+
+    @Override
+    public String toHumanReadableString() {
+        return getTag() + " wrapping (" + wrapped.toHumanReadableString() + "), with frequency " + frequency +
+                ", " + octaves + " octaves, and mode " + MODES[mode];
     }
 
     @Override

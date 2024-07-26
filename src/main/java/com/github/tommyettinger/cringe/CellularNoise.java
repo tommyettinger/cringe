@@ -602,5 +602,8 @@ public class CellularNoise extends RawNoise {
         setNoiseType(in.readInt());
     }
 
-
+    @Override
+    public String toHumanReadableString() {
+        return getTag() + " with seed " + getSeed() + " and noise type " + noiseType;
+    }
 }

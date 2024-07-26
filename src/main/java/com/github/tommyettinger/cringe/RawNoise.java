@@ -224,6 +224,15 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
     public abstract RawNoise copy();
 
     /**
+     * Gets a simple human-readable String that describes this noise generator. This should use names instead of coded
+     * numbers, and should be enough to differentiate any two generators.
+     * @return a String that describes this noise generator for human consumption
+     */
+    public String toHumanReadableString(){
+        return getTag() + " with seed " + getSeed();
+    }
+
+    /**
      * Gets 1D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
      * changing the position instead of the seed; you can check if this will happen with {@link #hasEfficientSetSeed()}.
      * Most noise algorithms don't

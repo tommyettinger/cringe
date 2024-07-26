@@ -44,6 +44,8 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.*;
  */
 public class NoisePreviewGenerator extends ApplicationAdapter {
 
+    private static final boolean ACTUALLY_RENDER = false;
+
     public interface FloatToFloatFunction {
         float applyAsFloat(float f);
     }
@@ -107,31 +109,34 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
     }
 
     public void putMap() {
-        for (int c = 0; c < 256; c++) {
-            int w = 256, h = 256;
-//                            float halfW = (w-1) * 0.5f, halfH = (h-1) * 0.5f, inv = 1f / w;
-            float time = c * 0.25f;
-            Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    float color = prepare.applyAsFloat(noise.getNoise(x, y, time));
-                    // fisheye-like effect:
-//                                    float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, c - inv * ((x - halfW) * (x - halfW) + (y - halfH) * (y - halfH)), noise.seed));
-                    p.setColor(color, color, color, 1f);
-                    p.drawPixel(x, y);
-                }
-            }
-            frames.add(p);
-        }
         Gdx.files.local("out/").mkdirs();
 
         FileHandle file = Gdx.files.local("out/" + noise.stringSerialize() + ".gif");
-        System.out.println("Writing to file:\n" + file);
-        gif.write(file, frames, 16);
-        for (int i = 0; i < frames.size; i++) {
-            frames.get(i).dispose();
+        System.out.println(file.name() + " is: " + noise.toHumanReadableString());
+
+        if(ACTUALLY_RENDER) {
+            for (int c = 0; c < 256; c++) {
+                int w = 256, h = 256;
+//                            float halfW = (w-1) * 0.5f, halfH = (h-1) * 0.5f, inv = 1f / w;
+                float time = c * 0.25f;
+                Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+                for (int x = 0; x < w; x++) {
+                    for (int y = 0; y < h; y++) {
+                        float color = prepare.applyAsFloat(noise.getNoise(x, y, time));
+                        // fisheye-like effect:
+//                                    float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, c - inv * ((x - halfW) * (x - halfW) + (y - halfH) * (y - halfH)), noise.seed));
+                        p.setColor(color, color, color, 1f);
+                        p.drawPixel(x, y);
+                    }
+                }
+                frames.add(p);
+            }
+            gif.write(file, frames, 16);
+            for (int i = 0; i < frames.size; i++) {
+                frames.get(i).dispose();
+            }
+            frames.clear();
         }
-        frames.clear();
     }
 
     @Override

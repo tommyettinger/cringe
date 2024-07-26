@@ -18,33 +18,26 @@ package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tommyettinger.anim8.AnimatedGif;
 import com.github.tommyettinger.anim8.Dithered;
+import com.github.tommyettinger.anim8.FastPNG;
 import com.github.tommyettinger.anim8.PaletteReducer;
 
-import static com.badlogic.gdx.Input.Keys.*;
-import static com.badlogic.gdx.graphics.GL20.GL_POINTS;
-import static com.github.tommyettinger.cringe.ColorSupport.*;
 import static com.github.tommyettinger.cringe.ContinuousNoise.*;
 
 /**
  */
 public class NoisePreviewGenerator extends ApplicationAdapter {
 
-    private static final boolean ACTUALLY_RENDER = false;
+    private static final boolean ACTUALLY_RENDER_GIF = false;
+    private static final boolean ACTUALLY_RENDER_PNG = true;
 
     public interface FloatToFloatFunction {
         float applyAsFloat(float f);
@@ -72,6 +65,7 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
     private Viewport view;
 
     private AnimatedGif gif;
+    private FastPNG png;
     private final Array<Pixmap> frames = new Array<>(1024);
 
     public float basicPrepare(float n)
@@ -94,6 +88,8 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
         gif.setDitherStrength(1f);
         gif.palette = new PaletteReducer(gray256);
 
+        png = new FastPNG();
+
         for(RawNoise rn : noises) {
             noise.setWrapped(rn);
             for (int m = 0; m <= EXO; m++) {
@@ -109,33 +105,47 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
     }
 
     public void putMap() {
-        Gdx.files.local("out/").mkdirs();
+        Gdx.files.local("out/gif/").mkdirs();
+        Gdx.files.local("out/noise/").mkdirs();
 
-        FileHandle file = Gdx.files.local("out/" + noise.stringSerialize() + ".gif");
-        System.out.println(file.name() + " is: " + noise.toHumanReadableString());
+        FileHandle gifFile = Gdx.files.local("out/gif/" + noise.stringSerialize().replace('`', '$') + ".gif");
+        FileHandle pngFile = Gdx.files.local("out/noise/" + noise.stringSerialize().replace('`', '$') + ".png");
+        System.out.println(noise.toHumanReadableString()+": ![Noise Preview](noise/"+pngFile.name() + ")\n");
 
-        if(ACTUALLY_RENDER) {
+        if(ACTUALLY_RENDER_GIF) {
             for (int c = 0; c < 256; c++) {
                 int w = 256, h = 256;
-//                            float halfW = (w-1) * 0.5f, halfH = (h-1) * 0.5f, inv = 1f / w;
                 float time = c * 0.25f;
                 Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                 for (int x = 0; x < w; x++) {
                     for (int y = 0; y < h; y++) {
                         float color = prepare.applyAsFloat(noise.getNoise(x, y, time));
-                        // fisheye-like effect:
-//                                    float color = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, c - inv * ((x - halfW) * (x - halfW) + (y - halfH) * (y - halfH)), noise.seed));
                         p.setColor(color, color, color, 1f);
                         p.drawPixel(x, y);
                     }
                 }
                 frames.add(p);
             }
-            gif.write(file, frames, 16);
+            gif.write(gifFile, frames, 16);
             for (int i = 0; i < frames.size; i++) {
                 frames.get(i).dispose();
             }
             frames.clear();
+        }
+        if (ACTUALLY_RENDER_PNG) {
+            int w = 256, h = 256;
+            float time = 1.25f;
+            Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+            for (int x = 0; x < w; x++) {
+                for (int y = 0; y < h; y++) {
+                    float color = prepare.applyAsFloat(noise.getNoise(x, y, time));
+                    p.setColor(color, color, color, 1f);
+                    p.drawPixel(x, y);
+                }
+            }
+            png.write(pngFile, p);
+
+            p.dispose();
         }
     }
 

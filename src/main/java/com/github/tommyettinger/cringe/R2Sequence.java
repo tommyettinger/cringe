@@ -2,7 +2,13 @@ package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -12,9 +18,12 @@ import java.util.Random;
  * initial offsets from {@link MathUtils#random}. You can specify the offsets yourself, and if you want to
  * resume the sequence, you only need the last Vector2 produced, and can call {@link #resume(Vector2)} with it.
  * All Vector2 items this produces will be (and generally, those it is given should be) in the 0.0 (inclusive)
- * to 1.0 (exclusive) range.
+ * to 1.0 (exclusive) range. This allocates a new Vector2 every time you call {@link #next()}.
+ * <br>
+ * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+ * understands the {@link Externalizable} interface.
  */
-public class R2Sequence implements Iterator<Vector2>, Iterable<Vector2> {
+public class R2Sequence implements Iterator<Vector2>, Iterable<Vector2>, Json.Serializable, Externalizable {
     public float x, y;
 
     /**
@@ -71,7 +80,7 @@ public class R2Sequence implements Iterator<Vector2>, Iterable<Vector2> {
     public R2Sequence resume(Vector2 previous) {
         return resume(previous.x, previous.y);
     }
-    
+
     @Override
     public void remove() {
         throw new UnsupportedOperationException("Cannot remove from an infinite sequence.");
@@ -81,4 +90,32 @@ public class R2Sequence implements Iterator<Vector2>, Iterable<Vector2> {
     public Iterator<Vector2> iterator() {
         return this;
     }
+
+    @Override
+    public void write(Json json) {
+        json.writeObjectStart("r2");
+        json.writeValue("x", x);
+        json.writeValue("y", y);
+        json.writeObjectEnd();
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        jsonData = jsonData.get("r2");
+        x = jsonData.getFloat("x");
+        y = jsonData.getFloat("y");
+    }
+
+    @GwtIncompatible
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeFloat(x);
+        out.writeFloat(y);
+    }
+
+    @GwtIncompatible
+    public void readExternal(ObjectInput in) throws IOException {
+        x = in.readFloat();
+        y = in.readFloat();
+    }
+
 }

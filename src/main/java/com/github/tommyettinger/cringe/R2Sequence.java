@@ -14,7 +14,11 @@ import java.util.Random;
 
 /**
  * A very simple Iterator or Iterable over Vector2 items, this produces Vector2 points that won't overlap
- * or be especially close to each other for a long time. If constructed with no arguments, this gets random
+ * or be especially close to each other for a long time by using the
+ * <a href="https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/">R2 Sequence</a>.
+ * This uses a slight variant credited to
+ * <a href="https://www.martysmods.com/a-better-r2-sequence/">Pascal Gilcher's article</a>.
+ * If constructed with no arguments, this gets random
  * initial offsets from {@link MathUtils#random}. You can specify the offsets yourself, and if you want to
  * resume the sequence, you only need the last Vector2 produced, and can call {@link #resume(Vector2)} with it.
  * All Vector2 items this produces will be (and generally, those it is given should be) in the 0.0 (inclusive)
@@ -63,9 +67,12 @@ public class R2Sequence implements Iterator<Vector2>, Iterable<Vector2>, Json.Se
 
     @Override
     public Vector2 next() {
-        // These specific "magic numbers" are what make this the R2 sequence.
-        x += 0.7548776662466927f;
-        y += 0.5698402909980532f;
+        // These specific "magic numbers" are what make this the R2 sequence, as found here:
+        // https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
+        // These specific numbers are 1f minus the original constants, an approach to minimize
+        // floating-point error noted by: https://www.martysmods.com/a-better-r2-sequence/
+        x += 0.24512233375330728f;
+        y += 0.4301597090019468f;
         x -= (int)x;
         y -= (int)y;
         return new Vector2(x, y);

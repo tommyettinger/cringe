@@ -170,7 +170,124 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
             baseY = in.readInt();
             index = in.readInt();
         }
+    }
 
+    /**
+     * A very simple Iterator or Iterable over Vector3 items, this produces Vector3 points that won't overlap
+     * or be especially close to each other for a long time by using a 2D
+     * <a href="https://en.wikipedia.org/wiki/Halton_sequence">Halton Sequence</a>. If given no constructor
+     * arguments, this uses a base of 2 for x, 3 for y, and 5 for z. You can specify the bases yourself (as long
+     * as they share no common factors). if you want to resume the sequence, you need only the {@link #index}
+     * this was on when you want to resume it, as well as possibly the {@link #baseX}, {@link #baseY}, and
+     * {@link #baseZ} if those differ, and can call {@link #resume(int, int, int, int)}.
+     * All Vector3 items this produces will be (and generally, those it is given should be) in the 0.0 (inclusive)
+     * to 1.0 (exclusive) range. This allocates a new Vector3 every time you call {@link #next()}. You can also
+     * use {@link #nextInto(Vector3)} to fill an existing Vector3 with what would otherwise be allocated by
+     * {@link #next()}.
+     * <br>
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * understands the {@link Externalizable} interface.
+     */
+    public static class Halton3 extends PointSequence<Vector3> {
+        public int baseX, baseY, baseZ, index;
+
+        /**
+         * Uses base (2,3) and starts at index 0.
+         */
+        public Halton3() {
+            this(2, 3, 5, 0);
+        }
+
+        /**
+         * Uses the given bases, which should be "relatively prime" (meaning they shouldn't share any common factors).
+         * Using different (small) prime numbers for xBase, yBase, and zBase is a good idea.
+         * @param xBase base for x, must not share any common factors with other bases (use a prime)
+         * @param yBase base for y, must not share any common factors with other bases (use a prime)
+         * @param zBase base for z, must not share any common factors with other bases (use a prime)
+         */
+        public Halton3(int xBase, int yBase, int zBase) {
+            this(xBase, yBase, zBase, 0);
+        }
+
+        /**
+         * Uses the given bases, which should be "relatively prime" (meaning they shouldn't share any common factors).
+         * Using different (small) prime numbers for xBase, yBase, and zBase is a good idea.
+         * @param xBase base for x, must not share any common factors with other bases (use a prime)
+         * @param yBase base for y, must not share any common factors with other bases (use a prime)
+         * @param zBase base for z, must not share any common factors with other bases (use a prime)
+         * @param index which (usually small) positive index to start at; often starts at 0
+         */
+        public Halton3(int xBase, int yBase, int zBase, int index) {
+            this.baseX = xBase;
+            this.baseY = yBase;
+            this.baseZ = zBase;
+            this.index = index;
+        }
+
+        @Override
+        public Vector3 next() {
+            ++index;
+            return new Vector3(vanDerCorput(baseX, index), vanDerCorput(baseY, index), vanDerCorput(baseZ, index));
+        }
+
+        /**
+         * Sets the x,y,z of {@code into} to the x,y,z of the next item in this Halton sequence, and advances
+         * the sequence. Does not allocate. Modifies {@code into} in-place.
+         * @param into will be overwritten with new values, modified in-place
+         * @return {@code into}, after modifications
+         */
+        public Vector3 nextInto(Vector3 into) {
+            ++index;
+            return into.set(vanDerCorput(baseX, index), vanDerCorput(baseY, index), vanDerCorput(baseZ, index));
+        }
+
+        public Halton3 resume(int index){
+            this.index = index;
+            return this;
+        }
+
+        public Halton3 resume(int baseX, int baseY, int baseZ, int index){
+            this.baseX = baseX;
+            this.baseY = baseY;
+            this.baseZ = baseZ;
+            this.index = index;
+            return this;
+        }
+
+        @Override
+        public void write(Json json) {
+            json.writeObjectStart("hs");
+            json.writeValue("x", baseX);
+            json.writeValue("y", baseY);
+            json.writeValue("z", baseZ);
+            json.writeValue("i", index);
+            json.writeObjectEnd();
+        }
+
+        @Override
+        public void read(Json json, JsonValue jsonData) {
+            jsonData = jsonData.get("hs");
+            baseX = jsonData.getInt("x");
+            baseY = jsonData.getInt("y");
+            baseZ = jsonData.getInt("z");
+            index = jsonData.getInt("i");
+        }
+
+        @GwtIncompatible
+        public void writeExternal(ObjectOutput out) throws IOException {
+            out.writeInt(baseX);
+            out.writeInt(baseY);
+            out.writeInt(baseZ);
+            out.writeInt(index);
+        }
+
+        @GwtIncompatible
+        public void readExternal(ObjectInput in) throws IOException {
+            baseX = in.readInt();
+            baseY = in.readInt();
+            baseZ = in.readInt();
+            index = in.readInt();
+        }
     }
 
     /**

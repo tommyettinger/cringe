@@ -18,7 +18,9 @@ import java.util.Iterator;
  * resume the sequence, you need only the {@link #index} this was on when you want to resume it, and possibly
  * also the {@link #baseX} and {@link #baseY} if those differ, and can call {@link #resume(int, int, int)}.
  * All Vector2 items this produces will be (and generally, those it is given should be) in the 0.0 (inclusive)
- * to 1.0 (exclusive) range. This allocates a new Vector2 every time you call {@link #next()}.
+ * to 1.0 (exclusive) range. This allocates a new Vector2 every time you call {@link #next()}. You can also
+ * use {@link #nextInto(Vector2)} to fill an existing Vector2 with what would otherwise be allocated by
+ * {@link #next()}.
  * <br>
  * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
  * understands the {@link Externalizable} interface.
@@ -88,6 +90,17 @@ public class HaltonSequence implements Iterator<Vector2>, Iterable<Vector2>, Jso
     public Vector2 next() {
         ++index;
         return new Vector2(vanDerCorput(baseX, index), vanDerCorput(baseY, index));
+    }
+
+    /**
+     * Sets the x and y of {@code into} to the x and y of the next item in this Halton sequence, and advances
+     * the sequence. Does not allocate. Modifies {@code into} in-place.
+     * @param into will be overwritten with new values, modified in-place
+     * @return {@code into}, after modifications
+     */
+    public Vector2 nextInto(Vector2 into) {
+        ++index;
+        return into.set(vanDerCorput(baseX, index), vanDerCorput(baseY, index));
     }
 
     public HaltonSequence resume(int index){

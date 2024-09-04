@@ -3,6 +3,7 @@ package com.github.tommyettinger.cringe;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
@@ -205,7 +206,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
          */
         public R2(Random random) {
             this.x = random.nextFloat();
-            this.y  = random.nextFloat();
+            this.y = random.nextFloat();
         }
 
         /**
@@ -284,6 +285,133 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
         public void readExternal(ObjectInput in) throws IOException {
             x = in.readFloat();
             y = in.readFloat();
+        }
+
+    }
+    /**
+     * A very simple Iterator or Iterable over Vector3 items, this produces Vector3 points that won't overlap
+     * or be especially close to each other for a long time by using the
+     * <a href="https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/">R3 Sequence</a>.
+     * This uses a slight variant credited to
+     * <a href="https://www.martysmods.com/a-better-r2-sequence/">Pascal Gilcher's article</a>.
+     * If constructed with no arguments, this gets random
+     * initial offsets from {@link MathUtils#random}. You can specify the offsets yourself, and if you want to
+     * resume the sequence, you only need the last Vector3 produced, and can call {@link #resume(Vector3)} with it.
+     * All Vector3 items this produces will be (and generally, those it is given should be) in the 0.0 (inclusive)
+     * to 1.0 (exclusive) range. This allocates a new Vector3 every time you call {@link #next()}. You can also
+     * use {@link #nextInto(Vector3)} to fill an existing Vector3 with what would otherwise be allocated by
+     * {@link #next()}.
+     * <br>
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * understands the {@link Externalizable} interface.
+     */
+    public static class R3 extends PointSequence<Vector3> {
+        public float x, y, z;
+
+        /**
+         * Gets random initial offsets from {@link MathUtils#random}.
+         */
+        public R3() {
+            this(MathUtils.random);
+        }
+
+        /**
+         * Gets random initial offsets from the given {@link Random} (or subclass).
+         * @param random any Random or a subclass of Random, such as RandomXS128
+         */
+        public R3(Random random) {
+            this.x = random.nextFloat();
+            this.y = random.nextFloat();
+            this.z = random.nextFloat();
+        }
+
+        /**
+         * Uses the given initial offsets; this only uses their fractional parts.
+         * @param x initial offset for x
+         * @param y initial offset for y
+         * @param z initial offset for z
+         */
+        public R3(float x, float y, float z) {
+            this.x = x - MathUtils.floor(x);
+            this.y = y - MathUtils.floor(y);
+            this.z = z - MathUtils.floor(z);
+        }
+
+        public R3(Vector3 offsets) {
+            this(offsets.x, offsets.y, offsets.z);
+        }
+
+        @Override
+        public Vector3 next() {
+            // These specific "magic numbers" are what make this the R3 sequence, as found here:
+            // https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
+            // These specific numbers are 1f minus the original constants, an approach to minimize
+            // floating-point error noted by: https://www.martysmods.com/a-better-r2-sequence/
+            x += 0.8191725133961645f;
+            y += 0.6710436067037893f;
+            z += 0.5497004779019703f;
+            x -= (int)x;
+            y -= (int)y;
+            z -= (int)z;
+            return new Vector3(x, y, z);
+        }
+
+        /**
+         * Sets the x,y,z of {@code into} to the x,y,z of the next item in the R3 sequence, and advances
+         * the sequence. Does not allocate. Modifies {@code into} in-place.
+         * @param into will be overwritten with new values, modified in-place
+         * @return {@code into}, after modifications
+         */
+        public Vector3 nextInto(Vector3 into) {
+            x += 0.8191725133961645f;
+            y += 0.6710436067037893f;
+            z += 0.5497004779019703f;
+            x -= (int)x;
+            y -= (int)y;
+            z -= (int)z;
+            return into.set(x, y, z);
+        }
+
+        public R3 resume(float x, float y, float z){
+            this.x = x - MathUtils.floor(x);
+            this.y = y - MathUtils.floor(y);
+            this.z = z - MathUtils.floor(z);
+            return this;
+        }
+
+        public R3 resume(Vector3 previous) {
+            return resume(previous.x, previous.y, previous.z);
+        }
+
+        @Override
+        public void write(Json json) {
+            json.writeObjectStart("r3");
+            json.writeValue("x", x);
+            json.writeValue("y", y);
+            json.writeValue("z", z);
+            json.writeObjectEnd();
+        }
+
+        @Override
+        public void read(Json json, JsonValue jsonData) {
+            jsonData = jsonData.get("r3");
+            x = jsonData.getFloat("x");
+            y = jsonData.getFloat("y");
+            z = jsonData.getFloat("z");
+        }
+
+        @GwtIncompatible
+        public void writeExternal(ObjectOutput out) throws IOException {
+            out.writeFloat(x);
+            out.writeFloat(y);
+            out.writeFloat(z);
+        }
+
+        @GwtIncompatible
+        public void readExternal(ObjectInput in) throws IOException {
+            x = in.readFloat();
+            y = in.readFloat();
+            z = in.readFloat();
         }
 
     }

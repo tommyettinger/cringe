@@ -22,7 +22,9 @@ import java.util.Random;
  * initial offsets from {@link MathUtils#random}. You can specify the offsets yourself, and if you want to
  * resume the sequence, you only need the last Vector2 produced, and can call {@link #resume(Vector2)} with it.
  * All Vector2 items this produces will be (and generally, those it is given should be) in the 0.0 (inclusive)
- * to 1.0 (exclusive) range. This allocates a new Vector2 every time you call {@link #next()}.
+ * to 1.0 (exclusive) range. This allocates a new Vector2 every time you call {@link #next()}. You can also
+ * use {@link #nextInto(Vector2)} to fill an existing Vector2 with what would otherwise be allocated by
+ * {@link #next()}.
  * <br>
  * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
  * understands the {@link Externalizable} interface.
@@ -76,6 +78,20 @@ public class R2Sequence implements Iterator<Vector2>, Iterable<Vector2>, Json.Se
         x -= (int)x;
         y -= (int)y;
         return new Vector2(x, y);
+    }
+
+    /**
+     * Sets the x and y of {@code into} to the x and y of the next item in the R2 sequence, and advances
+     * the sequence. Does not allocate. Modifies {@code into} in-place.
+     * @param into will be overwritten with new values, modified in-place
+     * @return {@code into}, after modifications
+     */
+    public Vector2 nextInto(Vector2 into) {
+        x += 0.24512233375330728f;
+        y += 0.4301597090019468f;
+        x -= (int)x;
+        y -= (int)y;
+        return into.set(x, y);
     }
 
     public R2Sequence resume(float x, float y){

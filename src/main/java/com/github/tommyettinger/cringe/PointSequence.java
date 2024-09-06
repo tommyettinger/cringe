@@ -1,9 +1,6 @@
 package com.github.tommyettinger.cringe;
 
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 
@@ -14,7 +11,25 @@ import java.io.ObjectOutput;
 import java.util.Iterator;
 import java.util.Random;
 
+/**
+ * A parent type for infinite point sequences, such as Halton sequences and the R2 sequence. This has several inner
+ * classes that extend PointSequence, currently all "low-discrepancy sequences." {@link R2} will look more random for
+ * the first several elements than the similar {@link Halton2} sequence, and R2 will maintain a higher minimum distance
+ * between points than Halton will. R2 will start to look more patterned than Halton after enough points have been
+ * produced to see repeating line patterns in R2 that aren't present in Halton sequences.
+ * <br>
+ * All PointSequence instances can be serialized using libGDX Json or with anything compatible with
+ * {@link Externalizable}, such as Apache Fury.
+ *
+ * @param <V> the libGDX {@link Vector} type of points, such as {@link Vector2} or {@link Vector3}
+ */
 public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>, Iterable<V>, Json.Serializable, Externalizable {
+    /**
+     * Gets the next point in this sequence and fills {@code into} with its contents instead of allocating any
+     * new vector object.
+     * @param into a Vector of the appropriate type for this PointSequence
+     * @return {@code into}, after modifications
+     */
     public abstract V nextInto(V into);
 
     /**
@@ -67,7 +82,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
      * or be especially close to each other for a long time by using a 2D
      * <a href="https://en.wikipedia.org/wiki/Halton_sequence">Halton Sequence</a>. If given no constructor
      * arguments, this uses a base of 2 for x and 3 for y. You can specify the two bases yourself (as long as
-     * they share no common factors). if you want to resume the sequence, you need only the {@link #index} this
+     * they share no common factors). If you want to resume the sequence, you need only the {@link #index} this
      * was on when you want to resume it, as well as possibly the {@link #baseX} and {@link #baseY} if those
      * differ, and can call {@link #resume(int, int, int)}.
      * All Vector2 items this produces will be (and generally, those it is given should be) in the 0.0 (inclusive)
@@ -174,10 +189,10 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
 
     /**
      * A very simple Iterator or Iterable over Vector3 items, this produces Vector3 points that won't overlap
-     * or be especially close to each other for a long time by using a 2D
+     * or be especially close to each other for a long time by using a 3D
      * <a href="https://en.wikipedia.org/wiki/Halton_sequence">Halton Sequence</a>. If given no constructor
      * arguments, this uses a base of 2 for x, 3 for y, and 5 for z. You can specify the bases yourself (as long
-     * as they share no common factors). if you want to resume the sequence, you need only the {@link #index}
+     * as they share no common factors). If you want to resume the sequence, you need only the {@link #index}
      * this was on when you want to resume it, as well as possibly the {@link #baseX}, {@link #baseY}, and
      * {@link #baseZ} if those differ, and can call {@link #resume(int, int, int, int)}.
      * All Vector3 items this produces will be (and generally, those it is given should be) in the 0.0 (inclusive)
@@ -192,7 +207,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
         public int baseX, baseY, baseZ, index;
 
         /**
-         * Uses base (2,3) and starts at index 0.
+         * Uses base (2,3,5) and starts at index 0.
          */
         public Halton3() {
             this(2, 3, 5, 0);
@@ -286,6 +301,135 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
             baseX = in.readInt();
             baseY = in.readInt();
             baseZ = in.readInt();
+            index = in.readInt();
+        }
+    }
+
+
+    /**
+     * A very simple Iterator or Iterable over Vector4 items, this produces Vector4 points that won't overlap
+     * or be especially close to each other for a long time by using a 4D
+     * <a href="https://en.wikipedia.org/wiki/Halton_sequence">Halton Sequence</a>. If given no constructor
+     * arguments, this uses a base of 2 for x, 3 for y, 5 for z, and 7 for w. You can specify the bases yourself (as
+     * long as they share no common factors). If you want to resume the sequence, you need only the {@link #index}
+     * this was on when you want to resume it, as well as possibly the {@link #baseX}, {@link #baseY}, {@link #baseZ},
+     * and {@link #baseW} if those differ, and can call {@link #resume(int, int, int, int, int)}.
+     * All Vector4 items this produces will be (and generally, those it is given should be) in the 0.0 (inclusive)
+     * to 1.0 (exclusive) range. This allocates a new Vector4 every time you call {@link #next()}. You can also
+     * use {@link #nextInto(Vector4)} to fill an existing Vector4 with what would otherwise be allocated by
+     * {@link #next()}.
+     * <br>
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * understands the {@link Externalizable} interface.
+     */
+    public static class Halton4 extends PointSequence<Vector4> {
+        public int baseX, baseY, baseZ, baseW, index;
+
+        /**
+         * Uses base (2,3,5,7) and starts at index 0.
+         */
+        public Halton4() {
+            this(2, 3, 5, 0);
+        }
+
+        /**
+         * Uses the given bases, which should be "relatively prime" (meaning they shouldn't share any common factors).
+         * Using different (small) prime numbers for xBase, yBase, zBase, and wBase is a good idea.
+         * @param xBase base for x, must not share any common factors with other bases (use a prime)
+         * @param yBase base for y, must not share any common factors with other bases (use a prime)
+         * @param zBase base for z, must not share any common factors with other bases (use a prime)
+         * @param wBase base for w, must not share any common factors with other bases (use a prime)
+         */
+        public Halton4(int xBase, int yBase, int zBase, int wBase) {
+            this(xBase, yBase, zBase, wBase, 0);
+        }
+
+        /**
+         * Uses the given bases, which should be "relatively prime" (meaning they shouldn't share any common factors).
+         * Using different (small) prime numbers for xBase, yBase, zBase, and wBase is a good idea.
+         * @param xBase base for x, must not share any common factors with other bases (use a prime)
+         * @param yBase base for y, must not share any common factors with other bases (use a prime)
+         * @param zBase base for z, must not share any common factors with other bases (use a prime)
+         * @param wBase base for w, must not share any common factors with other bases (use a prime)
+         * @param index which (usually small) positive index to start at; often starts at 0
+         */
+        public Halton4(int xBase, int yBase, int zBase, int wBase, int index) {
+            this.baseX = xBase;
+            this.baseY = yBase;
+            this.baseZ = zBase;
+            this.baseW = wBase;
+            this.index = index;
+        }
+
+        @Override
+        public Vector4 next() {
+            ++index;
+            return new Vector4(vanDerCorput(baseX, index), vanDerCorput(baseY, index),
+                    vanDerCorput(baseZ, index), vanDerCorput(baseW, index));
+        }
+
+        /**
+         * Sets the x,y,z of {@code into} to the x,y,z of the next item in this Halton sequence, and advances
+         * the sequence. Does not allocate. Modifies {@code into} in-place.
+         * @param into will be overwritten with new values, modified in-place
+         * @return {@code into}, after modifications
+         */
+        public Vector4 nextInto(Vector4 into) {
+            ++index;
+            return into.set(vanDerCorput(baseX, index), vanDerCorput(baseY, index),
+                    vanDerCorput(baseZ, index), vanDerCorput(baseW, index));
+        }
+
+        public Halton4 resume(int index){
+            this.index = index;
+            return this;
+        }
+
+        public Halton4 resume(int baseX, int baseY, int baseZ, int baseW, int index){
+            this.baseX = baseX;
+            this.baseY = baseY;
+            this.baseZ = baseZ;
+            this.baseW = baseW;
+            this.index = index;
+            return this;
+        }
+
+        @Override
+        public void write(Json json) {
+            json.writeObjectStart("hs");
+            json.writeValue("x", baseX);
+            json.writeValue("y", baseY);
+            json.writeValue("z", baseZ);
+            json.writeValue("w", baseW);
+            json.writeValue("i", index);
+            json.writeObjectEnd();
+        }
+
+        @Override
+        public void read(Json json, JsonValue jsonData) {
+            jsonData = jsonData.get("hs");
+            baseX = jsonData.getInt("x");
+            baseY = jsonData.getInt("y");
+            baseZ = jsonData.getInt("z");
+            baseZ = jsonData.getInt("w");
+            index = jsonData.getInt("i");
+        }
+
+        @GwtIncompatible
+        public void writeExternal(ObjectOutput out) throws IOException {
+            out.writeInt(baseX);
+            out.writeInt(baseY);
+            out.writeInt(baseZ);
+            out.writeInt(baseW);
+            out.writeInt(index);
+        }
+
+        @GwtIncompatible
+        public void readExternal(ObjectInput in) throws IOException {
+            baseX = in.readInt();
+            baseY = in.readInt();
+            baseZ = in.readInt();
+            baseW = in.readInt();
             index = in.readInt();
         }
     }

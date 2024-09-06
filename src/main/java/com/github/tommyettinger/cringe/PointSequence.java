@@ -157,7 +157,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
 
         @Override
         public void write(Json json) {
-            json.writeObjectStart("hs");
+            json.writeObjectStart("h2");
             json.writeValue("x", baseX);
             json.writeValue("y", baseY);
             json.writeValue("i", index);
@@ -166,7 +166,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
 
         @Override
         public void read(Json json, JsonValue jsonData) {
-            jsonData = jsonData.get("hs");
+            jsonData = jsonData.get("h2");
             baseX = jsonData.getInt("x");
             baseY = jsonData.getInt("y");
             index = jsonData.getInt("i");
@@ -271,7 +271,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
 
         @Override
         public void write(Json json) {
-            json.writeObjectStart("hs");
+            json.writeObjectStart("h3");
             json.writeValue("x", baseX);
             json.writeValue("y", baseY);
             json.writeValue("z", baseZ);
@@ -281,7 +281,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
 
         @Override
         public void read(Json json, JsonValue jsonData) {
-            jsonData = jsonData.get("hs");
+            jsonData = jsonData.get("h3");
             baseX = jsonData.getInt("x");
             baseY = jsonData.getInt("y");
             baseZ = jsonData.getInt("z");
@@ -369,7 +369,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
         }
 
         /**
-         * Sets the x,y,z of {@code into} to the x,y,z of the next item in this Halton sequence, and advances
+         * Sets the x,y,z,w of {@code into} to the x,y,z,w of the next item in this Halton sequence, and advances
          * the sequence. Does not allocate. Modifies {@code into} in-place.
          * @param into will be overwritten with new values, modified in-place
          * @return {@code into}, after modifications
@@ -396,7 +396,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
 
         @Override
         public void write(Json json) {
-            json.writeObjectStart("hs");
+            json.writeObjectStart("h4");
             json.writeValue("x", baseX);
             json.writeValue("y", baseY);
             json.writeValue("z", baseZ);
@@ -407,7 +407,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
 
         @Override
         public void read(Json json, JsonValue jsonData) {
-            jsonData = jsonData.get("hs");
+            jsonData = jsonData.get("h4");
             baseX = jsonData.getInt("x");
             baseY = jsonData.getInt("y");
             baseZ = jsonData.getInt("z");
@@ -549,6 +549,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
         }
 
     }
+
     /**
      * A very simple Iterator or Iterable over Vector3 items, this produces Vector3 points that won't overlap
      * or be especially close to each other for a long time by using the
@@ -608,9 +609,9 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
             // https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
             // These specific numbers are 1f minus the original constants, an approach to minimize
             // floating-point error noted by: https://www.martysmods.com/a-better-r2-sequence/
-            x += 0.8191725133961645f;
-            y += 0.6710436067037893f;
-            z += 0.5497004779019703f;
+            x += 0.18082748660383552f;
+            y += 0.32895639329621074f;
+            z += 0.45029952209802970f;
             x -= (int)x;
             y -= (int)y;
             z -= (int)z;
@@ -624,9 +625,9 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
          * @return {@code into}, after modifications
          */
         public Vector3 nextInto(Vector3 into) {
-            x += 0.8191725133961645f;
-            y += 0.6710436067037893f;
-            z += 0.5497004779019703f;
+            x += 0.18082748660383552f;
+            y += 0.32895639329621074f;
+            z += 0.45029952209802970f;
             x -= (int)x;
             y -= (int)y;
             z -= (int)z;
@@ -674,6 +675,144 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
             y = in.readFloat();
             z = in.readFloat();
         }
+    }
 
+    /**
+     * A very simple Iterator or Iterable over Vector4 items, this produces Vector4 points that won't overlap
+     * or be especially close to each other for a long time by using the
+     * <a href="https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/">R4 Sequence</a>.
+     * This uses a slight variant credited to
+     * <a href="https://www.martysmods.com/a-better-r2-sequence/">Pascal Gilcher's article</a>.
+     * If constructed with no arguments, this gets random
+     * initial offsets from {@link MathUtils#random}. You can specify the offsets yourself, and if you want to
+     * resume the sequence, you only need the last Vector4 produced, and can call {@link #resume(Vector4)} with it.
+     * All Vector4 items this produces will be (and generally, those it is given should be) in the 0.0 (inclusive)
+     * to 1.0 (exclusive) range. This allocates a new Vector4 every time you call {@link #next()}. You can also
+     * use {@link #nextInto(Vector4)} to fill an existing Vector4 with what would otherwise be allocated by
+     * {@link #next()}.
+     * <br>
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * understands the {@link Externalizable} interface.
+     */
+    public static class R4 extends PointSequence<Vector4> {
+        public float x, y, z, w;
+
+        /**
+         * Gets random initial offsets from {@link MathUtils#random}.
+         */
+        public R4() {
+            this(MathUtils.random);
+        }
+
+        /**
+         * Gets random initial offsets from the given {@link Random} (or subclass).
+         * @param random any Random or a subclass of Random, such as RandomXS128
+         */
+        public R4(Random random) {
+            this.x = random.nextFloat();
+            this.y = random.nextFloat();
+            this.z = random.nextFloat();
+            this.w = random.nextFloat();
+        }
+
+        /**
+         * Uses the given initial offsets; this only uses their fractional parts.
+         * @param x initial offset for x
+         * @param y initial offset for y
+         * @param z initial offset for z
+         * @param w initial offset for w
+         */
+        public R4(float x, float y, float z, float w) {
+            this.x = x - MathUtils.floor(x);
+            this.y = y - MathUtils.floor(y);
+            this.z = z - MathUtils.floor(z);
+            this.w = w - MathUtils.floor(w);
+        }
+
+        public R4(Vector4 offsets) {
+            this(offsets.x, offsets.y, offsets.z, offsets.w);
+        }
+
+        @Override
+        public Vector4 next() {
+            // These specific "magic numbers" are what make this the R4 sequence, as found here:
+            // https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
+            // These specific numbers are 1f minus the original constants, an approach to minimize
+            // floating-point error noted by: https://www.martysmods.com/a-better-r2-sequence/
+            x += 0.14332511614549714f;
+            y += 0.26610814337287403f;
+            z += 0.37129327896219133f;
+            w += 0.46140274277638993f;
+            x -= (int)x;
+            y -= (int)y;
+            z -= (int)z;
+            w -= (int)w;
+            return new Vector4(x, y, z, w);
+        }
+
+        /**
+         * Sets the x,y,z,w of {@code into} to the x,y,z,w of the next item in the R4 sequence, and advances
+         * the sequence. Does not allocate. Modifies {@code into} in-place.
+         * @param into will be overwritten with new values, modified in-place
+         * @return {@code into}, after modifications
+         */
+        public Vector4 nextInto(Vector4 into) {
+            x += 0.14332511614549714f;
+            y += 0.26610814337287403f;
+            z += 0.37129327896219133f;
+            w += 0.46140274277638993f;
+            x -= (int)x;
+            y -= (int)y;
+            z -= (int)z;
+            w -= (int)w;
+            return into.set(x, y, z, w);
+        }
+
+        public R4 resume(float x, float y, float z, float w){
+            this.x = x - MathUtils.floor(x);
+            this.y = y - MathUtils.floor(y);
+            this.z = z - MathUtils.floor(z);
+            this.w = w - MathUtils.floor(w);
+            return this;
+        }
+
+        public R4 resume(Vector4 previous) {
+            return resume(previous.x, previous.y, previous.z, previous.w);
+        }
+
+        @Override
+        public void write(Json json) {
+            json.writeObjectStart("r4");
+            json.writeValue("x", x);
+            json.writeValue("y", y);
+            json.writeValue("z", z);
+            json.writeValue("w", w);
+            json.writeObjectEnd();
+        }
+
+        @Override
+        public void read(Json json, JsonValue jsonData) {
+            jsonData = jsonData.get("r4");
+            x = jsonData.getFloat("x");
+            y = jsonData.getFloat("y");
+            z = jsonData.getFloat("z");
+            w = jsonData.getFloat("w");
+        }
+
+        @GwtIncompatible
+        public void writeExternal(ObjectOutput out) throws IOException {
+            out.writeFloat(x);
+            out.writeFloat(y);
+            out.writeFloat(z);
+            out.writeFloat(w);
+        }
+
+        @GwtIncompatible
+        public void readExternal(ObjectInput in) throws IOException {
+            x = in.readFloat();
+            y = in.readFloat();
+            z = in.readFloat();
+            w = in.readFloat();
+        }
     }
 }

@@ -18,8 +18,9 @@ import java.util.Random;
  * between points than Halton will. R2 will start to look more patterned than Halton after enough points have been
  * produced to see repeating line patterns in R2 that aren't present in Halton sequences.
  * <br>
- * All PointSequence instances can be serialized using libGDX Json or with anything compatible with
- * {@link Externalizable}, such as Apache Fury.
+ * All PointSequence subclasses can be serialized using libGDX Json or with anything compatible with
+ * {@link Externalizable}, such as Apache Fury. They can be iterated over like any {@link Iterable}, or they can be
+ * treated as an {@link Iterator}; both return {@code V} items.
  *
  * @param <V> the libGDX {@link Vector} type of points, such as {@link Vector2} or {@link Vector3}
  */
@@ -53,6 +54,8 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
     public Iterator<V> iterator() {
         return this;
     }
+
+    public abstract PointSequence<V> copy();
 
     /**
      * Gets the {@code index}-th element from the base-{@code base} van der Corput sequence. The base should usually be
@@ -185,6 +188,11 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
             baseY = in.readInt();
             index = in.readInt();
         }
+
+        @Override
+        public Halton2 copy() {
+            return new Halton2(baseX, baseY, index);
+        }
     }
 
     /**
@@ -302,6 +310,11 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
             baseY = in.readInt();
             baseZ = in.readInt();
             index = in.readInt();
+        }
+
+        @Override
+        public Halton3 copy() {
+            return new Halton3(baseX, baseY, baseZ, index);
         }
     }
 
@@ -432,6 +445,11 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
             baseW = in.readInt();
             index = in.readInt();
         }
+
+        @Override
+        public Halton4 copy() {
+            return new Halton4(baseX, baseY, baseZ, baseW, index);
+        }
     }
 
     /**
@@ -548,6 +566,10 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
             y = in.readFloat();
         }
 
+        @Override
+        public R2 copy() {
+            return new R2(x, y);
+        }
     }
 
     /**
@@ -674,6 +696,11 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
             x = in.readFloat();
             y = in.readFloat();
             z = in.readFloat();
+        }
+
+        @Override
+        public R3 copy() {
+            return new R3(x, y, z);
         }
     }
 
@@ -813,6 +840,11 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
             y = in.readFloat();
             z = in.readFloat();
             w = in.readFloat();
+        }
+
+        @Override
+        public R4 copy() {
+            return new R4(x, y, z, w);
         }
     }
 }

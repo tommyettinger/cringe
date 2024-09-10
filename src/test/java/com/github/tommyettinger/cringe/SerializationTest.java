@@ -240,6 +240,38 @@ public class SerializationTest {
     }
 
     @Test
+    public void testContinuousNoiseJson() {
+        Json json = new Json();
+        Array<RawNoise> all = RawNoise.Serializer.getAll();
+        for (RawNoise rn : all) {
+            ContinuousNoise cn = new ContinuousNoise(rn, 1234, 0.3f, ContinuousNoise.WARP, 3);
+            String s = json.toJson(cn);
+            float rl = cn.getNoise(0.2f, 0.3f, 0.5f);
+            RawNoise de = json.fromJson(cn.getClass(), s);
+            System.out.println(s + "   " + json.toJson(de));
+            float dl = de.getNoise(0.2f, 0.3f, 0.5f);
+            Assert.assertEquals("Failure with " + s, rl, dl, 0.0001f);
+        }
+    }
+
+    @Test
+    public void testContinuousNoiseFury() {
+        Fury fury = Fury.builder().withLanguage(Language.JAVA).build();
+        fury.register(ContinuousNoise.class);
+        Array<RawNoise> all = RawNoise.Serializer.getAll();
+        for (RawNoise rn : all) {
+            fury.register(rn.getClass());
+            ContinuousNoise cn = new ContinuousNoise(rn, 1234, 0.3f, ContinuousNoise.WARP, 3);
+            byte[] s = fury.serializeJavaObject(cn);
+            float rl = cn.getNoise(0.2f, 0.3f, 0.5f);
+            RawNoise de = fury.deserializeJavaObject(s, cn.getClass());
+            System.out.println(cn + "   " + de);
+            float dl = de.getNoise(0.2f, 0.3f, 0.5f);
+            Assert.assertEquals("Failure with " + s, rl, dl, 0.0001f);
+        }
+    }
+
+    @Test
     public void testUUIDJson() {
         Json json = new Json();
         json.setSerializer(UUID.class, new Json.Serializer<UUID>() {

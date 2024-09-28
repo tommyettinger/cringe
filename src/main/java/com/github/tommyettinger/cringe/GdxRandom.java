@@ -1037,7 +1037,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable, Ext
 	 * {@code 1.0} from this random number generator's sequence
 	 */
 	public double nextGaussian () {
-		return MathSupport.probit(nextExclusiveDouble());
+		return Distributor.normal(nextLong());
 	}
 
 	/**
@@ -1156,41 +1156,43 @@ public abstract class GdxRandom extends Random implements Json.Serializable, Ext
 	 * A way of taking a double in the (0.0, 1.0) range and mapping it to a Gaussian or normal distribution, so high
 	 * inputs correspond to high outputs, and similarly for the low range. This is centered on 0.0 and its standard
 	 * deviation seems to be 1.0 (the same as {@link Random#nextGaussian()}). If this is given an input of 0.0
-	 * or less, it returns -38.5, which is slightly less than the result when given {@link Double#MIN_VALUE}. If it is
-	 * given an input of 1.0 or more, it returns 38.5, which is significantly larger than the result when given the
+	 * or less, it returns -8.375, which is slightly less than the result when given {@link Double#MIN_VALUE}. If it is
+	 * given an input of 1.0 or more, it returns 8.375, which is significantly larger than the result when given the
 	 * largest double less than 1.0 (this value is further from 1.0 than {@link Double#MIN_VALUE} is from 0.0). If
 	 * given {@link Double#NaN}, it returns whatever {@link Math#copySign(double, double)} returns for the arguments
-	 * {@code 38.5, Double.NaN}, which is implementation-dependent. It uses an algorithm by Peter John Acklam, as
-	 * implemented by Sherali Karimov.
+	 * {@code 8.375, Double.NaN}, which is implementation-dependent.
+	 * <br>
+	 * This uses an algorithm by Peter John Acklam, as implemented by Sherali Karimov.
 	 * <a href="https://web.archive.org/web/20150910002142/http://home.online.no/~pjacklam/notes/invnorm/impl/karimov/StatUtil.java">Original source</a>.
 	 * <a href="https://web.archive.org/web/20151030215612/http://home.online.no/~pjacklam/notes/invnorm/">Information on the algorithm</a>.
 	 * <a href="https://en.wikipedia.org/wiki/Probit_function">Wikipedia's page on the probit function</a> may help, but
 	 * is more likely to just be confusing.
 	 * <br>
-	 * Acklam's algorithm and Karimov's implementation are both quite fast. This appears faster than generating
-	 * Gaussian-distributed numbers using either the Box-Muller Transform or Marsaglia's Polar Method, though it isn't
-	 * as precise and can't produce as extreme min and max results in the extreme cases they should appear. If given
-	 * a typical uniform random {@code double} that's exclusive on 1.0, it won't produce a result higher than
+	 * Acklam's algorithm and Karimov's implementation are both competitive on speed with the Box-Muller Transform and
+	 * Marsaglia's Polar Method, but slower than Ziggurat and the {@link #normal(long)} method here. This isn't quite
+	 * as precise as Box-Muller or Marsaglia Polar, and can't produce as extreme min and max results in the extreme
+	 * cases they should appear. If given a typical uniform random {@code double} that's exclusive on 1.0, it won't
+	 * produce a result higher than
 	 * {@code 8.209536145151493}, and will only produce results of at least {@code -8.209536145151493} if 0.0 is
-	 * excluded from the inputs (if 0.0 is an input, the result is {@code -38.5}). A chief advantage of using this with
-	 * a random number generator is that it only requires one random double to obtain one Gaussian value;
-	 * {@link Random#nextGaussian()} generates at least two random doubles for each two Gaussian values, but
-	 * may rarely require much more random generation.
+	 * excluded from the inputs (if 0.0 is an input, the result is {@code -8.375}). This requires a fair amount of
+	 * floating-point multiplication and one division for all {@code d} where it is between 0 and 1 exclusive, but
+	 * roughly 1/20 of the time it need a {@link Math#sqrt(double)} and {@link Math#log(double)} as well.
 	 * <br>
 	 * This can be used both as an optimization for generating Gaussian random values, and as a way of generating
 	 * Gaussian values that match a pattern present in the inputs (which you could have by using a sub-random sequence
 	 * as the input, such as those produced by a van der Corput, Halton, Sobol or R2 sequence). Most methods of generating
-	 * Gaussian values (e.g. Box-Muller and Marsaglia polar) do not have any way to preserve a particular pattern.
-	 * <br>
-	 * This is used by {@link #nextGaussian()} here, though this could change in the future.
-	 * This method delegates to one with the same name in MathSupport. This is present for
-	 * backwards compatibility; new code should just call {@link MathSupport#probit(double)}.
+	 * Gaussian values (e.g. Box-Muller and Marsaglia polar) do not have any way to preserve a particular pattern. Note
+	 * that if you don't need to preserve patterns in input, then either the Ziggurat method (which is available and the
+	 * default in the juniper library for pseudo-random generation) or the Marsaglia polar method (which is the default
+	 * in the JDK Random class) will perform better in each one's optimal circumstances. The {@link #normal(long)}
+	 * method here (using the Linnormal algorithm) both preserves patterns in input (given a {@code long}) and is faster
+	 * than Ziggurat, making it the quickest here, though at some cost to precision.
 	 *
 	 * @param d should be between 0 and 1, exclusive, but other values are tolerated
-	 * @return a normal-distributed double centered on 0.0; all results will be between -38.5 and 38.5, both inclusive
+	 * @return a normal-distributed double centered on 0.0; all results will be between -8.375 and 8.375, both inclusive
 	 */
 	public static double probit (final double d) {
-		return MathSupport.probit(d);
+		return Distributor.probit(d);
 	}
 
 	// Equivalency with MathUtils

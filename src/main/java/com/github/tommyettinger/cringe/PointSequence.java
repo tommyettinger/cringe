@@ -913,11 +913,11 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
             // https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
             // These specific numbers are 1f minus the original constants, an approach to minimize
             // floating-point error noted by: https://www.martysmods.com/a-better-r2-sequence/
-            x += 0.11872851848602295f;
-            y += 0.22336059808731080f;
-            z += 0.31556987762451170f;
-            w += 0.39683127403259280f;
-            u += 0.46844458580017090f;
+            x += 0.11872853836643038f;
+            y += 0.22336061091023185f;
+            z += 0.31556987041465745f;
+            w += 0.39683125931427177f;
+            u += 0.46844460228420870f;
             x -= (int)x;
             y -= (int)y;
             z -= (int)z;
@@ -933,11 +933,11 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
          * @return {@code into}, after modifications
          */
         public Vector5 nextInto(Vector5 into) {
-            x += 0.11872851848602295f;
-            y += 0.22336059808731080f;
-            z += 0.31556987762451170f;
-            w += 0.39683127403259280f;
-            u += 0.46844458580017090f;
+            x += 0.11872853836643038f;
+            y += 0.22336061091023185f;
+            z += 0.31556987041465745f;
+            w += 0.39683125931427177f;
+            u += 0.46844460228420870f;
             x -= (int)x;
             y -= (int)y;
             z -= (int)z;

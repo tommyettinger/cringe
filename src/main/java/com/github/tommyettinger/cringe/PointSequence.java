@@ -927,7 +927,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
         }
 
         /**
-         * Sets the x,y,z,w of {@code into} to the x,y,z,w of the next item in the R5 sequence, and advances
+         * Sets the x,y,z,w,u of {@code into} to the x,y,z,w,u of the next item in the R5 sequence, and advances
          * the sequence. Does not allocate. Modifies {@code into} in-place.
          * @param into will be overwritten with new values, modified in-place
          * @return {@code into}, after modifications
@@ -1001,6 +1001,174 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
         @Override
         public R5 copy() {
             return new R5(x, y, z, w, u);
+        }
+    }
+
+    /**
+     * A very simple Iterator or Iterable over Vector6 items, this produces Vector6 points that won't overlap
+     * or be especially close to each other for a long time by using the
+     * <a href="https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/">R6 Sequence</a>.
+     * This uses a slight variant credited to
+     * <a href="https://www.martysmods.com/a-better-r2-sequence/">Pascal Gilcher's article</a>.
+     * If constructed with no arguments, this gets random
+     * initial offsets from {@link MathUtils#random}. You can specify the offsets yourself, and if you want to
+     * resume the sequence, you only need the last Vector6 produced, and can call {@link #resume(Vector6)} with it.
+     * All Vector6 items this produces will be (and generally, those it is given should be) in the 0.0 (inclusive)
+     * to 1.0 (exclusive) range. This allocates a new Vector6 every time you call {@link #next()}. You can also
+     * use {@link #nextInto(Vector6)} to fill an existing Vector6 with what would otherwise be allocated by
+     * {@link #next()}.
+     * <br>
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * understands the {@link Externalizable} interface.
+     */
+    public static class R6 extends PointSequence<Vector6> {
+        public float x, y, z, w, u, v;
+
+        /**
+         * Gets random initial offsets from {@link MathUtils#random}.
+         */
+        public R6() {
+            this(MathUtils.random);
+        }
+
+        /**
+         * Gets random initial offsets from the given {@link Random} (or subclass).
+         * @param random any Random or a subclass of Random, such as RandomXS128
+         */
+        public R6(Random random) {
+            this.x = random.nextFloat();
+            this.y = random.nextFloat();
+            this.z = random.nextFloat();
+            this.w = random.nextFloat();
+            this.u = random.nextFloat();
+            this.v = random.nextFloat();
+        }
+
+        /**
+         * Uses the given initial offsets; this only uses their fractional parts.
+         * @param x initial offset for x
+         * @param y initial offset for y
+         * @param z initial offset for z
+         * @param w initial offset for w
+         * @param u initial offset for u
+         * @param v initial offset for v
+         */
+        public R6(float x, float y, float z, float w, float u, float v) {
+            this.x = x - MathUtils.floor(x);
+            this.y = y - MathUtils.floor(y);
+            this.z = z - MathUtils.floor(z);
+            this.w = w - MathUtils.floor(w);
+            this.u = u - MathUtils.floor(u);
+            this.v = v - MathUtils.floor(v);
+        }
+
+        public R6(Vector6 offsets) {
+            this(offsets.x, offsets.y, offsets.z, offsets.w, offsets.u, offsets.v);
+        }
+
+        @Override
+        public Vector6 next() {
+            // These specific "magic numbers" are what make this the R6 sequence, as found here:
+            // https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
+            // These specific numbers are 1f minus the original constants, an approach to minimize
+            // floating-point error noted by: https://www.martysmods.com/a-better-r2-sequence/
+            x += 0.10134628737130069f;
+            y += 0.19242150477865516f;
+            z += 0.27426658703024020f;
+            w += 0.34781697405602830f;
+            u += 0.41391330242203050f;
+            v += 0.47331101329926406f;
+            x -= (int)x;
+            y -= (int)y;
+            z -= (int)z;
+            w -= (int)w;
+            u -= (int)u;
+            v -= (int)v;
+            return new Vector6(x, y, z, w, u, v);
+        }
+
+        /**
+         * Sets the x,y,z,w,u,v of {@code into} to the x,y,z,w,u,v of the next item in the R6 sequence, and advances
+         * the sequence. Does not allocate. Modifies {@code into} in-place.
+         * @param into will be overwritten with new values, modified in-place
+         * @return {@code into}, after modifications
+         */
+        public Vector6 nextInto(Vector6 into) {
+            x += 0.10134628737130069f;
+            y += 0.19242150477865516f;
+            z += 0.27426658703024020f;
+            w += 0.34781697405602830f;
+            u += 0.41391330242203050f;
+            v += 0.47331101329926406f;
+            x -= (int)x;
+            y -= (int)y;
+            z -= (int)z;
+            w -= (int)w;
+            u -= (int)u;
+            v -= (int)v;
+            return into.set(x, y, z, w, u, v);
+        }
+
+        public R6 resume(float x, float y, float z, float w, float u, float v){
+            this.x = x - MathUtils.floor(x);
+            this.y = y - MathUtils.floor(y);
+            this.z = z - MathUtils.floor(z);
+            this.w = w - MathUtils.floor(w);
+            this.u = u - MathUtils.floor(u);
+            this.v = v - MathUtils.floor(v);
+            return this;
+        }
+
+        public R6 resume(Vector6 previous) {
+            return resume(previous.x, previous.y, previous.z, previous.w, previous.u, previous.v);
+        }
+
+        @Override
+        public void write(Json json) {
+            json.writeObjectStart("R6");
+            json.writeValue("x", x);
+            json.writeValue("y", y);
+            json.writeValue("z", z);
+            json.writeValue("w", w);
+            json.writeValue("u", u);
+            json.writeValue("v", v);
+            json.writeObjectEnd();
+        }
+
+        @Override
+        public void read(Json json, JsonValue jsonData) {
+            jsonData = jsonData.get("R6");
+            x = jsonData.getFloat("x");
+            y = jsonData.getFloat("y");
+            z = jsonData.getFloat("z");
+            w = jsonData.getFloat("w");
+            u = jsonData.getFloat("u");
+            v = jsonData.getFloat("v");
+        }
+
+        @GwtIncompatible
+        public void writeExternal(ObjectOutput out) throws IOException {
+            out.writeFloat(x);
+            out.writeFloat(y);
+            out.writeFloat(z);
+            out.writeFloat(w);
+            out.writeFloat(u);
+            out.writeFloat(v);
+        }
+
+        @GwtIncompatible
+        public void readExternal(ObjectInput in) throws IOException {
+            x = in.readFloat();
+            y = in.readFloat();
+            z = in.readFloat();
+            w = in.readFloat();
+            u = in.readFloat();
+            v = in.readFloat();
+        }
+
+        @Override
+        public R6 copy() {
+            return new R6(x, y, z, w, u, v);
         }
     }
 }

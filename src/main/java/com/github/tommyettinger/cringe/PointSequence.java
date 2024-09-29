@@ -471,7 +471,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
         public int baseX, baseY, baseZ, baseW, baseU, index;
 
         /**
-         * Uses base (2,3,5,7) and starts at index 0.
+         * Uses base (2,3,5,7,11) and starts at index 0.
          */
         public Halton5() {
             this(2, 3, 5, 7, 11, 0);
@@ -545,7 +545,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
 
         @Override
         public void write(Json json) {
-            json.writeObjectStart("h4");
+            json.writeObjectStart("h5");
             json.writeValue("x", baseX);
             json.writeValue("y", baseY);
             json.writeValue("z", baseZ);
@@ -557,7 +557,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
 
         @Override
         public void read(Json json, JsonValue jsonData) {
-            jsonData = jsonData.get("h4");
+            jsonData = jsonData.get("h5");
             baseX = jsonData.getInt("x");
             baseY = jsonData.getInt("y");
             baseZ = jsonData.getInt("z");
@@ -589,6 +589,156 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
         @Override
         public Halton5 copy() {
             return new Halton5(baseX, baseY, baseZ, baseW, baseU, index);
+        }
+    }
+    
+    /**
+     * A very simple Iterator or Iterable over Vector6 items, this produces Vector6 points that won't overlap
+     * or be especially close to each other for a long time by using a 6D
+     * <a href="https://en.wikipedia.org/wiki/Halton_sequence">Halton Sequence</a>. If given no constructor
+     * arguments, this uses a base of 2 for x, 3 for y, 5 for z, 7 for w, 11 for u, and 13 for v. You can specify the
+     * bases yourself (as long as they share no common factors). If you want to resume the sequence, you need only the
+     * {@link #index} this was on when you want to resume it, as well as possibly the {@link #baseX}, {@link #baseY},
+     * {@link #baseZ}, {@link #baseW}, {@link #baseU}, and {@link #baseV} if those differ, and can call
+     * {@link #resume(int, int, int, int, int, int, int)}.
+     * All Vector6 items this produces will be (and generally, those it is given should be) in the 0.0 (inclusive)
+     * to 1.0 (exclusive) range. This allocates a new Vector6 every time you call {@link #next()}. You can also
+     * use {@link #nextInto(Vector6)} to fill an existing Vector6 with what would otherwise be allocated by
+     * {@link #next()}.
+     * <br>
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * understands the {@link Externalizable} interface.
+     */
+    public static class Halton6 extends PointSequence<Vector6> {
+        public int baseX, baseY, baseZ, baseW, baseU, baseV, index;
+
+        /**
+         * Uses base (2,3,5,7,11,13) and starts at index 0.
+         */
+        public Halton6() {
+            this(2, 3, 5, 7, 11, 13, 0);
+        }
+
+        /**
+         * Uses the given bases, which should be "relatively prime" (meaning they shouldn't share any common factors).
+         * Using different (small) prime numbers for xBase, yBase, zBase, wBase, uBase, and vBase is a good idea.
+         * @param xBase base for x, must not share any common factors with other bases (use a prime)
+         * @param yBase base for y, must not share any common factors with other bases (use a prime)
+         * @param zBase base for z, must not share any common factors with other bases (use a prime)
+         * @param wBase base for w, must not share any common factors with other bases (use a prime)
+         * @param uBase base for u, must not share any common factors with other bases (use a prime)
+         * @param vBase base for v, must not share any common factors with other bases (use a prime)
+         */
+        public Halton6(int xBase, int yBase, int zBase, int wBase, int uBase, int vBase) {
+            this(xBase, yBase, zBase, wBase, uBase, vBase, 0);
+        }
+
+        /**
+         * Uses the given bases, which should be "relatively prime" (meaning they shouldn't share any common factors).
+         * Using different (small) prime numbers for xBase, yBase, zBase, wBase, uBase, and vBase is a good idea.
+         * @param xBase base for x, must not share any common factors with other bases (use a prime)
+         * @param yBase base for y, must not share any common factors with other bases (use a prime)
+         * @param zBase base for z, must not share any common factors with other bases (use a prime)
+         * @param wBase base for w, must not share any common factors with other bases (use a prime)
+         * @param uBase base for u, must not share any common factors with other bases (use a prime)
+         * @param vBase base for v, must not share any common factors with other bases (use a prime)
+         * @param index which (usually small) positive index to start at; often starts at 0
+         */
+        public Halton6(int xBase, int yBase, int zBase, int wBase, int uBase, int vBase, int index) {
+            this.baseX = xBase;
+            this.baseY = yBase;
+            this.baseZ = zBase;
+            this.baseW = wBase;
+            this.baseU = uBase;
+            this.baseV = vBase;
+            this.index = index;
+        }
+
+        @Override
+        public Vector6 next() {
+            ++index;
+            return new Vector6(vanDerCorput(baseX, index), vanDerCorput(baseY, index), vanDerCorput(baseZ, index),
+                    vanDerCorput(baseW, index), vanDerCorput(baseU, index), vanDerCorput(baseV, index));
+        }
+
+        /**
+         * Sets the x,y,z,w,u,v of {@code into} to the x,y,z,w,u,v of the next item in this Halton sequence, and
+         * advances the sequence. Does not allocate. Modifies {@code into} in-place.
+         * @param into will be overwritten with new values, modified in-place
+         * @return {@code into}, after modifications
+         */
+        public Vector6 nextInto(Vector6 into) {
+            ++index;
+            return into.set(vanDerCorput(baseX, index), vanDerCorput(baseY, index), vanDerCorput(baseZ, index),
+                    vanDerCorput(baseW, index), vanDerCorput(baseU, index), vanDerCorput(baseV, index));
+        }
+
+        public Halton6 resume(int index){
+            this.index = index;
+            return this;
+        }
+
+        public Halton6 resume(int baseX, int baseY, int baseZ, int baseW, int baseU, int baseV, int index){
+            this.baseX = baseX;
+            this.baseY = baseY;
+            this.baseZ = baseZ;
+            this.baseW = baseW;
+            this.baseU = baseU;
+            this.baseV = baseV;
+            this.index = index;
+            return this;
+        }
+
+        @Override
+        public void write(Json json) {
+            json.writeObjectStart("h6");
+            json.writeValue("x", baseX);
+            json.writeValue("y", baseY);
+            json.writeValue("z", baseZ);
+            json.writeValue("w", baseW);
+            json.writeValue("u", baseU);
+            json.writeValue("v", baseV);
+            json.writeValue("i", index);
+            json.writeObjectEnd();
+        }
+
+        @Override
+        public void read(Json json, JsonValue jsonData) {
+            jsonData = jsonData.get("h6");
+            baseX = jsonData.getInt("x");
+            baseY = jsonData.getInt("y");
+            baseZ = jsonData.getInt("z");
+            baseW = jsonData.getInt("w");
+            baseU = jsonData.getInt("u");
+            baseV = jsonData.getInt("v");
+            index = jsonData.getInt("i");
+        }
+
+        @GwtIncompatible
+        public void writeExternal(ObjectOutput out) throws IOException {
+            out.writeInt(baseX);
+            out.writeInt(baseY);
+            out.writeInt(baseZ);
+            out.writeInt(baseW);
+            out.writeInt(baseU);
+            out.writeInt(baseV);
+            out.writeInt(index);
+        }
+
+        @GwtIncompatible
+        public void readExternal(ObjectInput in) throws IOException {
+            baseX = in.readInt();
+            baseY = in.readInt();
+            baseZ = in.readInt();
+            baseW = in.readInt();
+            baseU = in.readInt();
+            baseV = in.readInt();
+            index = in.readInt();
+        }
+
+        @Override
+        public Halton6 copy() {
+            return new Halton6(baseX, baseY, baseZ, baseW, baseU, baseV, index);
         }
     }
 
@@ -1101,7 +1251,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
 
         @Override
         public void write(Json json) {
-            json.writeObjectStart("R5");
+            json.writeObjectStart("r5");
             json.writeValue("x", x);
             json.writeValue("y", y);
             json.writeValue("z", z);
@@ -1112,7 +1262,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
 
         @Override
         public void read(Json json, JsonValue jsonData) {
-            jsonData = jsonData.get("R5");
+            jsonData = jsonData.get("r5");
             x = jsonData.getFloat("x");
             y = jsonData.getFloat("y");
             z = jsonData.getFloat("z");
@@ -1265,7 +1415,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
 
         @Override
         public void write(Json json) {
-            json.writeObjectStart("R6");
+            json.writeObjectStart("r6");
             json.writeValue("x", x);
             json.writeValue("y", y);
             json.writeValue("z", z);
@@ -1277,7 +1427,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
 
         @Override
         public void read(Json json, JsonValue jsonData) {
-            jsonData = jsonData.get("R6");
+            jsonData = jsonData.get("r6");
             x = jsonData.getFloat("x");
             y = jsonData.getFloat("y");
             z = jsonData.getFloat("z");

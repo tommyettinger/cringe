@@ -75,6 +75,12 @@ each 1 has liek a diff flavor i guess?
 
 `SorbetNoise` tastes niiiice but its also liek `CyclicNoise` and bettr in 2D i think?
 
+`PerlueNoise` is liek Perlin but aslo makin Value at teh saem tiem liek, an then woop woop mixes em up!
+
+`OpenSimplex2FastNoise` is tht fancy OpenSimplex2 thgin in fassssst moddddde
+
+`OpenSimplex2SmoothNoise` is tht fancy OpenSimplex2 thgin in smooooth moddddde
+
 an those 2 use liek `RotationTools` but u prolly dont have 2 lololol
 
 then u can give 1 of thoes 2 `ContinuousNoise` n get liek rideged mode n octaevs n stuf
@@ -102,6 +108,18 @@ teh encarption is not 4 web tho :(
 `RoughMath` is omg so itchy n rough but has superfast math if u can handle a lil mess >:)
 
 but i think this new stuf is p. cool
+
+# an then theres liek anothr i guess
+
+`PointSequence` has liek diff classes insied 4 maekin a buncha poitns but thye wont be nreaby in liek forever
+
+`PointSequence.Halton2` is a 2D one an u can cnofgiure its bases or smth
+
+`PointSequence.R2` what evne is an R liek omg. but it also maeks a buncha 2D poitns an thye wont be cloes
+
+theres like a lot more Ds 4 each of thees, 3D an 4D an 5D an 6D wowowow
+
+`Vector5` an `Vector6` r xtendorizatioins on libgdx `Vector2`, `Vector3`, an `Vector4`, 4 biggar D lololol
 
 # cereal
 
@@ -182,15 +200,22 @@ The noise classes are almost always used with a `ContinuousNoise` object wrappin
 The ContinuousNoise provides the most useful features, but the RawNoise provides the underlying algorithm. The
 noise classes are more inter-dependent; most RawNoise types use `LineWobble` to provide 1D noise, and classes like
 `FoamNoise` and `HoneyNoise` call `ValueNoise` methods directly. Meanwhile, `SorbetNoise` inherits from `CyclicNoise`,
-and there's lots of other connections. To use the noise, you should probably have a dependency on all of `cringe`.
+and there's lots of other connections. More noise classes have been added more recently.
+To use the noise, you should probably have a dependency on all of `cringe`.
+
+This also adds `Vector5` and `Vector6` to the `Vector2` through `Vector4` libGDX provides, and the `PointSequence`
+class' implementations can generate the appropriate type of Vector for a given dimension. `PointSequence` produces
+either Halton sequences or R2-like sequences, and can be 2D through 6D. The `Distributor` class handles conversion
+from either `double` or `long` values to normal-distributed ones. `RoughMath` provides approximations to various
+math functions.
 
 You can depend on the library as a whole, using it as a normal Gradle or Maven dependency.
 
-`api "com.github.tommyettinger:cringe:0.1.1"`
+`api "com.github.tommyettinger:cringe:0.1.2"`
 
 If you use GWT, then your GWT module needs to depend on:
 
-`implementation "com.github.tommyettinger:cringe:0.1.1:sources"`
+`implementation "com.github.tommyettinger:cringe:0.1.2:sources"`
 
 GWT also needs this `inherits` line added to your `GdxDefinition.gwt.xml` file, with the other inherits lines:
 

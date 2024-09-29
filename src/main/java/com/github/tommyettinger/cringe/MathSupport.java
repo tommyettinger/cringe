@@ -58,7 +58,7 @@ public final class MathSupport {
      * is more likely to just be confusing.
      * <br>
      * Acklam's algorithm and Karimov's implementation are both competitive on speed with the Box-Muller Transform and
-     * Marsaglia's Polar Method, but slower than Ziggurat and the {@link #normal(long)} method here. This isn't quite
+     * Marsaglia's Polar Method, but slower than Ziggurat and the {@link Distributor#normal(long)} method here. This isn't quite
      * as precise as Box-Muller or Marsaglia Polar, and can't produce as extreme min and max results in the extreme
      * cases they should appear. If given a typical uniform random {@code double} that's exclusive on 1.0, it won't
      * produce a result higher than
@@ -73,7 +73,7 @@ public final class MathSupport {
      * Gaussian values (e.g. Box-Muller and Marsaglia polar) do not have any way to preserve a particular pattern. Note
      * that if you don't need to preserve patterns in input, then either the Ziggurat method (which is available and the
      * default in the juniper library for pseudo-random generation) or the Marsaglia polar method (which is the default
-     * in the JDK Random class) will perform better in each one's optimal circumstances. The {@link #normal(long)}
+     * in the JDK Random class) will perform better in each one's optimal circumstances. The {@link Distributor#normal(long)}
      * method here (using the Linnormal algorithm) both preserves patterns in input (given a {@code long}) and is faster
      * than Ziggurat, making it the quickest here, though at some cost to precision.
      *

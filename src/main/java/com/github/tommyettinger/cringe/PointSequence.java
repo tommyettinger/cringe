@@ -317,8 +317,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
             return new Halton3(baseX, baseY, baseZ, index);
         }
     }
-
-
+    
     /**
      * A very simple Iterator or Iterable over Vector4 items, this produces Vector4 points that won't overlap
      * or be especially close to each other for a long time by using a 4D
@@ -342,7 +341,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
          * Uses base (2,3,5,7) and starts at index 0.
          */
         public Halton4() {
-            this(2, 3, 5, 0);
+            this(2, 3, 5, 7, 0);
         }
 
         /**
@@ -424,7 +423,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
             baseX = jsonData.getInt("x");
             baseY = jsonData.getInt("y");
             baseZ = jsonData.getInt("z");
-            baseZ = jsonData.getInt("w");
+            baseW = jsonData.getInt("w");
             index = jsonData.getInt("i");
         }
 

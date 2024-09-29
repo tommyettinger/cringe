@@ -120,6 +120,104 @@ public final class RotationSupport {
     }
 
     /**
+     * A geometric "slerp" (spherical linear interpolation) from the input n-dimensional point {@code start} to the
+     * point in the same dimension {@code end}, moving a fraction of the distance equal to {@code alpha}, and placing
+     * the result in {@code output} (modifying it in-place). This does not allocate. This has undefined behavior if
+     * start and end are polar opposites; that is, points where for any coordinate {@code a} in start, that coordinate
+     * in end is {@code -a} or any positive linear scale of the point where that is true. This degenerates to a linear
+     * interpolation if either start or end is the origin, and simply returns the start if both are the origin.
+     * Otherwise, this can smoothly move points that aren't already on the unit sphere towards the distance of the other
+     * point from the origin.
+     * <br>
+     * Based on the non-approximation code from
+     * <a href="https://observablehq.com/@mourner/approximating-geometric-slerp">an article by Volodymyr Agafonkin</a>.
+     * Note that this is the "geometric slerp" rather than the version using quaternions in 3D (or rotors in other
+     * dimensions). It has been augmented slightly to handle start and end vectors that don't have unit length.
+     *
+     * @param start an n-dimensional point, where {@code start.length} is n
+     * @param end another n-dimensional point, where {@code end.length} is also the same n
+     * @param alpha between 0 and 1, inclusive; how much to travel from start towards end
+     * @param output the first n items in this will receive the interpolated position, modifying it in-place
+     * @return output, after modifications.
+     */
+    public static float[] slerp(float[] start, float[] end, float alpha, float[] output) {
+        return slerp(start.length, start, 0, end, 0, alpha, output, 0);
+    }
+    /**
+     * A geometric "slerp" (spherical linear interpolation) from the input n-dimensional point {@code start} to the
+     * point in the same dimension {@code end}, moving a fraction of the distance equal to {@code alpha}, and placing
+     * the result in {@code output} (modifying it in-place). This does not allocate. This has undefined behavior if
+     * start and end are polar opposites; that is, points where for any coordinate {@code a} in start, that coordinate
+     * in end is {@code -a} or any positive linear scale of the point where that is true. This degenerates to a linear
+     * interpolation if either start or end is the origin, and simply returns the start if both are the origin.
+     * Otherwise, this can smoothly move points that aren't already on the unit sphere towards the distance of the other
+     * point from the origin.
+     * <br>
+     * Based on the non-approximation code from
+     * <a href="https://observablehq.com/@mourner/approximating-geometric-slerp">an article by Volodymyr Agafonkin</a>.
+     * Note that this is the "geometric slerp" rather than the version using quaternions in 3D (or rotors in other
+     * dimensions). It has been augmented slightly to handle start and end vectors that don't have unit length.
+     *
+     * @param n the dimension of the points in start, end, and output; must be 2 or more
+     * @param start an n-dimensional point to rotate from
+     * @param startOffset what array index to start reading from in {@code start}
+     * @param end another n-dimensional point to rotate to
+     * @param endOffset what array index to start reading from in {@code start}
+     * @param alpha between 0 and 1, inclusive; how much to travel from start towards end
+     * @param output will be modified in-place so n items, starting at outputOffset, have the result
+     * @param outputOffset what array index to start writing to in {@code output}
+     * @return output, after modifications.
+     */
+    public static float[] slerp(int n, float[] start, int startOffset, float[] end, int endOffset,
+                                float alpha, float[] output, int outputOffset) {
+        n = Math.max(2, n);
+        int startEnd = startOffset + n;
+        if(startEnd > start.length) throw new IllegalArgumentException("start is not large enough; must have "
+                + startEnd + " items.");
+        int endEnd = endOffset + n;
+        if(endEnd > end.length) throw new IllegalArgumentException("end is not large enough; must have "
+                + endEnd + " items.");
+        float magS = 0f, magE = 0f;
+        for (int i = startOffset, j = endOffset; i < startEnd; i++, j++) {
+            magS += start[i] * start[i];
+            magE += end[j] * end[j];
+        }
+        // if both start and end are the origin
+        if(MathUtils.isZero(magS + magE)) {
+            System.arraycopy(start, startOffset, output, outputOffset, n);
+        }
+        // if only the start is the origin
+        else if(MathUtils.isZero(magS)){
+            for (int i = endOffset, j = outputOffset; i < endEnd; i++, j++) {
+                output[j] = end[i] * alpha;
+            }
+        }
+        // if only the end is the origin
+        else if(MathUtils.isZero(magE)){
+            for (int i = startOffset, j = outputOffset; i < startEnd; i++, j++) {
+                output[j] = start[i] * (1f - alpha);
+            }
+        }
+        else {
+            magS = (float) Math.sqrt(magS);
+            magE = (float) Math.sqrt(magE);
+
+            float k = 0, invDistance = 1f / (magS * (1f - alpha) + magE * alpha);
+            for (int i = startOffset, j = endOffset; i < startEnd; i++, j++) {
+                k += (start[i] / magS) * (end[j] / magE);
+            }
+            k = MathUtils.acos(k);
+            float s = MathUtils.sin(k * (1f - alpha));
+            float e = MathUtils.sin(k * alpha);
+
+            for (int i = startOffset, j = endOffset, h = outputOffset; i < startEnd; i++, j++, h++) {
+                output[h] = (start[i] * s + end[j] * e) * invDistance;
+            }
+        }
+        return output;
+    }
+
+    /**
      * Multiplies two square matrices with side length {@code side}, and stores the result in {@code out}. The inputs
      * {@code lf} and {@code rt} are 1D float arrays treated as row-major matrices.
      * @param lf the left input matrix, as row-major

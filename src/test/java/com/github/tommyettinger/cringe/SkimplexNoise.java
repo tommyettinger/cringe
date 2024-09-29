@@ -20,7 +20,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import static com.badlogic.gdx.math.MathUtils.floor;
-import static com.github.tommyettinger.cringe.PointHasher.hash256;
 
 /**
  * Simplex noise functions, in 2D, 3D, 4D, 5D, and 6D. This variety scales the result with multiplication by a constant,

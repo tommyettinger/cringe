@@ -17,8 +17,6 @@
 
 package com.github.tommyettinger.cringe;
 
-import com.badlogic.gdx.utils.NumberUtils;
-
 /**
  * Static methods that can take any {@code long} as input and produce a very different, but deterministically chosen,
  * number of some type. The simplest of these conceptually is {@link #scramble(long)}, which takes a long and returns
@@ -199,9 +197,9 @@ public final class Scramblers {
      * to 0.0 than to either of the extreme limits.
      * <br>
      * This uses the MX3 unary hash by Jon Maiga, but XORs the input with 0xABC98388FB8FAC03L before using MX3.
-     * It also uses {@link Distributor#normal(long)} to distribute the output.
+     * It also uses {@link Ziggurat#normal(long)} to distribute the output.
      * @param x any long
-     * @return a Gaussian-distributed double between -9.155293773112453 and 8.209536145151493
+     * @return a Gaussian-distributed double with mean (mu) 0.0 and standard deviation (sigma) 1.0
      */
     public static double scrambleGaussian(long x) {
         x ^= 0xABC98388FB8FAC03L;
@@ -212,7 +210,7 @@ public final class Scramblers {
         x ^= x >>> 32;
         x *= 0xBEA225F9EB34556DL;
         x ^= x >>> 29;
-        return Distributor.normal(x);
+        return Ziggurat.normal(x);
     }
 
     /**

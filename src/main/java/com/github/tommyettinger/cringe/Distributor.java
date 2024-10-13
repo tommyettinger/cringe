@@ -4,15 +4,14 @@ import java.util.Random;
 
 /**
  * Different methods for distributing input {@code long} or {@code double} values from a given domain into specific
- * distributions, such as the normal distribution. This is primarily meant for internal use; external code is probably
- * most likely to use probit() and normal() if it uses this at all.
- * <br>
- * Here, {@link #probit(double)} and {@link #probitHighPrecision(double)} take
+ * distributions, such as the normal distribution. {@link #probit(double)} and {@link #probitHighPrecision(double)} take
  * a double in the 0.0 to 1.0 range (typically exclusive, but not required to be), and produce a normal-distributed
  * double centered on 0.0 with standard deviation 1.0 . {@link #normal(long)} takes a long in the entire range of
- * possible long values, and also produces a double centered on 0.0 with standard deviation 1.0 . ALl of these ways will
- * preserve patterns in the input, so inputs close to the lowest possible input (0.0 for probit(),
- * {@link Long#MIN_VALUE} for normal()) will produce the lowest possible output (-8.375 for probit() and normal()),
+ * possible long values, and also produces a double centered on 0.0 with standard deviation 1.0 . Similarly,
+ * {@link #normalF(int)} takes an int in the entire range of possible int values, and produces a float centered on 0f
+ * with standard deviation 1f. All of these ways will preserve patterns in the input, so inputs close to the lowest
+ * possible input (0.0 for probit(), {@link Long#MIN_VALUE} for normal(), {@link Integer#MIN_VALUE} for normalF()) will
+ * produce the lowest possible output (-8.375 for probit(), normal(), and normalF()),
  * and similarly for the highest possible inputs producing the highest possible outputs.
  */
 public final class Distributor {
@@ -20,10 +19,11 @@ public final class Distributor {
     private Distributor() {}
 
     private static final double[] TABLE = new double[1024];
+    private static final float[] TABLE_F = new float[1024];
 
     static {
         for (int i = 0; i < 1024; i++) {
-            TABLE[i] = probitHighPrecision(0.5 + i * 0x1p-11);
+            TABLE_F[i] = (float) (TABLE[i] = probitHighPrecision(0.5 + i * 0x1p-11));
         }
     }
 
@@ -148,7 +148,7 @@ public final class Distributor {
      * The algorithm here can be called Linnormal; it is comparatively quite simple, and mostly relies on lookup from a
      * precomputed table of results of {@link #probitHighPrecision(double)}, followed by linear interpolation. Values in
      * the "trail" of the normal distribution, that is, those produced by long values in the uppermost 1/2048 of all
-     * values of the lowermost 1/2048 of all values, are computed slightly differently. Where the other parts of the
+     * values or the lowermost 1/2048 of all values, are computed slightly differently. Where the other parts of the
      * distribution use the bottom 53 bits to make an interpolant between 0.0 and 1.0 and use it verbatim, values in the
      * trail do all that and then square that interpolant, before going through the same type of interpolation.
      * <br>
@@ -174,6 +174,47 @@ public final class Distributor {
         } else {
             final double s = TABLE[top10];
             v = t * (TABLE[top10 + 1] - s) + s;
+        }
+        return Math.copySign(v, sign);
+    }
+    /**
+     * Given any {@code int} as input, this maps the full range of non-negative int values to much of the non-negative
+     * half of the range of the normal distribution with standard deviation 1f, and similarly maps all negative int
+     * values to their equivalent-magnitude non-negative counterparts. Notably, an input of 0 will map to {@code 0f},
+     * an input of -1 will map to {@code -0f}, and inputs of {@link Integer#MIN_VALUE} and {@link Integer#MAX_VALUE}
+     * will map to {@code -8.375f} and {@code 8.375f}, respectively. If you only pass this small
+     * sequential inputs, there may be no detectable difference between some outputs. This is meant to be given inputs
+     * with large differences (at least millions) if very different outputs are desired.
+     * <br>
+     * The algorithm here can be called Linnormal; it is comparatively quite simple, and mostly relies on lookup from a
+     * precomputed table of results of {@link #probitHighPrecision(double)}, followed by linear interpolation. Values in
+     * the "trail" of the normal distribution, that is, those produced by int values in the uppermost 1/2048 of all
+     * values or the lowermost 1/2048 of all values, are computed slightly differently. Where the other parts of the
+     * distribution use the bottom 53 bits to make an interpolant between 0.0 and 1.0 and use it verbatim, values in the
+     * trail do all that and then square that interpolant, before going through the same type of interpolation.
+     * <br>
+     * This is like the "Ziggurat algorithm" to make normal-distributed doubles, but this preserves patterns in the
+     * input. Uses a large table of the results of {@link #probitHighPrecision(double)}, and interpolates between
+     * them using linear interpolation. This tends to be faster than Ziggurat at generating normal-distributed values,
+     * though it probably has slightly worse quality. Since Ziggurat is already much faster than other common methods,
+     * such as the Box-Muller Method, {@link #probit(double)} function, or the Marsaglia Polar Method (which Java itself
+     * uses), this being faster than Ziggurat is a good thing. All methods of generating normal-distributed variables
+     * while preserving input patterns are approximations, and this is slightly less accurate than some ways (but better
+     * than the simplest ways, like just summing many random variables and re-centering around 0).
+     *
+     * @param n any int; input patterns will be preserved
+     * @return a normal-distributed float, matching patterns in {@code n}
+     */
+    public static float normalF(int n) {
+        final int sign = n >> 31;
+        n ^= sign;
+        final int top10 = (n >>> 21);
+        final float t = (n & 0x1FFFFF) * 0x1p-21f, v;
+        if (top10 == 1023) {
+            v = t * t * (8.375005f - 3.297193345691938f) + 3.297193345691938f;
+        } else {
+            final float s = TABLE_F[top10];
+            v = t * (TABLE_F[top10 + 1] - s) + s;
         }
         return Math.copySign(v, sign);
     }

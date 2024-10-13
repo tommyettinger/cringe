@@ -187,11 +187,11 @@ public class Vector5 implements Vector<Vector5> {
         // https://extremelearning.com.au/how-to-generate-uniformly-random-points-on-n-spheres-and-n-balls/ .
         // It is the only recommended way to randomly generate a point on the surface of the unit 5D hypersphere.
 
-        x = (float)Distributor.normal(random.nextLong());
-        y = (float)Distributor.normal(random.nextLong());
-        z = (float)Distributor.normal(random.nextLong());
-        w = (float)Distributor.normal(random.nextLong());
-        u = (float)Distributor.normal(random.nextLong());
+        x = (float)Ziggurat.normal(random.nextLong());
+        y = (float)Ziggurat.normal(random.nextLong());
+        z = (float)Ziggurat.normal(random.nextLong());
+        w = (float)Ziggurat.normal(random.nextLong());
+        u = (float)Ziggurat.normal(random.nextLong());
         // Once we normalize five normal-distributed floats, we have a point on the unit hypersphere's surface.
         return this.nor();
     }

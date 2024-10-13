@@ -1037,7 +1037,7 @@ public abstract class GdxRandom extends Random implements Json.Serializable, Ext
 	 * {@code 1.0} from this random number generator's sequence
 	 */
 	public double nextGaussian () {
-		return Distributor.normal(nextLong());
+		return Ziggurat.normal(nextLong());
 	}
 
 	/**

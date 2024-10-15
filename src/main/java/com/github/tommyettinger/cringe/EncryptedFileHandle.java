@@ -48,7 +48,7 @@ public final class EncryptedFileHandle extends FileHandle {
 	 * encrypted data from the wrapped FileHandle. The four-part key and the FileHandle's {@link FileHandle#path()}
 	 * must all be the same between encryption and decryption for them to refer to the same unencrypted file. This
 	 * overload is meant to be used when the path will be the same for reading and writing. If the path may be
-	 * different, use {@link #EncryptedFileHandle(FileHandle, long, long, long, long, String)} with either only
+	 * different, use {@link #EncryptedFileHandle(FileHandle, long, long, long, long, CharSequence)} with either only
 	 * the first path or some other source of a unique String.
 	 *
 	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
@@ -66,7 +66,7 @@ public final class EncryptedFileHandle extends FileHandle {
 	 * encrypted data from the wrapped FileHandle. The long array keyBundle and the FileHandle's
 	 * {@link FileHandle#path()} must all be the same between encryption and decryption for them to refer to the same
 	 * unencrypted file. This overload is meant to be used when the path will be the same for reading and writing. If
-	 * the path may be different, use {@link #EncryptedFileHandle(FileHandle, long[], String)} with
+	 * the path may be different, use {@link #EncryptedFileHandle(FileHandle, long[], CharSequence)} with
 	 * either only the first path or some other source of a unique String.
 	 *
 	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
@@ -81,7 +81,7 @@ public final class EncryptedFileHandle extends FileHandle {
 	 * encrypted data from the wrapped FileHandle. The String or other CharSequence {@code keyphrase} and the FileHandle's
 	 * {@link FileHandle#path()} must all be the same between encryption and decryption for them to refer to the same
 	 * unencrypted file. This overload is meant to be used when the path will be the same for reading and writing. If
-	 * the path may be different, use {@link #EncryptedFileHandle(FileHandle, CharSequence, String)} with
+	 * the path may be different, use {@link #EncryptedFileHandle(FileHandle, CharSequence, CharSequence)} with
 	 * either only the first path or some other source of a unique String.
 	 *
 	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
@@ -100,9 +100,9 @@ public final class EncryptedFileHandle extends FileHandle {
 	 *
 	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
 	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
-	 * @param unique any String that is likely to be unique for a given key, such as the path to the wrapped file
+	 * @param unique any CharSequence that is likely to be unique for a given key, such as the path to the wrapped file
 	 */
-	public EncryptedFileHandle(FileHandle file, CharSequence keyphrase, String unique) {
+	public EncryptedFileHandle(FileHandle file, CharSequence keyphrase, CharSequence unique) {
 		this.fh = file;
 		this.key = expandKeyphrase(keyphrase);
 		this.n0 = Scramblers.hash64(Scramblers.scramble(this.key[0] ^ this.key[this.key.length-1]), unique);
@@ -119,7 +119,7 @@ public final class EncryptedFileHandle extends FileHandle {
 	 * @param keyBundle a long array that should be at least length 34; if not, the remaining items are generated
 	 * @param unique any String that is likely to be unique for a given key, such as the path to the wrapped file
 	 */
-	public EncryptedFileHandle(FileHandle file, long[] keyBundle, String unique) {
+	public EncryptedFileHandle(FileHandle file, long[] keyBundle, CharSequence unique) {
 		this.fh = file;
 		this.key = expandKeyBundle(keyBundle);
 		this.n0 = Scramblers.hash64(Scramblers.scramble(this.key[0] ^ this.key[this.key.length-1]), unique);
@@ -139,7 +139,7 @@ public final class EncryptedFileHandle extends FileHandle {
 	 * @param k4 part 4 of the key; may be any long
 	 * @param unique any String that is likely to be unique for a given key, such as the path to the wrapped file
 	 */
-	public EncryptedFileHandle(FileHandle file, long k1, long k2, long k3, long k4, String unique) {
+	public EncryptedFileHandle(FileHandle file, long k1, long k2, long k3, long k4, CharSequence unique) {
 		this.fh = file;
 		this.key = expandKeys(k1, k2, k3, k4);
 		this.n0 = Scramblers.hash64(Scramblers.scramble(this.key[0] ^ this.key[this.key.length-1]), unique);
@@ -658,6 +658,16 @@ public final class EncryptedFileHandle extends FileHandle {
 	@Override
 	public FileHandle[] list(String suffix) {
 		return fh.list(suffix);
+	}
+
+	@Override
+	public FileHandle[] list(FilenameFilter filter) {
+		return fh.list(filter);
+	}
+
+	@Override
+	public FileHandle[] list(FileFilter filter) {
+		return fh.list(filter);
 	}
 
 	@Override

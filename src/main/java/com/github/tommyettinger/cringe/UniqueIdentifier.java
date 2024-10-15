@@ -9,56 +9,117 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 /**
- * A substitute for the UUID class that isn't available on GWT.
+ * A substitute for the UUID class, since it isn't available on GWT.
  * The typical usage is to call {@link #next()} when you want a new UniqueIdentifier. If the app is closing down and
  * needs to save its state to be resumed later, {@link #GENERATOR} must be serialized as well, and deserialized before
- * calling {@link #next()} again after resuming. Without this last step, the generated identifiers are <em>likely</em>
- * to be unique, but not <em>guaranteed</em> to be unique.
+ * calling {@link #next()} again after resuming. Without this last step, the generated identifiers are <em>extremely
+ * likely</em> to be unique, but not <em>guaranteed</em> to be unique.
  * <br>
- * This can be serialized as JSON, and so can (and must) the {@link #GENERATOR} that produces new UniqueIdentifier
- * instances and ensures they are unique. This is also Comparable, for some reason (UUID is, but since these should all
- * be random, it doesn't mean much). UniqueIdentifier supports up to 2 to the 128 minus 1 unique instances, which should
- * be far more than enough for centuries of generation.
+ * This can be serialized out-of-the-box to Strings using {@link #stringSerialize()}, but if you do, so must the
+ * {@link #GENERATOR} that produces new UniqueIdentifier instances and ensures they are unique.
+ * If you are using Fury or another type of serializer that can use {@link Externalizable} objects, this can be sent
+ * directly to that without needing any extra serialization code. Like with the String serialization, you must serialize
+ * the {@link #GENERATOR} field and restore it when restarting from a serialized state. This can also be serialized as
+ * JSON, and so can (and must) the {@link #GENERATOR} that produces new UniqueIdentifier
+ * instances and ensures they are unique.
+ * <br>
+ * This is also Comparable, for some reason (UUID is, but since these should all be random, it doesn't mean much).
+ * UniqueIdentifier supports up to 2 to the 128 minus 1 unique instances, which should be far more than enough for
+ * centuries of generation. If you were using UUID, it only supports 2 to the 122 unique random UUIDs, with a collision
+ * 50% likely after 2 to the 61 UUIDs were generated. If this is used properly, it can't collide until all (2 to the 128
+ * minus 1) identifiers have been generated.
  */
 public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Json.Serializable, Externalizable {
 
-    private long hi;
-    private long lo;
+    private int a;
+    private int b;
+    private int c;
+    private int d;
 
     /**
-     * Creates a new, invalid UniqueIdentifier. Both hi and lo will be 0.
+     * Creates a new, <em>invalid</em> UniqueIdentifier. All states will be 0.
+     * Use {@link #next()} to generate random UniqueIdentifiers.
      */
     public UniqueIdentifier(){
-        hi = 0L;
-        lo = 0L;
+        a = 0;
+        b = 0;
+        c = 0;
+        d = 0;
     }
 
     /**
-     * Creates a new UniqueIdentifier that may or may not actually be unique. This uses hi and lo verbatim.
-     * If both hi and lo are 0, this will be treated as an invalid identifier. Most usage should prefer
+     * Creates a new UniqueIdentifier that may or may not actually be unique. This uses the given states verbatim.
+     * If both all states are 0, this will be treated as an invalid identifier. Most usage should prefer
      * {@link #next()} instead.
      *
      * @param hi the high 64 bits, as a long
      * @param lo the low 64 bits, as a long
      */
     public UniqueIdentifier(long hi, long lo){
-        this.hi = hi;
-        this.lo = lo;
-    }
-
-    public long getHi() {
-        return hi;
-    }
-
-    public long getLo() {
-        return lo;
+        this.a = (int)(hi >>> 32);
+        this.b = (int)hi;
+        this.c = (int)(lo >>> 32);
+        this.d = (int)lo;
     }
 
     /**
-     * @return false if this instance was produced by {@link #UniqueIdentifier()} and not modified; true otherwise
+     * Creates a new UniqueIdentifier that may or may not actually be unique. This uses the given states verbatim.
+     * If all states are 0, this will be treated as an invalid identifier. Most usage should prefer
+     * {@link #next()} instead.
+     *
+     * @param stateA will be used verbatim for state a
+     * @param stateB will be used verbatim for state b
+     * @param stateC will be used verbatim for state c
+     * @param stateD will be used verbatim for state d
+     */
+    public UniqueIdentifier(int stateA, int stateB, int stateC, int stateD){
+        this.a = stateA;
+        this.b = stateB;
+        this.c = stateC;
+        this.d = stateD;
+    }
+
+    /**
+     * Given a String containing the output of {@link #stringSerialize()}, this creates a new UniqueIdentifier
+     * with the same data as the UniqueIdentifier that was serialized.
+     * @param serialized a String almost always produced by {@link #stringSerialize()}
+     */
+    public UniqueIdentifier(String serialized){
+        a = MathSupport.intFromHex(serialized, 0, 8);
+        b = MathSupport.intFromHex(serialized, 9, 17);
+        c = MathSupport.intFromHex(serialized, 18, 26);
+        d = MathSupport.intFromHex(serialized, 27, 35);
+    }
+
+    public int getA() {
+        return a;
+    }
+
+    public int getB() {
+        return b;
+    }
+
+    public int getC() {
+        return c;
+    }
+
+    public int getD() {
+        return d;
+    }
+
+    public long getHi() {
+        return (long) a << 32 | (b & 0xFFFFFFFFL);
+    }
+
+    public long getLo() {
+        return (long) c << 32 | (d & 0xFFFFFFFFL);
+    }
+
+    /**
+     * @return false if this instance is the invalid all-0 value; true otherwise
      */
     public boolean isValid() {
-        return ((hi | lo) != 0L);
+        return ((a | b | c | d) != 0L);
     }
 
     @Override
@@ -68,34 +129,72 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
 
         UniqueIdentifier that = (UniqueIdentifier) o;
 
-        if (hi != that.hi) return false;
-        return lo == that.lo;
+        return a == that.a && b == that.b && c == that.c && d == that.d;
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (hi ^ (hi >>> 32));
-        result = 31 * result + (int) (lo ^ (lo >>> 32));
-        return result;
+        return a ^ b ^ c ^ d;
     }
 
     @Override
     public String toString() {
         return "UniqueIdentifier{" +
-                "hi=" + hi +
-                ", lo=" + lo +
+                "a=" + a +
+                ", b=" + b +
+                ", c=" + c +
+                ", d=" + d +
                 '}';
+    }
+
+    @Override
+    public void write(Json json) {
+        json.writeObjectStart("ui");
+        json.writeValue("a", a);
+        json.writeValue("b", b);
+        json.writeValue("c", c);
+        json.writeValue("d", d);
+        json.writeObjectEnd();
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        jsonData = jsonData.get("ui");
+        a = jsonData.getInt("a");
+        b = jsonData.getInt("b");
+        c = jsonData.getInt("c");
+        d = jsonData.getInt("d");
     }
 
     /**
      * Serializes this UniqueIdentifier to a String, where it can be read back by {@link #stringDeserialize(String)}.
-     * This is different from most other stringSerialize() methods in that it always produces a 33-character String,
-     * consisting of {@link #getHi()}, then a {@code '_'}, then {@link #getLo()}, with hi and lo represented as unsigned
-     * hex long Strings.
-     * @return a 33-character-long String storing this identifier; can be read back with {@link #stringDeserialize(String)}
+     * This is different from most other stringSerialize() methods in that it always produces a 35-character String,
+     * consisting of {@link #getA()}, then a {@code '_'}, then {@link #getB()}, then another underscore, c, underscore,
+     * and finally d, with a, b, c, and d represented as unsigned hex int Strings.
+     * <br>
+     * This simply calls {@link #appendSerialized(StringBuilder)} with a new StringBuilder, and converts that to a
+     * String. To avoid these two allocations, you can use appendSerialized() directly.
+     *
+     * @return a 35-character-long String storing this identifier; can be read back with {@link #stringDeserialize(String)}
      */
     public String stringSerialize() {
-        return MathSupport.appendUnsignedHex(MathSupport.appendUnsignedHex(new StringBuilder(33), hi).append('_'), lo).toString();
+        return appendSerialized(new StringBuilder(35)).toString();
+    }
+    /**
+     * Serializes this UniqueIdentifier and appends the result to a StringBuilder, where it can be read back by
+     * {@link #stringDeserialize(String)}. This is different from most other stringSerialize() methods in that it always
+     * produces a 35-character String,
+     * consisting of {@link #getA()}, then a {@code '_'}, then {@link #getB()}, then another underscore, c, underscore,
+     * and finally d, with a, b, c, and d represented as unsigned hex int Strings.
+     * @param sb a non-null StringBuilder that will be appended to
+     * @return sb, after appending
+     */
+    public StringBuilder appendSerialized(StringBuilder sb) {
+        MathSupport.appendUnsignedHex(sb, a).append('_');
+        MathSupport.appendUnsignedHex(sb, b).append('_');
+        MathSupport.appendUnsignedHex(sb, c).append('_');
+        MathSupport.appendUnsignedHex(sb, d);
+        return sb;
     }
 
     /**
@@ -104,24 +203,11 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
      * @return this UniqueIdentifier, after it has been modified.
      */
     public UniqueIdentifier stringDeserialize(String data) {
-        hi = MathSupport.longFromHex(data, 0, 16);
-        lo = MathSupport.longFromHex(data, 17, 33);
+        a = MathSupport.intFromHex(data, 0, 8);
+        b = MathSupport.intFromHex(data, 9, 17);
+        c = MathSupport.intFromHex(data, 18, 26);
+        d = MathSupport.intFromHex(data, 27, 35);
         return this;
-    }
-
-    @Override
-    public void write(Json json) {
-        json.writeObjectStart("ui");
-        json.writeValue("h", hi);
-        json.writeValue("l", lo);
-        json.writeObjectEnd();
-    }
-
-    @Override
-    public void read(Json json, JsonValue jsonData) {
-        jsonData = jsonData.get("ui");
-        hi = jsonData.getLong("h");
-        lo = jsonData.getLong("l");
     }
 
     /**
@@ -140,8 +226,10 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
      */
     @GwtIncompatible
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeLong(hi);
-        out.writeLong(lo);
+        out.writeInt(a);
+        out.writeInt(b);
+        out.writeInt(c);
+        out.writeInt(d);
     }
 
     /**
@@ -156,8 +244,10 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
      */
     @GwtIncompatible
     public void readExternal(ObjectInput in) throws IOException {
-        hi = in.readLong();
-        lo = in.readLong();
+        a = in.readInt();
+        b = in.readInt();
+        c = in.readInt();
+        d = in.readInt();
     }
 
     /**
@@ -181,8 +271,13 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
 
     @Override
     public int compareTo(UniqueIdentifier other) {
-        int c = Long.compare(hi, other.hi);
-        return c == 0 ? Long.compare(lo, other.lo) : c;
+        int r = Integer.compare(a, other.a);
+        if(r != 0) return r;
+        r = Integer.compare(b, other.b);
+        if(r != 0) return r;
+        r = Integer.compare(c, other.c);
+        if(r != 0) return r;
+        return Integer.compare(d, other.d);
     }
 
     /**

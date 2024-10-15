@@ -285,16 +285,28 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
      * This is used in {@link UniqueIdentifier#GENERATOR}, and can be used independently via {@link #generate()}.
      */
     public static final class Generator implements Json.Serializable, Externalizable {
-        private long stateA;
-        private long stateB;
+        private int a;
+        private int b;
+        private int c;
+        private int d;
 
         /**
-         * Creates a new Generator with one of (2 to the 64) possible random initial states.
+         * Creates a new Generator with a and b states derived from the current time in milliseconds, and one of (2 to
+         * the 48) possible random initial c and d states pulled from {@link Math#random()}. This means that unless
+         * trillions of Generator instances are created <em>before the millisecond time changes</em>, this cannot have
+         * the same initial state as another Generator. Eventually, all valid generators will enter all valid states,
+         * but this should really only be a concern after calling {@link #next()} for over a year continuously.
          */
         public Generator() {
-            stateA = Scramblers.scramble(System.currentTimeMillis()) ^ GdxRandom.seedFromMath();
-            stateB = Scramblers.scramble(stateA);
+            long state = System.currentTimeMillis();
+            a = (int)(state>>>32);
+            b = (int)state;
+            c = (int)((Math.random() - 0.5) * 4294967296.0); // 4294967296.0 is 2.0 to the 32
+            d = (int)((Math.random() - 0.5) * 4294967296.0); // 4294967296.0 is 2.0 to the 32
+            if((a | b | c | d) == 0) d = 1;
+
         }
+
 
         /**
          * Creates a new Generator given two long values for state.
@@ -302,8 +314,38 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
          * @param stateB may be any long unless both states are 0, in which case this is treated as 1
          */
         public Generator(long stateA, long stateB) {
-            this.stateA = stateA;
-            this.stateB = (stateA | stateB) == 0L ? 1L : stateB;
+            a = (int)(stateA>>>32);
+            b = (int)stateA;
+            c = (int)(stateB>>>32);
+            d = (stateA | stateB) == 0 ? 1 : (int)stateB;
+        }
+
+        /**
+         * Creates a new Generator using the given 4 states verbatim, unless they are all 0 (then it treats d as 1).
+         * @param a may be any int unless all are 0
+         * @param b may be any int unless all are 0
+         * @param c may be any int unless all are 0
+         * @param d may be any int unless all are 0
+         */
+        public Generator(int a, int b, int c, int d) {
+            this.a = a;
+            this.b = b;
+            this.c = c;
+            this.d = (a | b | c | d) == 0 ? 1 : d;
+        }
+
+        /**
+         * Given a String containing the output of {@link #stringSerialize()}, this creates a new
+         * UniqueIdentifier.Generator with the same data as the UniqueIdentifier.Generator that was serialized.
+         * This requires a 35-char String at minimum with four 8-hex-digit sections, but the delimiters between sections
+         * are permitted to be anything (such as {@code '_'} for {@link UniqueIdentifier} or {@code '$'} for this).
+         * @param serialized a String almost always produced by {@link #stringSerialize()}
+         */
+        public Generator(String serialized){
+            a = MathSupport.intFromHex(serialized, 0, 8);
+            b = MathSupport.intFromHex(serialized, 9, 17);
+            c = MathSupport.intFromHex(serialized, 18, 26);
+            d = MathSupport.intFromHex(serialized, 27, 35);
         }
 
         /**
@@ -311,37 +353,96 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
          * @return a new UniqueIdentifier that will not occur again from this Generator unless (2 to the 128) - 1 more identifiers are generated
          */
         public UniqueIdentifier generate(){
-            // xoroshiro algorithm
-            final long s0 = stateA;
-            final long s1 = stateB ^ s0;
-            stateA = (s0 << 24 | s0 >>> 40) ^ s1 ^ (s1 << 16);
-            stateB = (s1 << 37 | s1 >>> 27);
-            return new UniqueIdentifier(stateA, stateB);
+            // xoshiro algorithm
+            int t = b << 9;
+            c ^= a;
+            d ^= b;
+            b ^= c;
+            a ^= d;
+            c ^= t;
+            d = (d << 11 | d >>> 21);
+            return new UniqueIdentifier(a, b, c, d);
         }
 
+        public int getA() {
+            return a;
+        }
+
+        public int getB() {
+            return b;
+        }
+
+        public int getC() {
+            return c;
+        }
+
+        public int getD() {
+            return d;
+        }
+
+        /**
+         * Serializes this UniqueIdentifier to a String, where it can be read back by {@link #stringDeserialize(String)}.
+         * This is different from most other stringSerialize() methods in that it always produces a 35-character String,
+         * consisting of {@link #getA()}, then a {@code '$'}, then {@link #getB()}, then another dollar sign, c, dollar
+         * sign, and finally d, with a, b, c, and d represented as unsigned hex int Strings.
+         * <br>
+         * This simply calls {@link #appendSerialized(StringBuilder)} with a new StringBuilder, and converts that to a
+         * String. To avoid these two allocations, you can use appendSerialized() directly.
+         *
+         * @return a 35-character-long String storing this identifier; can be read back with {@link #stringDeserialize(String)}
+         */
         public String stringSerialize() {
-            return MathSupport.appendUnsignedHex(MathSupport.appendUnsignedHex(new StringBuilder(33), stateA).append('$'), stateB).toString();
+            return appendSerialized(new StringBuilder(35)).toString();
+        }
+        /**
+         * Serializes this UniqueIdentifier and appends the result to a StringBuilder, where it can be read back by
+         * {@link #stringDeserialize(String)}. This is different from most other stringSerialize() methods in that it always
+         * produces a 35-character String,
+         * consisting of {@link #getA()}, then a {@code '$'}, then {@link #getB()}, then another dollar sign, c, dollar
+         * sign, and finally d, with a, b, c, and d represented as unsigned hex int Strings.
+         * @param sb a non-null StringBuilder that will be appended to
+         * @return sb, after appending
+         */
+        public StringBuilder appendSerialized(StringBuilder sb) {
+            MathSupport.appendUnsignedHex(sb, a).append('$');
+            MathSupport.appendUnsignedHex(sb, b).append('$');
+            MathSupport.appendUnsignedHex(sb, c).append('$');
+            MathSupport.appendUnsignedHex(sb, d);
+            return sb;
         }
 
+        /**
+         * Loads the state of another serialized Generator (or UniqueIdentifier) into this.
+         * This requires a 35-char String at minimum with four 8-hex-digit sections, but the delimiters between sections
+         * are permitted to be anything (such as {@code '_'} for {@link UniqueIdentifier} or {@code '$'} for this).
+         * @param data a String almost always produced by {@link #stringSerialize()}
+         * @return this Generator, after deserializing
+         */
         public Generator stringDeserialize(String data) {
-            stateA = MathSupport.longFromHex(data, 0, 16);
-            stateB = MathSupport.longFromHex(data, 17, 33);
+            a = MathSupport.intFromHex(data, 0, 8);
+            b = MathSupport.intFromHex(data, 9, 17);
+            c = MathSupport.intFromHex(data, 18, 26);
+            d = MathSupport.intFromHex(data, 27, 35);
             return this;
         }
 
         @Override
         public void write(Json json) {
             json.writeObjectStart("uig");
-            json.writeValue("a", stateA);
-            json.writeValue("b", stateB);
+            json.writeValue("a", a);
+            json.writeValue("b", b);
+            json.writeValue("c", c);
+            json.writeValue("d", d);
             json.writeObjectEnd();
         }
 
         @Override
         public void read(Json json, JsonValue jsonData) {
             jsonData = jsonData.get("uig");
-            stateA = jsonData.getLong("a");
-            stateB = jsonData.getLong("b");
+            a = jsonData.getInt("a");
+            b = jsonData.getInt("b");
+            c = jsonData.getInt("c");
+            d = jsonData.getInt("d");
         }
 
         /**
@@ -360,8 +461,10 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
          */
         @GwtIncompatible
         public void writeExternal(ObjectOutput out) throws IOException {
-            out.writeLong(stateA);
-            out.writeLong(stateB);
+            out.writeInt(a);
+            out.writeInt(b);
+            out.writeInt(c);
+            out.writeInt(d);
         }
 
         /**
@@ -376,8 +479,10 @@ public final class UniqueIdentifier implements Comparable<UniqueIdentifier>, Jso
          */
         @GwtIncompatible
         public void readExternal(ObjectInput in) throws IOException {
-            stateA = in.readLong();
-            stateB = in.readLong();
+            a = in.readInt();
+            b = in.readInt();
+            c = in.readInt();
+            d = in.readInt();
         }
     }
 }

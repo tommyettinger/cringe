@@ -2,8 +2,14 @@ package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.NumberUtils;
 
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.Random;
 
 /**
@@ -13,7 +19,7 @@ import java.util.Random;
  * @author Antz
  * @author Tommy Ettinger
  */
-public class Vector6 implements Vector<Vector6> {
+public class Vector6 implements Vector<Vector6>, Json.Serializable, Externalizable {
     /** the x-component of this vector **/
     public float x;
     /** the y-component of this vector **/
@@ -881,5 +887,45 @@ public class Vector6 implements Vector<Vector6> {
         this.u = 0;
         this.v = 0;
         return this;
+    }
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("x", x, float.class);
+        json.writeValue("y", y, float.class);
+        json.writeValue("z", z, float.class);
+        json.writeValue("w", w, float.class);
+        json.writeValue("u", u, float.class);
+        json.writeValue("v", v, float.class);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        this.x = jsonData.getFloat("x");
+        this.y = jsonData.getFloat("y");
+        this.z = jsonData.getFloat("z");
+        this.w = jsonData.getFloat("w");
+        this.u = jsonData.getFloat("u");
+        this.v = jsonData.getFloat("v");
+    }
+
+    @GwtIncompatible
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeFloat(x);
+        out.writeFloat(y);
+        out.writeFloat(z);
+        out.writeFloat(w);
+        out.writeFloat(u);
+        out.writeFloat(v);
+    }
+
+    @GwtIncompatible
+    public void readExternal(ObjectInput in) throws IOException {
+        x = in.readFloat();
+        y = in.readFloat();
+        z = in.readFloat();
+        w = in.readFloat();
+        u = in.readFloat();
+        v = in.readFloat();
     }
 }

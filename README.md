@@ -206,8 +206,8 @@ To use the noise, you should probably have a dependency on all of `cringe`.
 This also adds `Vector5` and `Vector6` to the `Vector2` through `Vector4` libGDX provides, and the `PointSequence`
 class' implementations can generate the appropriate type of Vector for a given dimension. `PointSequence` produces
 either Halton sequences or R2-like sequences, and can be 2D through 6D. The `Distributor` class handles conversion
-from either `double` or `long` values to normal-distributed ones. `RoughMath` provides approximations to various
-math functions.
+from `double`, `int`, or `long` values to normal-distributed ones. `RoughMath` provides approximations to various
+math functions. There was briefly a `Ziggurat` class, but it has been merged entirely into `Distributor`.
 
 You can depend on the library as a whole, using it as a normal Gradle or Maven dependency.
 

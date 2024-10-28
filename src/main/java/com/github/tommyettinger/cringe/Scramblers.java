@@ -197,7 +197,7 @@ public final class Scramblers {
      * to 0.0 than to either of the extreme limits.
      * <br>
      * This uses the MX3 unary hash by Jon Maiga, but XORs the input with 0xABC98388FB8FAC03L before using MX3.
-     * It also uses {@link Ziggurat#normal(long)} to distribute the output.
+     * It also uses {@link Distributor#normal(long)} to distribute the output.
      * @param x any long
      * @return a Gaussian-distributed double with mean (mu) 0.0 and standard deviation (sigma) 1.0
      */
@@ -210,7 +210,7 @@ public final class Scramblers {
         x ^= x >>> 32;
         x *= 0xBEA225F9EB34556DL;
         x ^= x >>> 29;
-        return Ziggurat.normal(x);
+        return Distributor.normal(x);
     }
 
     /**

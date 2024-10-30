@@ -33,6 +33,10 @@ import com.github.tommyettinger.anim8.PaletteReducer;
 import static com.github.tommyettinger.cringe.ContinuousNoise.*;
 
 /**
+ * {@code cd out/noise/}
+ * {@code oxipng -o 6 -s *.png}
+ * {@code cd ../gif/}
+ * {@code gifsicle -O=99 --use-colormap gray --resize 128x128 -b *.gif}
  */
 public class NoisePreviewGenerator extends ApplicationAdapter {
 

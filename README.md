@@ -163,20 +163,24 @@ has been good at exploiting to improve performance since Java 16 or so. The mini
 maximum is over 2 to the 300 (but it's impractical to say exactly). Most random seeds will be in one of the largest
 cycles, and even in the minuscule chance that you randomly start in the shortest cycle, that's still almost always going
 to be good enough for any app, and effectively always enough for any game. It has five `long`s of state, each of which
-can have any value.
+can have any value. This generator relies entirely on its state transition to appear random.
 
 `RandomDistinct64` produces each `long` from `nextLong()` exactly once, which makes it good for producing random UUIDs.
 It's also rather fast on most JVMs, and might be much faster on GraalVM (version 20 and later). I need to verify some
 unusual benchmarks using GraalVM 20, but they appear to show RandomDistinct64 producing over 4 billion long values per
 second, which is over twice as fast as RandomAce320. This could be the benchmark code eliminating the tested loop
-entirely, so take it with a large grain of salt. It has one `long` of state, which can have any value.
+entirely, so take it with a large grain of salt. It has one `long` of state, which can have any value. This generator
+relies entirely on its output function to appear random, and doesn't have a random-like state transition at all.
 
 `RandomXMX256` is a fortified version of `Xoshiro256**`, which is present in Java 17, but removes its `**` or StarStar
 "scrambler" and replaces it with the much more robust MX3 unary hash, which is also used in our `Scramblers` class.
 This generator produces each sequence of four numbers exactly once, except for `0, 0, 0, 0`, which never appears.
 RandomXMX256 is slower than the other two generators, but should be much more resilient against statistical quality
-issues, probably to the point of being overkill. It has 4 `long`s of state, each of which can have any value unless all
-states are 0 (which is not permitted).
+issues, probably to the point of being overkill. That's still only overkill for the most common usages, with either
+one generator producing many random numbers, or many generators with random initial states -- if the initial states
+are extremely similar, patterns may become observable over time. It has 4 `long`s of state, each of which can have any
+value unless all states are 0 (which is not permitted). This generator has a mildly random state transition and an
+extremely thorough output function (also called a scrambler).
 
 There are also a few files that use random number generators in some way:
 
@@ -192,7 +196,9 @@ You don't need any of these 3 files to use the library, but they may come in han
 
 [UniqueIdentifier](src/main/java/com/github/tommyettinger/cringe/UniqueIdentifier.java) is also here, and doesn't use
 any GdxRandom. Instead, it produces a sequence of UUID-like values that are guaranteed to be unique unless an impossibly
-large amount of identifiers have been produced (2 to the 128 minus 1).
+large amount of identifiers have been produced (2 to the 128 minus 1). Unlike the JDK class UUID, UniqueIdentifier is
+compatible with GWT. Random UniqueIdentifier values are less likely to collide than random UUID values, though in both
+cases the chance of a collision is mind-bogglingly rare.
 
 In more recent versions, `cringe` has gotten larger, and now has code for continuous noise, which is fittingly
 random-like, and `EncryptedFileHandle`s, which are akin to randomized, but reversible, scrambling of files.

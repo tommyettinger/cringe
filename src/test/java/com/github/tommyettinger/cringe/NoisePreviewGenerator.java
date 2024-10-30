@@ -36,7 +36,7 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.*;
  */
 public class NoisePreviewGenerator extends ApplicationAdapter {
 
-    private static final boolean ACTUALLY_RENDER_GIF = false;
+    private static final boolean ACTUALLY_RENDER_GIF = true;
     private static final boolean ACTUALLY_RENDER_PNG = true;
 
     public interface FloatToFloatFunction {
@@ -47,6 +47,8 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
             new CyclicNoise(1, 3),
             new FoamNoise(1),
             new HoneyNoise(1),
+            new OpenSimplex2FastNoise(1),
+            new OpenSimplex2SmoothNoise(1),
             new PerlinNoise(1),
             new PerlueNoise(1),
             new SimplexNoise(1),
@@ -66,14 +68,14 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
 
     private AnimatedGif gif;
     private FastPNG png;
-    private final Array<Pixmap> frames = new Array<>(1024);
+    private final Array<Pixmap> frames = new Array<>(80);
 
     public float basicPrepare(float n)
     {
         return n * 0.5f + 0.5f;
     }
 
-    private FloatToFloatFunction prepare = this::basicPrepare;
+    private final FloatToFloatFunction prepare = this::basicPrepare;
 
     @Override
     public void create() {
@@ -84,7 +86,7 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
         }
 
         gif = new AnimatedGif();
-        gif.setDitherAlgorithm(Dithered.DitherAlgorithm.OCEANIC);
+        gif.setDitherAlgorithm(Dithered.DitherAlgorithm.NONE);
         gif.setDitherStrength(1f);
         gif.palette = new PaletteReducer(gray256);
 
@@ -108,12 +110,12 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
         Gdx.files.local("out/gif/").mkdirs();
         Gdx.files.local("out/noise/").mkdirs();
 
-        FileHandle gifFile = Gdx.files.local("out/gif/" + noise.stringSerialize().replace('`', '$') + ".gif");
-        FileHandle pngFile = Gdx.files.local("out/noise/" + noise.stringSerialize().replace('`', '$') + ".png");
-        System.out.println(noise.toHumanReadableString()+": ![Noise Preview](noise/"+pngFile.name() + ")\n");
+        FileHandle gifFile = Gdx.files.local("out/gif/" + noise.stringSerialize().replace('`', '_') + ".gif");
+        FileHandle pngFile = Gdx.files.local("out/noise/" + noise.stringSerialize().replace('`', '_') + ".png");
+        System.out.println(noise.toHumanReadableString()+": ([Animated GIF link](gif/"+gifFile.name()+")) ![Noise Preview](noise/"+pngFile.name() + ")\n");
 
         if(ACTUALLY_RENDER_GIF) {
-            for (int c = 0; c < 256; c++) {
+            for (int c = 0; c < 80; c++) {
                 int w = 256, h = 256;
                 float time = c * 0.25f;
                 Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);

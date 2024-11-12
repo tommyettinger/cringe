@@ -55,19 +55,21 @@ public class FoamNoise extends RawNoise {
 
     /**
      * Gets 1D noise with using this generator's {@link #getSeed() seed}.
-     * Delegates to {@link LineWobble#smoothWobble(float, int)}.
+     * Actually uses this generator's 2D noise internally, using
+     * {@code sin(1) * x} for the 2D x and {@code cos(1) * x} for the 2D y.
      *
      * @param x x position; can be any finite float
      * @return a noise value between -1.0f and 1.0f, both inclusive
      */
     @Override
     public float getNoise(float x) {
-        return LineWobble.smoothWobble(x, seed);
+        return getNoiseWithSeed(0.8414709848078965f * x, 0.5403023058681398f * x, seed);
     }
 
     /**
      * Gets 1D noise with a specific seed.
-     * This delegates to {@link LineWobble#smoothWobble(float, int)}.
+     * Actually uses this generator's 2D noise internally, using
+     * {@code sin(1) * x} for the 2D x and {@code cos(1) * x} for the 2D y.
      *
      * @param x    x position; can be any finite float
      * @param seed any int; must be the same between calls for the noise to be continuous
@@ -75,7 +77,7 @@ public class FoamNoise extends RawNoise {
      */
     @Override
     public float getNoiseWithSeed(float x, int seed) {
-        return LineWobble.smoothWobble(x, seed);
+        return getNoiseWithSeed(0.8414709848078965f * x, 0.5403023058681398f * x, seed);
     }
 
     // 2D SECTION

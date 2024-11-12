@@ -172,7 +172,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                                 float bright = d / 9999f;
                                 float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
                                 float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
-                                ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f), 1f);
+                                ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright * 0.4f + 0.5f), 1f);
                                 p.setColor(tempColor);
                                 p.drawPixel((int) x, (int) y);
                             }
@@ -182,8 +182,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
 
                         file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + "_1D.gif");
                         System.out.println("Writing to file:\n" + file);
-                        gif.setFastAnalysis(true);
-                        gif.palette.analyze(frames);
+                        gif.palette.analyzeHueWise(frames);
                         gif.write(file, frames, 60);
                         for (int i = 0; i < frames.size; i++) {
                             frames.get(i).dispose();

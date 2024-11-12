@@ -167,20 +167,7 @@ public class WigglyNoise extends RawNoise {
         float freq  = MathSupport.floatFromDec(data, pos+1, data.indexOf('`', pos+1));
         return new WigglyNoise(seed, octaves, freq);
     }
-
     
-    /**
-     * Gets 1D noise with using this generator's {@link #getSeed() seed}.
-     * Delegates to {@link LineWobble#splineWobble(float, long)}.
-     *
-     * @param x x position; can be any finite float
-     * @return a noise value between -1.0f and 1.0f, both inclusive
-     */
-    @Override
-    public float getNoise(float x) {
-        return LineWobble.wobble(x, seed);
-    }
-
     private float sin(float n) {
         return LineWobble.wobble(n * 0.4f, ~seed);
     }

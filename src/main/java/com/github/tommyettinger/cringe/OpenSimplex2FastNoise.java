@@ -85,18 +85,6 @@ public class OpenSimplex2FastNoise extends RawNoise {
     }
 
     /**
-     * Gets 1D noise with using this generator's {@link #getSeed() seed}.
-     * Delegates to {@link LineWobble#bicubicWobble(float, int)}.
-     *
-     * @param x x position; can be any finite float
-     * @return a noise value between -1.0f and 1.0f, both inclusive
-     */
-    @Override
-    public float getNoise(float x) {
-        return LineWobble.bicubicWobble(x, seed);
-    }
-
-    /**
      * Gets 2D noise with a default or pre-set seed.
      *
      * @param x x position; can be any finite float

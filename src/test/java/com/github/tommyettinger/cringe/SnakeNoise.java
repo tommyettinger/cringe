@@ -67,19 +67,6 @@ public class SnakeNoise extends RawNoise {
         return "SnakeNoise";
     }
 
-    /**
-     * Gets 1D noise with a default or pre-set seed. Most noise algorithms don't behave as well in 1D, so a common
-     * approach for implementations is to delegate to one of the LineWobble methods.
-     *
-     * @param x x position; can be any finite float
-     * @return a noise value between -1.0f and 1.0f, both inclusive
-     * @throws UnsupportedOperationException if 1D noise cannot be produced by this generator
-     */
-    @Override
-    public float getNoise(float x) {
-        return LineWobble.wobble(x, seed);
-    }
-
     @Override
     public float getNoise(float x, float y) {
         float n = ValueNoise.valueNoise(x, y, seed) * 0.6f;

@@ -118,7 +118,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
         }
 
         gif = new AnimatedGif();
-        gif.setDitherAlgorithm(Dithered.DitherAlgorithm.WREN);
+        gif.setDitherAlgorithm(Dithered.DitherAlgorithm.GOURD);
         gif.setDitherStrength(0.2f);
         gif.palette = new PaletteReducer(gray256);
 

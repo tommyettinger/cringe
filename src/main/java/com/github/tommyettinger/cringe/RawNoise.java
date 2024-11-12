@@ -98,15 +98,6 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
     public abstract boolean hasEfficientSetSeed();
 
     /**
-     * Gets 1D noise with a default or pre-set seed. Most noise algorithms don't behave as well in 1D, so a common
-     * approach for implementations is to delegate to one of the LineWobble methods.
-     * @param x x position; can be any finite float
-     * @return a noise value between -1.0f and 1.0f, both inclusive
-     * @throws UnsupportedOperationException if 1D noise cannot be produced by this generator
-     */
-    public abstract float getNoise(float x);
-
-    /**
      * Gets 2D noise with a default or pre-set seed.
      * @param x x position; can be any finite float
      * @param y y position; can be any finite float
@@ -233,25 +224,28 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
     }
 
     /**
-     * Gets 1D noise with a specific seed. If the seed cannot be retrieved or changed per-call, then this falls back to
-     * changing the position instead of the seed; you can check if this will happen with {@link #hasEfficientSetSeed()}.
-     * Most noise algorithms don't
-     * behave as well in 1D, so a common approach for implementations is to delegate to one of the LineWobble methods.
+     * Gets 1D noise with this generator's {@link #getSeed() seed}.
+     * Actually uses this generator's 2D noise internally, using
+     * {@code sin(1) * x} for the 2D x and {@code cos(1) * x} for the 2D y.
+     *
      * @param x x position; can be any finite float
+     * @return a noise value between -1.0f and 1.0f, both inclusive
+     */
+    public float getNoise(float x) {
+        return getNoise(0.8414709848078965f * x, 0.5403023058681398f * x);
+    }
+
+    /**
+     * Gets 1D noise with a specific seed.
+     * Actually uses this generator's 2D noise internally, using
+     * {@code sin(1) * x} for the 2D x and {@code cos(1) * x} for the 2D y.
+     *
+     * @param x    x position; can be any finite float
      * @param seed any int; must be the same between calls for the noise to be continuous
      * @return a noise value between -1.0f and 1.0f, both inclusive
-     * @throws UnsupportedOperationException if 1D noise cannot be produced by this generator
      */
-    public float getNoiseWithSeed(float x, int seed){
-        if(!hasEfficientSetSeed()) {
-            float s = seed * 0x1.9E3779B9p-16f;
-            return getNoise(x + s);
-        }
-        final int s = getSeed();
-        setSeed(seed);
-        final float r = getNoise(x);
-        setSeed(s);
-        return r;
+    public float getNoiseWithSeed(float x, int seed) {
+        return getNoiseWithSeed(0.8414709848078965f * x, 0.5403023058681398f * x, seed);
     }
 
     /**

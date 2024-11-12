@@ -89,18 +89,6 @@ public class HoneyNoise extends RawNoise {
         return true;
     }
 
-    /**
-     * Gets 1D noise with using this generator's {@link #getSeed() seed}.
-     * Delegates to {@link LineWobble#bicubicWobble(float, int)}.
-     *
-     * @param x x position; can be any finite float
-     * @return a noise value between -1.0f and 1.0f, both inclusive
-     */
-    @Override
-    public float getNoise(float x) {
-        return LineWobble.bicubicWobble(x, seed);
-    }
-
     @Override
     public float getNoise(float x, float y) {
         float n = (valueNoise(x, y, seed) + noise(x, y, seed));
@@ -139,18 +127,6 @@ public class HoneyNoise extends RawNoise {
     @Override
     public int getSeed() {
         return seed;
-    }
-
-    /**
-     * Gets 1D noise with using a specific seed.
-     * Delegates to {@link LineWobble#bicubicWobble(float, int)}.
-     *
-     * @param x x position; can be any finite float
-     * @return a noise value between -1.0f and 1.0f, both inclusive
-     */
-    @Override
-    public float getNoiseWithSeed(float x, int seed) {
-        return LineWobble.bicubicWobble(x, seed);
     }
 
     @Override

@@ -21,6 +21,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -40,8 +41,9 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.*;
  */
 public class NoisePreviewGenerator extends ApplicationAdapter {
 
-    private static final boolean ACTUALLY_RENDER_GIF = true;
-    private static final boolean ACTUALLY_RENDER_PNG = true;
+    private static final boolean ACTUALLY_RENDER_GIF = false;
+    private static final boolean ACTUALLY_RENDER_PNG_1D = true;
+    private static final boolean ACTUALLY_RENDER_PNG = false;
 
     public interface FloatToFloatFunction {
         float applyAsFloat(float f);
@@ -65,8 +67,8 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
     private float freq = 0x1p-4f;
     private final ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, FBM, octaves);
 
-    private static final int width = 512, height = 512;
-//    private static final int width = 256, height = 256;
+//    private static final int width = 512, height = 512;
+    private static final int width = 256, height = 256;
 
     private Viewport view;
 
@@ -96,6 +98,7 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
 
         png = new FastPNG();
 
+        System.out.println("# Noise Previews\n");
         for(RawNoise rn : noises) {
             noise.setWrapped(rn);
             for (int m = 0; m <= EXO; m++) {
@@ -116,11 +119,12 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
 
         FileHandle gifFile = Gdx.files.local("out/gif/" + noise.stringSerialize().replace('`', '_') + ".gif");
         FileHandle pngFile = Gdx.files.local("out/noise/" + noise.stringSerialize().replace('`', '_') + ".png");
-        System.out.println(noise.toHumanReadableString()+": ([Animated GIF link](gif/"+gifFile.name()+")) ![Noise Preview](noise/"+pngFile.name() + ")\n");
+        FileHandle png1DFile = Gdx.files.local("out/noise1d/" + noise.stringSerialize().replace('`', '_') + ".png");
+        System.out.println(noise.toHumanReadableString()+":\n\n"+"![1D Noise Preview](noise1d/"+png1DFile.name() + ")"+" ![Noise Preview](noise/"+pngFile.name() + ")"+" ([Animated GIF link](gif/"+gifFile.name()+"))"+"\n");
 
         if(ACTUALLY_RENDER_GIF) {
             for (int c = 0; c < 80; c++) {
-                int w = 256, h = 256;
+                int w = width, h = height;
                 float time = c * 0.25f;
                 Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                 for (int x = 0; x < w; x++) {
@@ -138,8 +142,29 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
             }
             frames.clear();
         }
+        if (ACTUALLY_RENDER_PNG_1D) {
+            int w = width, h = height, lastHeight, y;
+            Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+            p.setColor(Color.WHITE);
+            p.fill();
+            for (int row = 0; row < 4; row++) {
+                int sd = row * 0x12345 + 0x98765;
+                y = (int)(prepare.applyAsFloat(noise.getNoiseWithSeed(0, sd)) * 63.999f) + 64 * row;
+                p.setColor(Color.BLACK);
+                p.drawPixel(0, y);
+                for (int x = 1; x < w; x++) {
+                    lastHeight = y;
+                    y = (int)(prepare.applyAsFloat(noise.getNoiseWithSeed(x * 0.25f, sd)) * 63.999f) + 64 * row;
+                    p.setColor(Color.BLACK);
+                    p.drawLine(x - 1, lastHeight, x, y);
+                }
+            }
+            png.write(png1DFile, p);
+
+            p.dispose();
+        }
         if (ACTUALLY_RENDER_PNG) {
-            int w = 256, h = 256;
+            int w = width, h = height;
             float time = 1.25f;
             Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
             for (int x = 0; x < w; x++) {

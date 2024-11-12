@@ -167,7 +167,7 @@ public class WigglyNoise extends RawNoise {
         float freq  = MathSupport.floatFromDec(data, pos+1, data.indexOf('`', pos+1));
         return new WigglyNoise(seed, octaves, freq);
     }
-    
+
     private float sin(float n) {
         return LineWobble.wobble(n * 0.4f, ~seed);
     }

@@ -17,7 +17,6 @@
 package com.github.tommyettinger.cringe;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.NumberUtils;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -219,7 +218,7 @@ public class ContinuousNoise extends RawNoise {
     /**
      * Requires the type of the noise generator this wraps ({@link #wrapped}) to be registered.
      * @param out the stream to write the object to
-     * @throws IOException
+     * @throws IOException It probably shouldn't???
      */
     @GwtIncompatible
     public void writeExternal(ObjectOutput out) throws IOException {
@@ -229,6 +228,12 @@ public class ContinuousNoise extends RawNoise {
         out.writeInt(octaves);
     }
 
+    /**
+     * Requires the type of the noise generator ({@link #wrapped}) that is used by {@code in} to be registered.
+     * @param in the stream to read data from in order to restore the object
+     * @throws IOException It probably shouldn't???
+     * @throws ClassNotFoundException if the {@link RawNoise} subclass used by {@code in} is not registered
+     */
     @GwtIncompatible
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         setWrapped((RawNoise) in.readObject());
@@ -274,7 +279,7 @@ public class ContinuousNoise extends RawNoise {
     @Override
     public int hashCode() {
         int result = wrapped.hashCode();
-        result = 31 * result + (frequency != +0.0f ? NumberUtils.floatToIntBits(frequency) : 0);
+        result = 31 * result + Compatibility.floatToIntBits(frequency + 0f);
         result = 31 * result + mode;
         result = 31 * result + octaves;
         return result;

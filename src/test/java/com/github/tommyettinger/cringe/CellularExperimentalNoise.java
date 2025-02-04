@@ -23,10 +23,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import static com.github.tommyettinger.cringe.PointHasher.X2;
-import static com.github.tommyettinger.cringe.PointHasher.Y2;
-import static com.github.tommyettinger.cringe.SimplexNoise.noise;
-import static com.github.tommyettinger.cringe.ValueNoise.valueNoise;
+import static com.github.tommyettinger.cringe.PointHasher.*;
 
 /**
  * An INoise implementation that divides space up into cells, and has configurable ways to get values from cells.
@@ -161,13 +158,13 @@ public class CellularExperimentalNoise extends RawNoise {
         final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_2D;
         float distance = 999999;
         int xc = 0, yc = 0, xpc = 0, ypc = 0;
-        for (int xi = xr - 1, xpi = xp - X2; xi <= xr + 1; xi++, xpi += X2) {
-            for (int yi = yr - 1, ypi = yp - Y2; yi <= yr + 1; yi++, ypi += Y2) {
-                int hash = PointHasher.hashPrimed256(xpi, ypi, seed) << 1;
-                float vecX = xi - x + gradients[hash];
-                float vecY = yi - y + gradients[hash+1];
+        for (int xrl = xr + 1, xi = xr - 1, xpi = xp; xi <= xrl; xi++, xpi += X2) {
+            for (int yrl = yr + 1, yi = yr - 1, ypi = yp; yi <= yrl; yi++, ypi += Y2) {
+                final int hash = PointHasher.hashPrimed256(xpi, ypi, seed) << 1;
+                final float vecX = xi - x + gradients[hash];
+                final float vecY = yi - y + gradients[hash+1];
 
-                float newDistance = vecX * vecX + vecY * vecY;
+                final float newDistance = vecX * vecX + vecY * vecY;
 
                 if (newDistance < distance) {
                     distance = newDistance;
@@ -178,6 +175,7 @@ public class CellularExperimentalNoise extends RawNoise {
                 }
             }
         }
+
         switch (noiseType) {
             case CELL_VALUE:
                 return PointHasher.hashPrimedAll(xpc, ypc, seed) * 0x1.0p-31f;

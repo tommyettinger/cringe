@@ -22,9 +22,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import static com.github.tommyettinger.cringe.SimplexNoise.noise;
-import static com.github.tommyettinger.cringe.ValueNoise.valueNoise;
-
 /**
  * An INoise implementation that divides space up into cells, and has configurable ways to get values from cells.
  */

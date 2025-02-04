@@ -72,7 +72,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             /* 15 */ new CellularExperimentalNoise(1, CellularNoise.NoiseType.DISTANCE),
     };
     int noiseIndex = 15;
-    private int dim = 1; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
+    private int dim = 2; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
     private int octaves = 1; // starts at 1
     private float freq = 0x1p-4f;
     private float mulRaw = 1f, mul = RoughMath.pow2Rough(mulRaw);

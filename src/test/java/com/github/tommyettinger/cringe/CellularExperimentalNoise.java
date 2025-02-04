@@ -382,13 +382,14 @@ public class CellularExperimentalNoise extends RawNoise {
         final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_4D;
         float distance = 999999;
         int xc = 0, yc = 0, zc = 0, wc = 0;
-        int xpc = 0, ypc = 0, zpc = 0, wpc = 0;
+        int bestHash = 0;
 
         for (int xrl = xr + 1, xi = xr - 1, xpi = xp; xi <= xrl; xi++, xpi += X4) {
             for (int yrl = yr + 1, yi = yr - 1, ypi = yp; yi <= yrl; yi++, ypi += Y4) {
                 for (int zrl = zr + 1, zi = zr - 1, zpi = zp; zi <= zrl; zi++, zpi += Z4) {
                     for (int wrl = wr + 1, wi = wr - 1, wpi = wp; wi <= wrl; wi++, wpi += W4) {
-                        int hash = PointHasher.hashPrimed256(xpi, ypi, zpi, wpi, seed) << 2;
+                        final int rawHash = PointHasher.hashPrimed256(xpi, ypi, zpi, wpi, seed);
+                        final int hash = rawHash << 2;
                         float vecX = xi - x + gradients[hash];
                         float vecY = yi - y + gradients[hash + 1];
                         float vecZ = zi - z + gradients[hash + 2];
@@ -398,10 +399,11 @@ public class CellularExperimentalNoise extends RawNoise {
 
                         if (newDistance < distance) {
                             distance = newDistance;
-                            xc = xi; xpc = xpi;
-                            yc = yi; ypc = ypi;
-                            zc = zi; zpc = zpi;
-                            wc = wi; wpc = wpi;
+                            xc = xi;
+                            yc = yi;
+                            zc = zi;
+                            wc = wi;
+                            bestHash = rawHash;
                         }
                     }
                 }
@@ -409,7 +411,7 @@ public class CellularExperimentalNoise extends RawNoise {
         }
         switch (noiseType) {
             case CELL_VALUE:
-                return PointHasher.hashPrimedAll(xpc, ypc, zpc, wpc, seed) * 0x1p-31f;
+                return bestHash * 0x1p-31f;
             case NOISE_LOOKUP:
                 return SimplexNoise.instance.getNoiseWithSeed(xc * 0.0625f, yc * 0.0625f, zc * 0.0625f, wc * 0.0625f, seed);
             case DISTANCE:

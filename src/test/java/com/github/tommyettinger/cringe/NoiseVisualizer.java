@@ -68,11 +68,11 @@ public class NoiseVisualizer extends ApplicationAdapter {
             /* 11 */ new OpenSimplex2FastNoise(1),
             /* 12 */ new SkimplexNoise(1),
             /* 13 */ new PerlueNoise(1),
-            /* 14 */ new CellularNoise(1, CellularNoise.NoiseType.DISTANCE),
-            /* 15 */ new CellularExperimentalNoise(1, CellularNoise.NoiseType.DISTANCE),
+            /* 14 */ new CellularNoise(1, CellularNoise.NoiseType.DISTANCE_VALUE),
+            /* 15 */ new CellularExperimentalNoise(1, CellularNoise.NoiseType.DISTANCE_VALUE),
     };
     int noiseIndex = 15;
-    private int dim = 2; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
+    private int dim = 1; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
     private int octaves = 1; // starts at 1
     private float freq = 0x1p-4f;
     private float mulRaw = 1f, mul = RoughMath.pow2Rough(mulRaw);

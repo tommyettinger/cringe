@@ -196,23 +196,26 @@ public class CellularExperimentalNoise extends RawNoise {
         int yr = MathUtils.round(y);
 
         float sum = 0f;
+        int xp = xr * X2;
+        int yp = yr * Y2;
+
         final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_2D;
 
-        for (int xi = xr - 1; xi <= xr + 1; xi++) {
-            for (int yi = yr - 1; yi <= yr + 1; yi++) {
-                int hash = PointHasher.hashAll(xi, yi, seed);
-                int h = (hash & 255) << 1;
+        for (int xrl = xr + 1, xi = xr - 1, xpi = xp; xi <= xrl; xi++, xpi += X2) {
+            for (int yrl = yr + 1, yi = yr - 1, ypi = yp; yi <= yrl; yi++, ypi += Y2) {
+                final int hash = PointHasher.hashPrimedAll(xpi, ypi, seed);
+                final int h = (hash & 255) << 1;
                 float vecX = xi - x + gradients[h];
                 float vecY = yi - y + gradients[h + 1];
 
                 float distance = 1f - (vecX * vecX + vecY * vecY);
 
                 if (distance > 0f) {
-                    sum += ((hash >>> 28) - (hash >>> 24 & 15)) * distance * distance * distance * 27f;
+                    sum += ((hash >>> 23) - (hash >>> 14 & 0x1FF)) * distance * distance * distance;
                 }
             }
         }
-        return sum / (64f + Math.abs(sum));
+        return sum / (128f + Math.abs(sum));
 //        return RoughMath.tanhRougher(0x1p-6f * sum);
     }
 

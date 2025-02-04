@@ -54,23 +54,24 @@ public class NoiseVisualizer extends ApplicationAdapter {
         Serializer.register(new WigglyNoise(1, 3));
     }
     RawNoise[] noises = new RawNoise[]{
-            new ValueNoise(1),
-            new FoamNoise(1),
-            new PerlinNoise(1),
-            new SimplexNoise(1),
-            new HoneyNoise(1),
-            new CyclicNoise(1, 3),
-            new SorbetNoise(1, 3),
-            new BadgerNoise(1),
-            new SnakeNoise(1),
-            new WigglyNoise(1, 3),
-            new CellularNoise(1),
-            new OpenSimplex2SmoothNoise(1),
-            new OpenSimplex2FastNoise(1),
-            new SkimplexNoise(1),
-            new PerlueNoise(1),
+            /*  0 */ new ValueNoise(1),
+            /*  1 */ new FoamNoise(1),
+            /*  2 */ new PerlinNoise(1),
+            /*  3 */ new SimplexNoise(1),
+            /*  4 */ new HoneyNoise(1),
+            /*  5 */ new CyclicNoise(1, 3),
+            /*  6 */ new SorbetNoise(1, 3),
+            /*  7 */ new BadgerNoise(1),
+            /*  8 */ new SnakeNoise(1),
+            /*  9 */ new WigglyNoise(1, 3),
+            /* 10 */ new OpenSimplex2SmoothNoise(1),
+            /* 11 */ new OpenSimplex2FastNoise(1),
+            /* 12 */ new SkimplexNoise(1),
+            /* 13 */ new PerlueNoise(1),
+            /* 14 */ new CellularNoise(1, CellularNoise.NoiseType.DISTANCE),
+            /* 15 */ new CellularExperimentalNoise(1, CellularNoise.NoiseType.DISTANCE),
     };
-    int noiseIndex = noises.length - 1;
+    int noiseIndex = 15;
     private int dim = 1; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
     private int octaves = 1; // starts at 1
     private float freq = 0x1p-4f;
@@ -118,8 +119,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
         }
 
         gif = new AnimatedGif();
-        gif.setDitherAlgorithm(Dithered.DitherAlgorithm.GOURD);
-        gif.setDitherStrength(0.2f);
+        gif.setDitherAlgorithm(Dithered.DitherAlgorithm.LOAF);
+        gif.setDitherStrength(0.25f);
         gif.palette = new PaletteReducer(gray256);
 
         InputAdapter input = new InputAdapter() {

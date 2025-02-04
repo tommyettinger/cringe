@@ -180,7 +180,7 @@ public class CellularExperimentalNoise extends RawNoise {
         }
         switch (noiseType) {
             case CELL_VALUE:
-                return PointHasher.hashAll(xpc, ypc, seed) * 0x1.0p-31f;
+                return PointHasher.hashPrimedAll(xpc, ypc, seed) * 0x1.0p-31f;
 
             case NOISE_LOOKUP:
                 return SimplexNoise.instance.getNoiseWithSeed(xc * 0.0625f, yc * 0.0625f, seed);

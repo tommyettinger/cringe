@@ -374,19 +374,21 @@ public class CellularExperimentalNoise extends RawNoise {
     }
 
     public float basicCellular(float x, float y, float z, float w, int seed) {
-        int xr = MathUtils.round(x);
-        int yr = MathUtils.round(y);
-        int zr = MathUtils.round(z);
-        int wr = MathUtils.round(w);
+        int xr = MathUtils.round(x), xp = xr * X4;
+        int yr = MathUtils.round(y), yp = yr * Y4;
+        int zr = MathUtils.round(z), zp = zr * Z4;
+        int wr = MathUtils.round(w), wp = wr * W4;
 
         final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_4D;
         float distance = 999999;
         int xc = 0, yc = 0, zc = 0, wc = 0;
-        for (int xi = xr - 1; xi <= xr + 1; xi++) {
-            for (int yi = yr - 1; yi <= yr + 1; yi++) {
-                for (int zi = zr - 1; zi <= zr + 1; zi++) {
-                    for (int wi = wr - 1; wi <= wr + 1; wi++) {
-                        int hash = PointHasher.hash256(xi, yi, zi, wi, seed) << 2;
+        int xpc = 0, ypc = 0, zpc = 0, wpc = 0;
+
+        for (int xrl = xr + 1, xi = xr - 1, xpi = xp; xi <= xrl; xi++, xpi += X4) {
+            for (int yrl = yr + 1, yi = yr - 1, ypi = yp; yi <= yrl; yi++, ypi += Y4) {
+                for (int zrl = zr + 1, zi = zr - 1, zpi = zp; zi <= zrl; zi++, zpi += Z4) {
+                    for (int wrl = wr + 1, wi = wr - 1, wpi = wp; wi <= wrl; wi++, wpi += W4) {
+                        int hash = PointHasher.hashPrimed256(xpi, ypi, zpi, wpi, seed) << 2;
                         float vecX = xi - x + gradients[hash];
                         float vecY = yi - y + gradients[hash + 1];
                         float vecZ = zi - z + gradients[hash + 2];
@@ -396,10 +398,10 @@ public class CellularExperimentalNoise extends RawNoise {
 
                         if (newDistance < distance) {
                             distance = newDistance;
-                            xc = xi;
-                            yc = yi;
-                            zc = zi;
-                            wc = wi;
+                            xc = xi; xpc = xpi;
+                            yc = yi; ypc = ypi;
+                            zc = zi; zpc = zpi;
+                            wc = wi; wpc = wpi;
                         }
                     }
                 }
@@ -407,7 +409,7 @@ public class CellularExperimentalNoise extends RawNoise {
         }
         switch (noiseType) {
             case CELL_VALUE:
-                return PointHasher.hashAll(xc, yc, zc, wc, seed) * 0x1p-31f;
+                return PointHasher.hashPrimedAll(xpc, ypc, zpc, wpc, seed) * 0x1p-31f;
             case NOISE_LOOKUP:
                 return SimplexNoise.instance.getNoiseWithSeed(xc * 0.0625f, yc * 0.0625f, zc * 0.0625f, wc * 0.0625f, seed);
             case DISTANCE:

@@ -258,15 +258,20 @@ public class CellularExperimentalNoise extends RawNoise {
         int yr = MathUtils.round(y);
         int zr = MathUtils.round(z);
 
+        int xp = xr * X3;
+        int yp = yr * Y3;
+        int zp = zr * Z3;
+
         final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_3D;
         float distance = 999999;
         int xc = 0, yc = 0, zc = 0;
+        int xpc = 0, ypc = 0, zpc = 0;
 
-        for (int xi = xr - 1; xi <= xr + 1; xi++) {
-            for (int yi = yr - 1; yi <= yr + 1; yi++) {
-                for (int zi = zr - 1; zi <= zr + 1; zi++) {
+        for (int xrl = xr + 1, xi = xr - 1, xpi = xp; xi <= xrl; xi++, xpi += X3) {
+            for (int yrl = yr + 1, yi = yr - 1, ypi = yp; yi <= yrl; yi++, ypi += Y3) {
+                for (int zrl = zr + 1, zi = zr - 1, zpi = zp; zi <= zrl; zi++, zpi += Z3) {
 
-                    int hash = PointHasher.hash256(xi, yi, zi, seed) << 2;
+                    int hash = PointHasher.hashPrimed256(xpi, ypi, zpi, seed) << 2;
                     float vecX = xi - x + gradients[hash];
                     float vecY = yi - y + gradients[hash + 1];
                     float vecZ = zi - z + gradients[hash + 2];
@@ -278,6 +283,9 @@ public class CellularExperimentalNoise extends RawNoise {
                         xc = xi;
                         yc = yi;
                         zc = zi;
+                        xpc = xpi;
+                        ypc = ypi;
+                        zpc = zpi;
                     }
                 }
             }
@@ -285,7 +293,7 @@ public class CellularExperimentalNoise extends RawNoise {
 
         switch (noiseType) {
             case CELL_VALUE:
-                return PointHasher.hashAll(xc, yc, zc, seed) * 0x1p-31f;
+                return PointHasher.hashPrimedAll(xpc, ypc, zpc, seed) * 0x1p-31f;
             case NOISE_LOOKUP:
                 return SimplexNoise.instance.getNoiseWithSeed(xc * 0.0625f, yc * 0.0625f, zc * 0.0625f, seed);
             case DISTANCE:

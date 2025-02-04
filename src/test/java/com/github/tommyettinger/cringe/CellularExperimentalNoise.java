@@ -257,6 +257,10 @@ public class CellularExperimentalNoise extends RawNoise {
     }
 
     public float basicCellular(float x, float y, float z, int seed) {
+        float distance = 999999;
+        int xc = 0, yc = 0, zc = 0;
+        int xpc = 0, ypc = 0, zpc = 0;
+
         int xr = MathUtils.round(x);
         int yr = MathUtils.round(y);
         int zr = MathUtils.round(z);
@@ -266,9 +270,6 @@ public class CellularExperimentalNoise extends RawNoise {
         int zp = zr * Z3;
 
         final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_3D;
-        float distance = 999999;
-        int xc = 0, yc = 0, zc = 0;
-        int xpc = 0, ypc = 0, zpc = 0;
 
         for (int xrl = xr + 1, xi = xr - 1, xpi = xp; xi <= xrl; xi++, xpi += X3) {
             for (int yrl = yr + 1, yi = yr - 1, ypi = yp; yi <= yrl; yi++, ypi += Y3) {
@@ -311,12 +312,17 @@ public class CellularExperimentalNoise extends RawNoise {
         int zr = MathUtils.round(z);
 
         float sum = 0f;
+
+        int xp = xr * X3;
+        int yp = yr * Y3;
+        int zp = zr * Z3;
+
         final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_3D;
 
-        for (int xi = xr - 1; xi <= xr + 1; xi++) {
-            for (int yi = yr - 1; yi <= yr + 1; yi++) {
-                for (int zi = zr - 1; zi <= zr + 1; zi++) {
-                    int hash = PointHasher.hashAll(xi, yi, zi, seed);
+        for (int xrl = xr + 1, xi = xr - 1, xpi = xp; xi <= xrl; xi++, xpi += X3) {
+            for (int yrl = yr + 1, yi = yr - 1, ypi = yp; yi <= yrl; yi++, ypi += Y3) {
+                for (int zrl = zr + 1, zi = zr - 1, zpi = zp; zi <= zrl; zi++, zpi += Z3) {
+                    int hash = PointHasher.hashPrimedAll(xpi, ypi, zpi, seed);
                     int h = (hash & 255) << 2;
                     float vecX = xi - x + gradients[h];
                     float vecY = yi - y + gradients[h + 1];
@@ -325,12 +331,12 @@ public class CellularExperimentalNoise extends RawNoise {
                     float distance = 1f - (vecX * vecX + vecY * vecY + vecZ * vecZ);
 
                     if (distance > 0f) {
-                        sum += ((hash >>> 28) - (hash >>> 24 & 15)) * distance * distance * distance * 27f;
+                        sum += ((hash >>> 23) - (hash >>> 14 & 0x1FF)) * distance * distance * distance;
                     }
                 }
             }
         }
-        return sum / (64f + Math.abs(sum));
+        return sum / (128f + Math.abs(sum));
 //        return RoughMath.tanhRougher(0x1p-6f * sum);
     }
 
@@ -377,15 +383,15 @@ public class CellularExperimentalNoise extends RawNoise {
     }
 
     public float basicCellular(float x, float y, float z, float w, int seed) {
-        int xr = MathUtils.round(x), xp = xr * X4;
-        int yr = MathUtils.round(y), yp = yr * Y4;
-        int zr = MathUtils.round(z), zp = zr * Z4;
-        int wr = MathUtils.round(w), wp = wr * W4;
-
         final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_4D;
         float distance = 999999;
         int xc = 0, yc = 0, zc = 0, wc = 0;
         int xpc = 0, ypc = 0, zpc = 0, wpc = 0;
+
+        int xr = MathUtils.round(x), xp = xr * X4;
+        int yr = MathUtils.round(y), yp = yr * Y4;
+        int zr = MathUtils.round(z), zp = zr * Z4;
+        int wr = MathUtils.round(w), wp = wr * W4;
 
         for (int xrl = xr + 1, xi = xr - 1, xpi = xp; xi <= xrl; xi++, xpi += X4) {
             for (int yrl = yr + 1, yi = yr - 1, ypi = yp; yi <= yrl; yi++, ypi += Y4) {
@@ -422,19 +428,19 @@ public class CellularExperimentalNoise extends RawNoise {
         }
     }
     public float mergingCellular(float x, float y, float z, float w, int seed) {
-        int xr = MathUtils.round(x);
-        int yr = MathUtils.round(y);
-        int zr = MathUtils.round(z);
-        int wr = MathUtils.round(w);
-
         final float[] gradients = GradientVectors.CELLULAR_GRADIENTS_4D;
         float sum = 0f;
 
-        for (int xi = xr - 1; xi <= xr + 1; xi++) {
-            for (int yi = yr - 1; yi <= yr + 1; yi++) {
-                for (int zi = zr - 1; zi <= zr + 1; zi++) {
-                    for (int wi = wr - 1; wi <= wr + 1; wi++) {
-                        int hash = PointHasher.hashAll(xi, yi, zi, wi, seed);
+        int xr = MathUtils.round(x), xp = xr * X4;
+        int yr = MathUtils.round(y), yp = yr * Y4;
+        int zr = MathUtils.round(z), zp = zr * Z4;
+        int wr = MathUtils.round(w), wp = wr * W4;
+
+        for (int xrl = xr + 1, xi = xr - 1, xpi = xp; xi <= xrl; xi++, xpi += X4) {
+            for (int yrl = yr + 1, yi = yr - 1, ypi = yp; yi <= yrl; yi++, ypi += Y4) {
+                for (int zrl = zr + 1, zi = zr - 1, zpi = zp; zi <= zrl; zi++, zpi += Z4) {
+                    for (int wrl = wr + 1, wi = wr - 1, wpi = wp; wi <= wrl; wi++, wpi += W4) {
+                        int hash = PointHasher.hashPrimedAll(xpi, ypi, zpi, wpi, seed);
                         int h = (hash & 255) << 2;
                         float vecX = xi - x + gradients[h];
                         float vecY = yi - y + gradients[h + 1];
@@ -444,13 +450,13 @@ public class CellularExperimentalNoise extends RawNoise {
                         float distance = 1f - (vecX * vecX + vecY * vecY + vecZ * vecZ + vecW * vecW);
 
                         if (distance > 0f) {
-                            sum += ((hash >>> 28) - (hash >>> 24 & 15)) * distance * distance * distance * 27f;
+                            sum += ((hash >>> 23) - (hash >>> 14 & 0x1FF)) * distance * distance * distance;
                         }
                     }
                 }
             }
         }
-        return sum / (64f + Math.abs(sum));
+        return sum / (128f + Math.abs(sum));
 //        return RoughMath.tanhRougher(0x1p-6f * sum);
     }
 

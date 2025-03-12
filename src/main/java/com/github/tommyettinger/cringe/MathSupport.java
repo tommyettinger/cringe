@@ -175,6 +175,23 @@ public final class MathSupport {
         return x;
     }
 
+    /**
+     * An incredibly simple convenience method that returns {@code n * n}.
+     * @param n any finite float
+     * @return {@code n * n}
+     */
+    public static float square(float n) {
+        return n * n;
+    }
+
+    /**
+     * An incredibly simple convenience method that returns {@code n * n * n}.
+     * @param n any finite float
+     * @return {@code n * n * n}
+     */
+    public static float cube(float n) {
+        return n * n * n;
+    }
 
     /**
      * A generalization on bias and gain functions that can represent both; this version is branch-less.

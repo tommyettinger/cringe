@@ -64,7 +64,7 @@ public final class LineWobble {
         final int start = imul(z ^ 0xD1B54A35, 0x92B5C323);
         final int end   = imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323);
         value -= floor;
-        value *= value * (3 - 2 * value);
+        value *= value * (1 - value - value + 2); // won't go outside 0f to 1f range
         return ((1 - value) * start + value * end) * 0x0.ffffffp-31f;
     }
 
@@ -83,7 +83,7 @@ public final class LineWobble {
         final float start = ((z ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L),
                 end = ((z + 0x6C8E9CF570932BD5L ^ 0x9E3779B97F4A7C15L) * 0xC6BC279692B5C323L);
         value -= floor;
-        value *= value * (3f - 2f * value);
+        value *= value * (1 - value - value + 2); // won't go outside 0f to 1f range
         return ((1f - value) * start + value * end) * 0x0.ffffffp-63f;
     }
     /**
@@ -262,7 +262,7 @@ public final class LineWobble {
         value = MathSupport.barronSpline(value,
                 (mixBits & 0xFFFF) * 6.1035156E-5f + 1f, // 6.1035156E-5f == 0x1p-14f
                 (mixBits >>> 16) * 1.1444092E-5f + 0.125f); // 1.1444092E-5f == 0x1.8p-17f
-        value *= value * (3f - 2f * value);
+        value *= value * (1 - value - value + 2); // won't go outside 0f to 1f range
         return ((1 - value) * startBits + value * endBits) * 4.6566126E-10f; // 4.6566126E-10f == 0x0.ffffffp-31f
     }
 
@@ -285,7 +285,7 @@ public final class LineWobble {
                 mixBits = startBits + endBits;
         value -= floor;
         value = MathSupport.barronSpline(value, (mixBits & 0xFFFFFFFFL) * 0x1p-30f + 1f, (mixBits >>> 32 & 0xFFFFL) * 0x1.8p-17f + 0.125f);
-        value *= value * (3f - 2f * value);
+        value *= value * (1 - value - value + 2); // won't go outside 0f to 1f range
         return ((1 - value) * startBits + value * endBits) * 0x0.ffffffp-63f;
     }
 
@@ -388,7 +388,7 @@ public final class LineWobble {
         float end   = (imul(z + 0x9E3779B9 ^ 0xD1B54A35, 0x92B5C323) >>> 1) * 0x1p-31f;
         value -= floor;
         // makes the changes smoother by slowing down near start or end.
-        value *= value * (3f - 2f * value);
+        value *= value * (1 - value - value + 2); // won't go outside 0f to 1f range
         // like lerpAngle code, but in turns
         end = end - start + 1.5f;
         end -= (int)end + 0.5f;
@@ -439,7 +439,7 @@ public final class LineWobble {
         value = MathSupport.barronSpline(value,
                 (mixBits & 0xFFFF) * 6.1035156E-5f + 1f, // 6.1035156E-5f == 0x1p-14f
                 (mixBits >>> 16) * 1.1444092E-5f + 0.125f); // 1.1444092E-5f == 0x1.8p-17f
-        value *= value * (3f - 2f * value);
+        value *= value * (1 - value - value + 2); // won't go outside 0f to 1f range
         float start = (startBits >>> 1) * 4.6566126E-10f; // 4.6566126E-10f == 0x0.ffffffp-31f
         float end   = (endBits   >>> 1) * 4.6566126E-10f; // 4.6566126E-10f == 0x0.ffffffp-31f
         end = end - start + 1.5f;
@@ -489,7 +489,7 @@ public final class LineWobble {
                 mixBits = startBits + endBits;
         value -= floor;
         value = MathSupport.barronSpline(value, (mixBits & 0xFFFFFFFFL) * 0x1p-30f + 1f, (mixBits & 0xFFFFL) * 0x1.8p-17f + 0.125f);
-        value *= value * (3f - 2f * value);
+        value *= value * (1 - value - value + 2); // won't go outside 0f to 1f range
         float start = (startBits >>> 1) * 0x0.ffffffp-63f;
         float end   = (endBits   >>> 1) * 0x0.ffffffp-63f;
         end = end - start + 1.5f;

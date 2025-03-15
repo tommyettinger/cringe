@@ -304,7 +304,7 @@ public class WeightedTable implements Json.Serializable, Externalizable {
      * relate the element to a public/protected field and/or
      * method of this Externalizable class.
      */
-    @Override
+    @GwtIncompatible
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeObject(mixed);
         out.writeObject(random);
@@ -322,7 +322,7 @@ public class WeightedTable implements Json.Serializable, Externalizable {
      * @throws ClassNotFoundException If the class for an object being
      *                                restored cannot be found.
      */
-    @Override
+    @GwtIncompatible
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         mixed = (int[]) in.readObject();
         random = (GdxRandom) in.readObject();

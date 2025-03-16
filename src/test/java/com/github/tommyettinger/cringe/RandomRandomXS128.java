@@ -175,7 +175,8 @@ public class RandomRandomXS128 extends GdxRandom {
      */
     @Override
     public void nextBytes(byte[] bytes) {
-        wrapped.nextBytes(bytes);
+        if(bytes != null)
+            wrapped.nextBytes(bytes);
     }
 
     /**

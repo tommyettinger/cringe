@@ -161,11 +161,11 @@ Gradle (or Maven or whatever your chosen build tool is) to depend on cringe.
 
 You can depend on the library as a whole, using it as a normal Gradle or Maven dependency.
 
-`api "com.github.tommyettinger:cringe:0.2.1"`
+`api "com.github.tommyettinger:cringe:0.2.2"`
 
 If you use GWT, then your GWT module needs to depend on:
 
-`implementation "com.github.tommyettinger:cringe:0.2.1:sources"`
+`implementation "com.github.tommyettinger:cringe:0.2.2:sources"`
 
 GWT also needs this `inherits` line added to your `GdxDefinition.gwt.xml` file, with the other inherits lines:
 

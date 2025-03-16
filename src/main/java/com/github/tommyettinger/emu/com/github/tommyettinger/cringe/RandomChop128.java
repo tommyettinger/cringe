@@ -426,13 +426,13 @@ public class RandomChop128 extends GdxRandom {
 		stateC = fa ^ fb + fc;
 		stateD = fd + 0xADB5B165 | 0;
 		if(inner >= outer) return inner;
-		return (int)(innerBound + (
+		return (int)(inner + (
 				((outer - inner & 0xFFFFFFFFL) * (fc & 0xFFFFFFFFL) >>> 32)
-						& ~((long)outerBound - (long)innerBound >> 63)));
+						& ~((long)outer - (long)inner >> 63)));
 	}
 
 	@Override
-	public int nextSignedInt (int innerBound, int outerBound) {
+	public int nextSignedInt (int inner, int outer) {
 		int fa = stateA;
 		int fb = stateB;
 		int fc = stateC;
@@ -444,7 +444,7 @@ public class RandomChop128 extends GdxRandom {
 		stateC = fa ^ fb + fc;
 		stateD = fd + 0xADB5B165 | 0;
 		if(inner >= outer) return inner;
-		return (int)(innerBound +
+		return (int)(inner +
 				((outer - inner & 0xFFFFFFFFL) * (fc & 0xFFFFFFFFL) >>> 32));
 	}
 

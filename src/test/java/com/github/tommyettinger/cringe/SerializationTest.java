@@ -15,7 +15,7 @@ import java.util.UUID;
 public class SerializationTest {
     @Test
     public void testGdxRandomString() {
-        List<GdxRandom> all = Arrays.asList(new RandomDistinct64(-1L), new RandomXMX256(-1L), new RandomAce320(-1L));
+        List<GdxRandom> all = Arrays.asList(new RandomDistinct64(-1L), new RandomXMX256(-1L), new RandomAce320(-1L), new RandomChop128(-1L));
         for (GdxRandom r : all) {
             String s = r.stringSerialize();
             r.nextLong();
@@ -32,7 +32,7 @@ public class SerializationTest {
     @Test
     public void testGdxRandomJson() {
         Json json = new Json();
-        List<GdxRandom> all = Arrays.asList(new RandomDistinct64(-1L), new RandomXMX256(-1L), new RandomAce320(-1L));
+        List<GdxRandom> all = Arrays.asList(new RandomDistinct64(-1L), new RandomXMX256(-1L), new RandomAce320(-1L), new RandomChop128(-1L));
         for (GdxRandom r : all) {
             String s = json.toJson(r);
             System.out.println(s);
@@ -53,7 +53,8 @@ public class SerializationTest {
         fury.register(RandomDistinct64.class);
         fury.register(RandomXMX256.class);
         fury.register(RandomAce320.class);
-        List<GdxRandom> all = Arrays.asList(new RandomDistinct64(-1L), new RandomXMX256(-1L), new RandomAce320(-1L));
+        fury.register(RandomChop128.class);
+        List<GdxRandom> all = Arrays.asList(new RandomDistinct64(-1L), new RandomXMX256(-1L), new RandomAce320(-1L), new RandomChop128(-1L));
         for (GdxRandom r : all) {
             GdxRandom cpy = r.copy();
             byte[] s = fury.serializeJavaObject(r);

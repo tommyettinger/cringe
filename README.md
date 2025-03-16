@@ -75,19 +75,25 @@ each 1 has liek a diff flavor i guess?
 
 `SorbetNoise` tastes niiiice but its also liek `CyclicNoise` and bettr in 2D i think?
 
+an those 2 use liek `RotationTools` but u prolly dont have 2 lololol
+
 `PerlueNoise` is liek Perlin but aslo makin Value at teh saem tiem liek, an then woop woop mixes em up!
 
 `OpenSimplex2FastNoise` is tht fancy OpenSimplex2 thgin in fassssst moddddde
 
-`OpenSimplex2SmoothNoise` is tht fancy OpenSimplex2 thgin in smooooth moddddde
-
-an those 2 use liek `RotationTools` but u prolly dont have 2 lololol
+`OpenSimplex2SmoothNoise` is tht facny OpenSimplex2 thign in smooooth moddddde
 
 then u can give 1 of thoes 2 `ContinuousNoise` n get liek rideged mode n octaevs n stuf
+
+`ContinuousNoise` is siccnastee cooll dawg an u shuod use it lotts!!!11!
 
 these r all liek `Json.Serializable` so u can liek saev and laod stuf
 
 `LineWobble` is kinda liek those but jus 4 1D noise
+
+it liek um gose upp an dowwn wit a um wiglgy wbobly waev but theres different waevs i thikn
+
+wut even is `GradientVectors`??? dont use it lol i gess???
 
 # even moar!!!!!!11!!!
 
@@ -106,6 +112,12 @@ these r all liek `Json.Serializable` so u can liek saev and laod stuf
 teh encarption is not 4 web tho :(
 
 `RoughMath` is omg so itchy n rough but has superfast math if u can handle a lil mess >:)
+
+`MathSupport` dos liek basick mathy thigns tht shulod b suporpted as liek standerd
+
+`Distributor` taeks liek unfiorm nubmers n maeks them nomraler
+
+liek wut >:O um whu siad its nomral thees nubmers are liek rly loooogn demcials
 
 but i think this new stuf is p. cool
 
@@ -135,16 +147,37 @@ or `Fury` 4 moar bianry storaeg from [teh apache foudnatoin](https://fury.apache
 
 or sometimes stuff has codes that liek wriets 2 a String or reads frm 1
 
+im not drukn ur drnuk
+
+heeheeeeeeee
+
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+
 # get
 
 The easiest way to use this library was to copy files from the source code.
 ... But, that was only in the earliest versions. In 0.1.0 and newer, you should probably use
 Gradle (or Maven or whatever your chosen build tool is) to depend on cringe.
 
-The three [GdxRandom](src/main/java/com/github/tommyettinger/cringe/GdxRandom.java) implementations:
+You can depend on the library as a whole, using it as a normal Gradle or Maven dependency.
+
+`api "com.github.tommyettinger:cringe:0.2.1"`
+
+If you use GWT, then your GWT module needs to depend on:
+
+`implementation "com.github.tommyettinger:cringe:0.2.1:sources"`
+
+GWT also needs this `inherits` line added to your `GdxDefinition.gwt.xml` file, with the other inherits lines:
+
+`<inherits name="com.github.tommyettinger.cringe" />`
+
+You don't need the `inherits` line if you just copy a few classes into your sources.
+
+The four [GdxRandom](src/main/java/com/github/tommyettinger/cringe/GdxRandom.java) implementations:
 ([RandomAce320](src/main/java/com/github/tommyettinger/cringe/RandomAce320.java),
 [RandomDistinct64](src/main/java/com/github/tommyettinger/cringe/RandomDistinct64.java),
-and [RandomXMX256](src/main/java/com/github/tommyettinger/cringe/RandomXMX256.java))
+[RandomXMX256](src/main/java/com/github/tommyettinger/cringe/RandomXMX256.java)),
+and [RandomChop128](src/main/java/com/github/tommyettinger/cringe/RandomChop128.java))
 can be used as drop-in replacements for `java.util.Random` or an
 almost-identical replacement for libGDX's `RandomXS128`.
 
@@ -153,9 +186,13 @@ the PractRand battery of tests to 64TB of tested data. They each have different 
 results that can be produced before the sequence repeats. In practice, a game will probably never have to worry about
 exhausting an entire period and actually seeing the sequence repeat. However, far enough along through the actual period
 of a generator, it becomes possible for an adversary (typically a player) to notice and exploit patterns. The shortest
-I believe this could happen is in `RandomDistinct64`, after over 4 billion random numbers are generated (2 to the 32).
-For `RandomXMX256`, the earliest point should be 2 to the 128, which just means it isn't going to happen. `AceRandom320`
-has many different possible cycles, with the shortest possible one at least as long as `RandomDistinct64`'s period.
+I believe this could happen predictably is in `RandomDistinct64`, after over 4 billion random numbers are generated (2
+to the 32). It can theoretically happen earlier in `RandomChop128`, which has a minimum guaranteed period of 2 to the 64
+calls to `nextInt()`, but in practice, encountering a period shorter than 2 to the 40-something is vanishingly unlikely
+(buy a lottery ticket if you encounter it, why not), putting the closest point that might be predictable at over a
+million generated `int`s. For `RandomXMX256`, the earliest point should be 2 to the 128, which just means it isn't going
+to happen. `AceRandom320` has many different possible cycles, with the shortest possible one at least as long as
+`RandomDistinct64`'s period.
 
 `RandomAce320` is very fast. It uses very few types of instruction, and only performs one math instruction on each state
 to get a random result. It also can perform those 5 math instructions using instruction-level parallelism, which the JVM
@@ -181,6 +218,14 @@ one generator producing many random numbers, or many generators with random init
 are extremely similar, patterns may become observable over time. It has 4 `long`s of state, each of which can have any
 value unless all states are 0 (which is not permitted). This generator has a mildly random state transition and an
 extremely thorough output function (also called a scrambler).
+
+`RandomChop128` is meant primarily for games that target GWT (or may sometimes target GWT), and it is optimized so it
+does almost all possible math on 32-bit values. It's "super-sourced" so a different file is used when GWT compiles it,
+and all the GWT quirks are isolated to that file (in the `emu` folder, which isn't built otherwise). This is a subcycle
+generator, like `RandomAce320`, but has 4 states instead of 5, and its counter state only goes through 2 to the 32
+values instead of `RandomAce320`'s 2 to the 64 values. It also relies entirely on its state transition to appear random,
+and it returns its `stateC` verbatim on the first call to `nextInt()`. As a result, it's a good idea to seed one of
+these with `setSeed(long)` instead of `setState(long, long, long, long)`, since it randomizes all states well.
 
 There are also a few files that use random number generators in some way:
 
@@ -214,20 +259,6 @@ class' implementations can generate the appropriate type of Vector for a given d
 either Halton sequences or R2-like sequences, and can be 2D through 6D. The `Distributor` class handles conversion
 from `double`, `int`, or `long` values to normal-distributed ones. `RoughMath` provides approximations to various
 math functions. There was briefly a `Ziggurat` class, but it has been merged entirely into `Distributor`.
-
-You can depend on the library as a whole, using it as a normal Gradle or Maven dependency.
-
-`api "com.github.tommyettinger:cringe:0.2.0"`
-
-If you use GWT, then your GWT module needs to depend on:
-
-`implementation "com.github.tommyettinger:cringe:0.2.0:sources"`
-
-GWT also needs this `inherits` line added to your `GdxDefinition.gwt.xml` file, with the other inherits lines:
-
-`<inherits name="com.github.tommyettinger.cringe" />`
-
-You don't need the `inherits` line if you just copy a few classes into your sources.
 
 # license
 

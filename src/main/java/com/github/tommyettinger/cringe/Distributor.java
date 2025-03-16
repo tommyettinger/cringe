@@ -1,5 +1,7 @@
 package com.github.tommyettinger.cringe;
 
+import static com.github.tommyettinger.cringe.RoughMath.logRougher;
+
 /**
  * Different methods for distributing input {@code long} or {@code double} values from a given domain into specific
  * distributions, such as the normal distribution. {@link #probitD(double)} and {@link #probitF(float)} take a number in
@@ -12,7 +14,7 @@ package com.github.tommyettinger.cringe;
  * <br>
  * All of these ways so far will preserve patterns in the input, so inputs close to the lowest
  * possible input (0.0 for probit(), {@link Long#MIN_VALUE} for normal(), {@link Integer#MIN_VALUE} for normalF()) will
- * produce the lowest possible output (-26.48372928592822 for probitD() and probitL(), or -9.080134 for probitF() and
+ * produce the lowest possible output (-26.48372928592822 for probitD() and probitL(), or -9.082295 for probitF() and
  * probitI()), and similarly for the highest possible inputs producing the highest possible outputs.
  * <br>
  * There's also {@link #normal(long)}, which uses the
@@ -73,23 +75,23 @@ public final class Distributor {
 
     /**
      * A single-precision probit() approximation that takes a float between 0 and 1 inclusive and returns an
-     * approximately-Gaussian-distributed float between -9.080134 and 9.080134 .
+     * approximately-Gaussian-distributed float between -9.082295 and 9.082295 .
      * The function maps the lowest inputs to the most negative outputs, the highest inputs to the most
      * positive outputs, and inputs near 0.5 to outputs near 0.
      * <a href="https://www.researchgate.net/publication/46462650_A_New_Approximation_to_the_Normal_Distribution_Quantile_Function">Uses this algorithm by Paul Voutier</a>.
      * @see <a href="https://en.wikipedia.org/wiki/Probit_function">Wikipedia has a page on the probit function.</a>
      * @param p should be between 0 and 1, inclusive.
-     * @return an approximately-Gaussian-distributed float between -9.080134 and 9.080134
+     * @return an approximately-Gaussian-distributed float between -9.082295 and 9.082295
      */
     public static float probitF(float p) {
         if(0.0465f > p){
-            float r = (float)Math.sqrt(logRough(1f / (p * p)));
+            final float r = (float)Math.sqrt(logRougher(1f / (p * p)));
             return c3f * r + c2f + (c1f * r + c0f) / (r * (r + d1f) + d0f);
         } else if(0.9535f < p) {
-            float q = 1f - p, r = (float)Math.sqrt(logRough(1f / (q * q)));
+            final float q = 1f - p, r = (float)Math.sqrt(logRougher(1f / (q * q)));
             return -c3f * r - c2f - (c1f * r + c0f) / (r * (r + d1f) + d0f);
         } else {
-            float q = p - 0.5f, r = q * q;
+            final float q = p - 0.5f, r = q * q;
             return q * (a2f + (a1f * r + a0f) / (r * (r + b1f) + b0f));
         }
     }
@@ -106,39 +108,41 @@ public final class Distributor {
      */
     public static double probitD(double p) {
         if(0.0465 > p){
-            double r = Math.sqrt(Math.log(1.0 / (p * p + 5.56268464626801E-309)));
+            /* 5.56268464626801E-309 is the smallest number possible to add here. */
+            final double r = Math.sqrt(Math.log(1.0 / (p * p + 5.56268464626801E-309)));
             return c3 * r + c2 + (c1 * r + c0) / (r * (r + d1) + d0);
         } else if(0.9535 < p) {
-            double q = 1.0 - p, r = Math.sqrt(Math.log(1.0 / (q * q + 5.56268464626801E-309)));
+            /* 5.56268464626801E-309 is the smallest number possible to add here. */
+            final double q = 1.0 - p, r = Math.sqrt(Math.log(1.0 / (q * q + 5.56268464626801E-309)));
             return -c3 * r - c2 - (c1 * r + c0) / (r * (r + d1) + d0);
         } else {
-            double q = p - 0.5, r = q * q;
+            final double q = p - 0.5, r = q * q;
             return q * (a2 + (a1 * r + a0) / (r * (r + b1) + b0));
         }
     }
 
     /**
      * A single-precision probit() approximation that takes any int and returns an
-     * approximately-Gaussian-distributed float between -9.080134 and 9.080134 .
+     * approximately-Gaussian-distributed float between -9.082295 and 9.082295 .
      * The function maps the most negative inputs to the most negative outputs, the most positive inputs to the most
-     * positive outputs, and inputs near 0 to outputs near 0. This does not consider the bottom 8 bits of {@code i}.
+     * positive outputs, and inputs near 0 to outputs near 0.
      * <a href="https://www.researchgate.net/publication/46462650_A_New_Approximation_to_the_Normal_Distribution_Quantile_Function">Uses this algorithm by Paul Voutier</a>.
      * @see <a href="https://en.wikipedia.org/wiki/Probit_function">Wikipedia has a page on the probit function.</a>
      * @param i may be any int, though very close ints will not produce different results
-     * @return an approximately-Gaussian-distributed float between -9.080134 and 9.080134
+     * @return an approximately-Gaussian-distributed float between -9.082295 and 9.082295
      */
     public static float probitI(int i) {
         /* 2.3283064E-10f is 0x1p-32f */
-        final float p = 2.3283064E-10f * i + 0.5f;
-        if(0.0465f > p){
-            float r = (float)Math.sqrt(logRough(1f / (p * p)));
+        final float h = 2.3283064E-10f * i;
+        if(-0.4535f > h){
+            final float q = h + 0.5f, r = (float)Math.sqrt(logRougher(1f / (q * q)));
             return c3f * r + c2f + (c1f * r + c0f) / (r * (r + d1f) + d0f);
-        } else if(0.9535f < p) {
-            float q = 1f - p, r = (float)Math.sqrt(logRough(1f / (q * q)));
+        } else if(0.4535f < h) {
+            final float q = 0.5f - h, r = (float)Math.sqrt(logRougher(1f / (q * q)));
             return -c3f * r - c2f - (c1f * r + c0f) / (r * (r + d1f) + d0f);
         } else {
-            float q = p - 0.5f, r = q * q;
-            return q * (a2f + (a1f * r + a0f) / (r * (r + b1f) + b0f));
+            final float r = h * h;
+            return h * (a2f + (a1f * r + a0f) / (r * (r + b1f) + b0f));
         }
     }
 
@@ -146,7 +150,7 @@ public final class Distributor {
      * A double-precision probit() approximation that takes any long and returns an
      * approximately-Gaussian-distributed double between -26.48372928592822 and 26.48372928592822 .
      * The function maps the most negative inputs to the most negative outputs, the most positive inputs to the most
-     * positive outputs, and inputs near 0 to outputs near 0. This does not consider the bottom 11 bits of {@code l}.
+     * positive outputs, and inputs near 0 to outputs near 0.
      * <a href="https://www.researchgate.net/publication/46462650_A_New_Approximation_to_the_Normal_Distribution_Quantile_Function">Uses this algorithm by Paul Voutier</a>.
      * @see <a href="https://en.wikipedia.org/wiki/Probit_function">Wikipedia has a page on the probit function.</a>
      * @param l may be any long, though very close longs will not produce different results
@@ -154,16 +158,18 @@ public final class Distributor {
      */
     public static double probitL(long l) {
         /* 5.421010862427522E-20 is 0x1p-64 */
-        final double p = l * 5.421010862427522E-20 + 0.5;
-        if(0.0465 > p) {
-            double r = Math.sqrt(Math.log(1.0 / (p * p + 5.56268464626801E-309)));
+        final double h = l * 5.421010862427522E-20;
+        if(-0.4535 > h) {
+            /* 5.56268464626801E-309 is the smallest number possible to add here. */
+            final double p = h + 0.5, r = Math.sqrt(Math.log(1.0 / (p * p + 5.56268464626801E-309)));
             return c3 * r + c2 + (c1 * r + c0) / (r * (r + d1) + d0);
-        } else if(0.9535 < p) {
-            double q = 1.0 - p, r = Math.sqrt(Math.log(1.0 / (q * q + 5.56268464626801E-309)));
+        } else if(0.4535 < h) {
+            /* 5.56268464626801E-309 is the smallest number possible to add here. */
+            final double q = 0.5 - h, r = Math.sqrt(Math.log(1.0 / (q * q + 5.56268464626801E-309)));
             return -c3 * r - c2 - (c1 * r + c0) / (r * (r + d1) + d0);
         } else {
-            double q = p - 0.5, r = q * q;
-            return q * (a2 + (a1 * r + a0) / (r * (r + b1) + b0));
+            final double r = h * h;
+            return h * (a2 + (a1 * r + a0) / (r * (r + b1) + b0));
         }
     }
 
@@ -252,15 +258,13 @@ public final class Distributor {
     /**
      * Approximates the natural logarithm of {@code x} (that is, with base E), using single-precision, somewhat roughly.
      * Ported from <a href="https://code.google.com/archive/p/fastapprox/">fastapprox</a>, which is open source
-     * under the New BSD License.
+     * under the New BSD License. Delegates here to {@link RoughMath#logRough(float)}.
      * @param x the argument to the logarithm; must be greater than 0
      * @return an approximation of the logarithm of x with base E; can be any float
      */
     public static float logRough (float x)
     {
-        final int vx = Compatibility.floatToIntBits(x);
-        final float mx = Compatibility.intBitsToFloat((vx & 0x007FFFFF) | 0x3f000000);
-        return vx * 8.262958E-8f - 86.10657f - 1.0383555f * mx - 1.1962888f / (0.3520887068f + mx);
+        return RoughMath.logRough(x);
     }
 
     /**

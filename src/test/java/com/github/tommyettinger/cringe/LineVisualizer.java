@@ -31,6 +31,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import static com.badlogic.gdx.Input.Keys.*;
+import static com.github.tommyettinger.cringe.ColorSupport.*;
 
 /**
  */
@@ -54,7 +55,7 @@ public class LineVisualizer extends ApplicationAdapter {
             (f, i) -> MathSupport.cbrt(LineWobble.bicubicWobble(f, i))                                       //10
     };
     public int wobbleCount = wobbles.length;
-    public int currentWobble = wobbleCount-1;
+    public int currentWobble = 1;
     public int octaves = 1;
 
 
@@ -78,8 +79,8 @@ public class LineVisualizer extends ApplicationAdapter {
 
 
     public static String title = "";
-    public static int modeCount = 3;
-    private int currentMode = 0;
+    public static int modeCount = 4;
+    private int currentMode = 3;
     private int seed = 1;
     private Viewport view;
     private boolean keepGoing = true;
@@ -88,6 +89,10 @@ public class LineVisualizer extends ApplicationAdapter {
     private float speed = 0.25f;
     private double speedControl = -1.0;
     private static final int width = 256, height = 256, half = height >>> 1;
+
+    private final Color color = new Color(Color.WHITE);//new Color(Color.LIME);
+    private final Color tempColor = new Color(Color.WHITE);
+    private float hue = hue(color), sat = saturation(color), lit = lightness(color);
 
     // packed float colors
     private static final float[] heights = new float[width * 128];
@@ -224,6 +229,26 @@ public class LineVisualizer extends ApplicationAdapter {
                     heights[width * (t+1) - 1] = (int) (wobble.applyAsFloat(traveled, seed+t) * 0x.fcp7f);
                 }
                 break;
+            case 3: {
+                ScreenUtils.clear(Color.DARK_GRAY);
+                renderer.begin(view.getCamera().combined, GL20.GL_POINTS);
+                float c = traveled * 2f;
+                // c and ctr are both about the same counter, they advance by a tiny float every frame.
+                for (int d = 4096; d < 8192; d++) {
+                    float bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
+                    float da = d * 0x1p-8f;
+                    float x = (wobble.applyAsFloat(da * 0.7548776662466927f + c, seed) * 0.5f) * bright * width + width * 0.5f;
+                    float y = (wobble.applyAsFloat(da * 0.5698402909980532f + c, ~seed) * 0.5f) * bright * height + height * 0.5f;
+                    // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
+                    // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
+                    ColorSupport.hsb2rgb(tempColor, hue + bright + traveled * 0.3f, 1f, bright * 1.2f - 0.2f, 1f);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x, y, 0);
+                }
+                renderer.end();
+                return;
+            }
+
         }
         renderer.begin(view.getCamera().combined, GL20.GL_LINES);
         renderer.color(GRAY);

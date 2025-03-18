@@ -20,8 +20,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import static com.badlogic.gdx.math.MathUtils.floor;
-import static com.github.tommyettinger.cringe.PointHasher.hash256;
-import static com.github.tommyettinger.cringe.PointHasher.hash32;
+import static com.github.tommyettinger.cringe.PointHasher.*;
 
 /**
  * Simplex noise functions, in 2D, 3D, 4D, 5D, and 6D. This variety scales the result with multiplication by a constant,
@@ -120,38 +119,39 @@ public class SimplexNoise extends RawNoise {
 
         int i1, j1;
         if (x0 > y0) {
-            i1 = 1;
+            i1 = -1;
             j1 = 0;
         } else {
             i1 = 0;
-            j1 = 1;
+            j1 = -1;
         }
 
-        float x1 = x0 - i1 + G2;
-        float y1 = y0 - j1 + G2;
+        float x1 = x0 + i1 + G2;
+        float y1 = y0 + j1 + G2;
         float x2 = x0 - 1 + H2;
         float y2 = y0 - 1 + H2;
 
         float n = 0;
-
+        i *= X2;
+        j *= Y2;
         t = 0.5f - x0 * x0 - y0 * y0;
         if (t > 0) {
             t *= t;
-            final int h = hash256(i, j, seed) << 1;
+            final int h = hashPrimed256(i, j, seed) << 1;
             n += t * t * (x0 * GRADIENTS_2D[h] + y0 * GRADIENTS_2D[h+1]);
         }
 
         t = 0.5f - x1 * x1 - y1 * y1;
         if (t > 0) {
             t *= t;
-            final int h = hash256(i + i1, j + j1, seed) << 1;
+            final int h = hashPrimed256(i + (i1 & X2), j + (j1 & Y2), seed) << 1;
             n += t * t * (x1 * GRADIENTS_2D[h] + y1 * GRADIENTS_2D[h+1]);
         }
 
         t = 0.5f - x2 * x2 - y2 * y2;
         if (t > 0)  {
             t *= t;
-            final int h = hash256(i + 1, j + 1, seed) << 1;
+            final int h = hashPrimed256(i + X2, j + Y2, seed) << 1;
             n += t * t * (x2 * GRADIENTS_2D[h] + y2 * GRADIENTS_2D[h+1]);
         }
 
@@ -176,92 +176,94 @@ public class SimplexNoise extends RawNoise {
 
         if (x0 >= y0) {
             if (y0 >= z0) {
-                i1 = 1;
+                i1 =-1;
                 j1 = 0;
                 k1 = 0;
-                i2 = 1;
-                j2 = 1;
+                i2 =-1;
+                j2 =-1;
                 k2 = 0;
             } else if (x0 >= z0) {
-                i1 = 1;
+                i1 =-1;
                 j1 = 0;
                 k1 = 0;
-                i2 = 1;
+                i2 =-1;
                 j2 = 0;
-                k2 = 1;
+                k2 =-1;
             } else // x0 < z0
             {
                 i1 = 0;
                 j1 = 0;
-                k1 = 1;
-                i2 = 1;
+                k1 =-1;
+                i2 =-1;
                 j2 = 0;
-                k2 = 1;
+                k2 =-1;
             }
         } else // x0 < y0
         {
             if (y0 < z0) {
                 i1 = 0;
                 j1 = 0;
-                k1 = 1;
+                k1 =-1;
                 i2 = 0;
-                j2 = 1;
-                k2 = 1;
+                j2 =-1;
+                k2 =-1;
             } else if (x0 < z0) {
                 i1 = 0;
-                j1 = 1;
+                j1 =-1;
                 k1 = 0;
                 i2 = 0;
-                j2 = 1;
-                k2 = 1;
+                j2 =-1;
+                k2 =-1;
             } else // x0 >= z0
             {
                 i1 = 0;
-                j1 = 1;
+                j1 =-1;
                 k1 = 0;
-                i2 = 1;
-                j2 = 1;
+                i2 =-1;
+                j2 =-1;
                 k2 = 0;
             }
         }
 
-        float x1 = x0 - i1 + G3;
-        float y1 = y0 - j1 + G3;
-        float z1 = z0 - k1 + G3;
-        float x2 = x0 - i2 + F3;
-        float y2 = y0 - j2 + F3;
-        float z2 = z0 - k2 + F3;
+        float x1 = x0 + i1 + G3;
+        float y1 = y0 + j1 + G3;
+        float z1 = z0 + k1 + G3;
+        float x2 = x0 + i2 + F3;
+        float y2 = y0 + j2 + F3;
+        float z2 = z0 + k2 + F3;
         float x3 = x0 - 0.5f;
         float y3 = y0 - 0.5f;
         float z3 = z0 - 0.5f;
 
         float n = 0;
-
+        i *= X3;
+        j *= Y3;
+        k *= Z3;
         t = LIMIT3 - x0 * x0 - y0 * y0 - z0 * z0;
         if (t > 0) {
             t *= t;
-            final int h = hash32(i, j, k, seed) << 2;
+            final int h = hashPrimed32(i, j, k, seed) << 2;
             n += t * t * (x0 * GRADIENTS_3D[h] + y0 * GRADIENTS_3D[h + 1] + z0 * GRADIENTS_3D[h + 2]);
         }
 
         t = LIMIT3 - x1 * x1 - y1 * y1 - z1 * z1;
         if (t > 0) {
             t *= t;
-            final int h = hash32(i + i1, j + j1, k + k1, seed) << 2;
+            final int h = hashPrimed32(i + (i1 & X3), j + (j1 & Y3), k + (k1 & Z3), seed) << 2;
             n += t * t * (x1 * GRADIENTS_3D[h] + y1 * GRADIENTS_3D[h + 1] + z1 * GRADIENTS_3D[h + 2]);
         }
 
         t = LIMIT3 - x2 * x2 - y2 * y2 - z2 * z2;
         if (t > 0) {
             t *= t;
-            final int h = hash32(i + i2, j + j2, k + k2, seed) << 2;
+            final int h = hashPrimed32(i + (i2 & X3), j + (j2 & Y3), k + (k2 & Z3), seed) << 2;
             n += t * t * (x2 * GRADIENTS_3D[h] + y2 * GRADIENTS_3D[h + 1] + z2 * GRADIENTS_3D[h + 2]);
         }
 
         t = LIMIT3 - x3 * x3 - y3 * y3 - z3 * z3;
         if (t > 0)  {
             t *= t;
-            final int h = hash32(i + 1, j + 1, k + 1, seed) << 2;
+            final int h = hashPrimed32(i + X3, j + Y3, k + Z3, seed) << 2;
             n += t * t * (x3 * GRADIENTS_3D[h] + y3 * GRADIENTS_3D[h + 1] + z3 * GRADIENTS_3D[h + 2]);
         }
 
@@ -301,69 +303,74 @@ public class SimplexNoise extends RawNoise {
         if (z0 > w0) rankz++; else rankw++;
         // @formatter:on
 
-        int i1 = 2 - rankx >>> 31;
-        int j1 = 2 - ranky >>> 31;
-        int k1 = 2 - rankz >>> 31;
-        int l1 = 2 - rankw >>> 31;
+        int i1 = 2 - rankx >> 31;
+        int j1 = 2 - ranky >> 31;
+        int k1 = 2 - rankz >> 31;
+        int l1 = 2 - rankw >> 31;
 
-        int i2 = 1 - rankx >>> 31;
-        int j2 = 1 - ranky >>> 31;
-        int k2 = 1 - rankz >>> 31;
-        int l2 = 1 - rankw >>> 31;
+        int i2 = 1 - rankx >> 31;
+        int j2 = 1 - ranky >> 31;
+        int k2 = 1 - rankz >> 31;
+        int l2 = 1 - rankw >> 31;
 
-        int i3 = -rankx >>> 31;
-        int j3 = -ranky >>> 31;
-        int k3 = -rankz >>> 31;
-        int l3 = -rankw >>> 31;
+        int i3 = -rankx >> 31;
+        int j3 = -ranky >> 31;
+        int k3 = -rankz >> 31;
+        int l3 = -rankw >> 31;
 
-        float x1 = x0 - i1 + G4;
-        float y1 = y0 - j1 + G4;
-        float z1 = z0 - k1 + G4;
-        float w1 = w0 - l1 + G4;
+        float x1 = x0 + i1 + G4;
+        float y1 = y0 + j1 + G4;
+        float z1 = z0 + k1 + G4;
+        float w1 = w0 + l1 + G4;
 
-        float x2 = x0 - i2 + 2 * G4;
-        float y2 = y0 - j2 + 2 * G4;
-        float z2 = z0 - k2 + 2 * G4;
-        float w2 = w0 - l2 + 2 * G4;
+        float x2 = x0 + i2 + 2 * G4;
+        float y2 = y0 + j2 + 2 * G4;
+        float z2 = z0 + k2 + 2 * G4;
+        float w2 = w0 + l2 + 2 * G4;
 
-        float x3 = x0 - i3 + 3 * G4;
-        float y3 = y0 - j3 + 3 * G4;
-        float z3 = z0 - k3 + 3 * G4;
-        float w3 = w0 - l3 + 3 * G4;
+        float x3 = x0 + i3 + 3 * G4;
+        float y3 = y0 + j3 + 3 * G4;
+        float z3 = z0 + k3 + 3 * G4;
+        float w3 = w0 + l3 + 3 * G4;
 
         float x4 = x0 - 1 + 4 * G4;
         float y4 = y0 - 1 + 4 * G4;
         float z4 = z0 - 1 + 4 * G4;
         float w4 = w0 - 1 + 4 * G4;
 
+        i *= X4;
+        j *= Y4;
+        k *= Z4;
+        l *= W4;
+
         float n = 0f;
         float t0 = LIMIT4 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0;
         if(t0 > 0) {
-            final int h0 = (hash256(i, j, k, l, seed) << 2);
+            final int h0 = (hashPrimed256(i, j, k, l, seed) << 2);
             t0 *= t0;
             n += t0 * t0 * (x0 * GRADIENTS_4D[h0] + y0 * GRADIENTS_4D[h0 + 1] + z0 * GRADIENTS_4D[h0 + 2] + w0 * GRADIENTS_4D[h0 + 3]);
         }
         float t1 = LIMIT4 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1;
         if (t1 > 0) {
-            final int h1 = (hash256(i + i1, j + j1, k + k1, l + l1, seed) << 2);
+            final int h1 = (hashPrimed256(i + (i1 & X4), j + (j1 & Y4), k + (k1 & Z4), l + (l1 & W4), seed) << 2);
             t1 *= t1;
             n += t1 * t1 * (x1 * GRADIENTS_4D[h1] + y1 * GRADIENTS_4D[h1 + 1] + z1 * GRADIENTS_4D[h1 + 2] + w1 * GRADIENTS_4D[h1 + 3]);
         }
         float t2 = LIMIT4 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2;
         if (t2 > 0) {
-            final int h2 = (hash256(i + i2, j + j2, k + k2, l + l2, seed) << 2);
+            final int h2 = (hashPrimed256(i + (i2 & X4), j + (j2 & Y4), k + (k2 & Z4), l + (l2 & W4), seed) << 2);
             t2 *= t2;
             n += t2 * t2 * (x2 * GRADIENTS_4D[h2] + y2 * GRADIENTS_4D[h2 + 1] + z2 * GRADIENTS_4D[h2 + 2] + w2 * GRADIENTS_4D[h2 + 3]);
         }
         float t3 = LIMIT4 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3;
         if (t3 > 0) {
-            final int h3 = (hash256(i + i3, j + j3, k + k3, l + l3, seed) << 2);
+            final int h3 = (hashPrimed256(i + (i3 & X4), j + (j3 & Y4), k + (k3 & Z4), l + (l3 & W4), seed) << 2);
             t3 *= t3;
             n += t3 * t3 * (x3 * GRADIENTS_4D[h3] + y3 * GRADIENTS_4D[h3 + 1] + z3 * GRADIENTS_4D[h3 + 2] + w3 * GRADIENTS_4D[h3 + 3]);
         }
         float t4 = LIMIT4 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4;
         if (t4 > 0) {
-            final int h4 = (hash256(i + 1, j + 1, k + 1, l + 1, seed) << 2);
+            final int h4 = (hashPrimed256(i + X4, j + Y4, k + Z4, l + W4, seed) << 2);
             t4 *= t4;
             n += t4 * t4 * (x4 * GRADIENTS_4D[h4] + y4 * GRADIENTS_4D[h4 + 1] + z4 * GRADIENTS_4D[h4 + 2] + w4 * GRADIENTS_4D[h4 + 3]);
         }

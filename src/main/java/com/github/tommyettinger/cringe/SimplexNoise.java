@@ -433,53 +433,53 @@ public class SimplexNoise extends RawNoise {
         if (w0 > u0) rankw++; else ranku++;
         // @formatter:on
 
-        int i1 = 3 - rankx >>> 31;
-        int j1 = 3 - ranky >>> 31;
-        int k1 = 3 - rankz >>> 31;
-        int l1 = 3 - rankw >>> 31;
-        int h1 = 3 - ranku >>> 31;
+        int i1 = 3 - rankx >> 31;
+        int j1 = 3 - ranky >> 31;
+        int k1 = 3 - rankz >> 31;
+        int l1 = 3 - rankw >> 31;
+        int h1 = 3 - ranku >> 31;
 
-        int i2 = 2 - rankx >>> 31;
-        int j2 = 2 - ranky >>> 31;
-        int k2 = 2 - rankz >>> 31;
-        int l2 = 2 - rankw >>> 31;
-        int h2 = 2 - ranku >>> 31;
+        int i2 = 2 - rankx >> 31;
+        int j2 = 2 - ranky >> 31;
+        int k2 = 2 - rankz >> 31;
+        int l2 = 2 - rankw >> 31;
+        int h2 = 2 - ranku >> 31;
 
-        int i3 = 1 - rankx >>> 31;
-        int j3 = 1 - ranky >>> 31;
-        int k3 = 1 - rankz >>> 31;
-        int l3 = 1 - rankw >>> 31;
-        int h3 = 1 - ranku >>> 31;
+        int i3 = 1 - rankx >> 31;
+        int j3 = 1 - ranky >> 31;
+        int k3 = 1 - rankz >> 31;
+        int l3 = 1 - rankw >> 31;
+        int h3 = 1 - ranku >> 31;
 
-        int i4 = -rankx >>> 31;
-        int j4 = -ranky >>> 31;
-        int k4 = -rankz >>> 31;
-        int l4 = -rankw >>> 31;
-        int h4 = -ranku >>> 31;
+        int i4 = -rankx >> 31;
+        int j4 = -ranky >> 31;
+        int k4 = -rankz >> 31;
+        int l4 = -rankw >> 31;
+        int h4 = -ranku >> 31;
 
-        float x1 = x0 - i1 + G5;
-        float y1 = y0 - j1 + G5;
-        float z1 = z0 - k1 + G5;
-        float w1 = w0 - l1 + G5;
-        float u1 = u0 - h1 + G5;
+        float x1 = x0 + i1 + G5;
+        float y1 = y0 + j1 + G5;
+        float z1 = z0 + k1 + G5;
+        float w1 = w0 + l1 + G5;
+        float u1 = u0 + h1 + G5;
 
-        float x2 = x0 - i2 + 2 * G5;
-        float y2 = y0 - j2 + 2 * G5;
-        float z2 = z0 - k2 + 2 * G5;
-        float w2 = w0 - l2 + 2 * G5;
-        float u2 = u0 - h2 + 2 * G5;
+        float x2 = x0 + i2 + 2 * G5;
+        float y2 = y0 + j2 + 2 * G5;
+        float z2 = z0 + k2 + 2 * G5;
+        float w2 = w0 + l2 + 2 * G5;
+        float u2 = u0 + h2 + 2 * G5;
 
-        float x3 = x0 - i3 + 3 * G5;
-        float y3 = y0 - j3 + 3 * G5;
-        float z3 = z0 - k3 + 3 * G5;
-        float w3 = w0 - l3 + 3 * G5;
-        float u3 = u0 - h3 + 3 * G5;
+        float x3 = x0 + i3 + 3 * G5;
+        float y3 = y0 + j3 + 3 * G5;
+        float z3 = z0 + k3 + 3 * G5;
+        float w3 = w0 + l3 + 3 * G5;
+        float u3 = u0 + h3 + 3 * G5;
 
-        float x4 = x0 - i4 + 4 * G5;
-        float y4 = y0 - j4 + 4 * G5;
-        float z4 = z0 - k4 + 4 * G5;
-        float w4 = w0 - l4 + 4 * G5;
-        float u4 = u0 - h4 + 4 * G5;
+        float x4 = x0 + i4 + 4 * G5;
+        float y4 = y0 + j4 + 4 * G5;
+        float z4 = z0 + k4 + 4 * G5;
+        float w4 = w0 + l4 + 4 * G5;
+        float u4 = u0 + h4 + 4 * G5;
 
         float x5 = x0 - 1 + 5 * G5;
         float y5 = y0 - 1 + 5 * G5;
@@ -487,45 +487,51 @@ public class SimplexNoise extends RawNoise {
         float w5 = w0 - 1 + 5 * G5;
         float u5 = u0 - 1 + 5 * G5;
 
+        i *= X5;
+        j *= Y5;
+        k *= Z5;
+        l *= W5;
+        h *= U5;
+
         t = LIMIT5 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0 - u0 * u0;
         if (t > 0) {
             t *= t;
-            final int hash = hash256(i, j, k, l, h, seed) << 3;
+            final int hash = hashPrimed256(i, j, k, l, h, seed) << 3;
             n += t * t * (x0 * GRADIENTS_5D[hash] + y0 * GRADIENTS_5D[hash + 1] + z0 * GRADIENTS_5D[hash + 2] + w0 * GRADIENTS_5D[hash + 3] + u0 * GRADIENTS_5D[hash + 4]);
         }
 
         t = LIMIT5 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1 - u1 * u1;
         if (t > 0) {
             t *= t;
-            final int hash = hash256(i + i1, j + j1, k + k1, l + l1, h + h1, seed) << 3;
+            final int hash = hashPrimed256(i + (i1 & X5), j + (j1 & Y5), k + (k1 & Z5), l + (l1 & W5), h + (h1 & U5), seed) << 3;
             n += t * t * (x1 * GRADIENTS_5D[hash] + y1 * GRADIENTS_5D[hash + 1] + z1 * GRADIENTS_5D[hash + 2] + w1 * GRADIENTS_5D[hash + 3] + u1 * GRADIENTS_5D[hash + 4]);
         }
 
         t = LIMIT5 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2 - u2 * u2;
         if (t > 0) {
             t *= t;
-            final int hash = hash256(i + i2, j + j2, k + k2, l + l2, h + h2, seed) << 3;
+            final int hash = hashPrimed256(i + (i2 & X5), j + (j2 & Y5), k + (k2 & Z5), l + (l2 & W5), h + (h2 & U5), seed) << 3;
             n += t * t * (x2 * GRADIENTS_5D[hash] + y2 * GRADIENTS_5D[hash + 1] + z2 * GRADIENTS_5D[hash + 2] + w2 * GRADIENTS_5D[hash + 3] + u2 * GRADIENTS_5D[hash + 4]);
         }
 
         t = LIMIT5 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3 - u3 * u3;
         if (t > 0) {
             t *= t;
-            final int hash = hash256(i + i3, j + j3, k + k3, l + l3, h + h3, seed) << 3;
+            final int hash = hashPrimed256(i + (i3 & X5), j + (j3 & Y5), k + (k3 & Z5), l + (l3 & W5), h + (h3 & U5), seed) << 3;
             n += t * t * (x3 * GRADIENTS_5D[hash] + y3 * GRADIENTS_5D[hash + 1] + z3 * GRADIENTS_5D[hash + 2] + w3 * GRADIENTS_5D[hash + 3] + u3 * GRADIENTS_5D[hash + 4]);
         }
 
         t = LIMIT5 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4 - u4 * u4;
         if (t > 0) {
             t *= t;
-            final int hash = hash256(i + i4, j + j4, k + k4, l + l4, h + h4, seed) << 3;
+            final int hash = hashPrimed256(i + (i4 & X5), j + (j4 & Y5), k + (k4 & Z5), l + (l4 & W5), h + (h4 & U5), seed) << 3;
             n += t * t * (x4 * GRADIENTS_5D[hash] + y4 * GRADIENTS_5D[hash + 1] + z4 * GRADIENTS_5D[hash + 2] + w4 * GRADIENTS_5D[hash + 3] + u4 * GRADIENTS_5D[hash + 4]);
         }
 
         t = LIMIT5 - x5 * x5 - y5 * y5 - z5 * z5 - w5 * w5 - u5 * u5;
         if (t > 0) {
             t *= t;
-            final int hash = hash256(i + 1, j + 1, k + 1, l + 1, h + 1, seed) << 3;
+            final int hash = hashPrimed256(i + X5, j + Y5, k + Z5, l + W5, h + U5, seed) << 3;
             n += t * t * (x5 * GRADIENTS_5D[hash] + y5 * GRADIENTS_5D[hash + 1] + z5 * GRADIENTS_5D[hash + 2] + w5 * GRADIENTS_5D[hash + 3] + u5 * GRADIENTS_5D[hash + 4]);
         }
 
@@ -587,75 +593,75 @@ public class SimplexNoise extends RawNoise {
         if (u0 > v0) ranku++; else rankv++;
         // @formatter:on
 
-        int i1 = 4 - rankx >>> 31;
-        int j1 = 4 - ranky >>> 31;
-        int k1 = 4 - rankz >>> 31;
-        int l1 = 4 - rankw >>> 31;
-        int h1 = 4 - ranku >>> 31;
-        int g1 = 4 - rankv >>> 31;
+        int i1 = 4 - rankx >> 31;
+        int j1 = 4 - ranky >> 31;
+        int k1 = 4 - rankz >> 31;
+        int l1 = 4 - rankw >> 31;
+        int h1 = 4 - ranku >> 31;
+        int g1 = 4 - rankv >> 31;
 
-        int i2 = 3 - rankx >>> 31;
-        int j2 = 3 - ranky >>> 31;
-        int k2 = 3 - rankz >>> 31;
-        int l2 = 3 - rankw >>> 31;
-        int h2 = 3 - ranku >>> 31;
-        int g2 = 3 - rankv >>> 31;
+        int i2 = 3 - rankx >> 31;
+        int j2 = 3 - ranky >> 31;
+        int k2 = 3 - rankz >> 31;
+        int l2 = 3 - rankw >> 31;
+        int h2 = 3 - ranku >> 31;
+        int g2 = 3 - rankv >> 31;
 
-        int i3 = 2 - rankx >>> 31;
-        int j3 = 2 - ranky >>> 31;
-        int k3 = 2 - rankz >>> 31;
-        int l3 = 2 - rankw >>> 31;
-        int h3 = 2 - ranku >>> 31;
-        int g3 = 2 - rankv >>> 31;
+        int i3 = 2 - rankx >> 31;
+        int j3 = 2 - ranky >> 31;
+        int k3 = 2 - rankz >> 31;
+        int l3 = 2 - rankw >> 31;
+        int h3 = 2 - ranku >> 31;
+        int g3 = 2 - rankv >> 31;
 
-        int i4 = 1 - rankx >>> 31;
-        int j4 = 1 - ranky >>> 31;
-        int k4 = 1 - rankz >>> 31;
-        int l4 = 1 - rankw >>> 31;
-        int h4 = 1 - ranku >>> 31;
-        int g4 = 1 - rankv >>> 31;
+        int i4 = 1 - rankx >> 31;
+        int j4 = 1 - ranky >> 31;
+        int k4 = 1 - rankz >> 31;
+        int l4 = 1 - rankw >> 31;
+        int h4 = 1 - ranku >> 31;
+        int g4 = 1 - rankv >> 31;
 
-        int i5 = -rankx >>> 31;
-        int j5 = -ranky >>> 31;
-        int k5 = -rankz >>> 31;
-        int l5 = -rankw >>> 31;
-        int h5 = -ranku >>> 31;
-        int g5 = -rankv >>> 31;
+        int i5 = -rankx >> 31;
+        int j5 = -ranky >> 31;
+        int k5 = -rankz >> 31;
+        int l5 = -rankw >> 31;
+        int h5 = -ranku >> 31;
+        int g5 = -rankv >> 31;
 
-        float x1 = x0 - i1 + G6;
-        float y1 = y0 - j1 + G6;
-        float z1 = z0 - k1 + G6;
-        float w1 = w0 - l1 + G6;
-        float u1 = u0 - h1 + G6;
-        float v1 = v0 - g1 + G6;
+        float x1 = x0 + i1 + G6;
+        float y1 = y0 + j1 + G6;
+        float z1 = z0 + k1 + G6;
+        float w1 = w0 + l1 + G6;
+        float u1 = u0 + h1 + G6;
+        float v1 = v0 + g1 + G6;
 
-        float x2 = x0 - i2 + 2 * G6;
-        float y2 = y0 - j2 + 2 * G6;
-        float z2 = z0 - k2 + 2 * G6;
-        float w2 = w0 - l2 + 2 * G6;
-        float u2 = u0 - h2 + 2 * G6;
-        float v2 = v0 - g2 + 2 * G6;
+        float x2 = x0 + i2 + 2 * G6;
+        float y2 = y0 + j2 + 2 * G6;
+        float z2 = z0 + k2 + 2 * G6;
+        float w2 = w0 + l2 + 2 * G6;
+        float u2 = u0 + h2 + 2 * G6;
+        float v2 = v0 + g2 + 2 * G6;
 
-        float x3 = x0 - i3 + 3 * G6;
-        float y3 = y0 - j3 + 3 * G6;
-        float z3 = z0 - k3 + 3 * G6;
-        float w3 = w0 - l3 + 3 * G6;
-        float u3 = u0 - h3 + 3 * G6;
-        float v3 = v0 - g3 + 3 * G6;
+        float x3 = x0 + i3 + 3 * G6;
+        float y3 = y0 + j3 + 3 * G6;
+        float z3 = z0 + k3 + 3 * G6;
+        float w3 = w0 + l3 + 3 * G6;
+        float u3 = u0 + h3 + 3 * G6;
+        float v3 = v0 + g3 + 3 * G6;
 
-        float x4 = x0 - i4 + 4 * G6;
-        float y4 = y0 - j4 + 4 * G6;
-        float z4 = z0 - k4 + 4 * G6;
-        float w4 = w0 - l4 + 4 * G6;
-        float u4 = u0 - h4 + 4 * G6;
-        float v4 = v0 - g4 + 4 * G6;
+        float x4 = x0 + i4 + 4 * G6;
+        float y4 = y0 + j4 + 4 * G6;
+        float z4 = z0 + k4 + 4 * G6;
+        float w4 = w0 + l4 + 4 * G6;
+        float u4 = u0 + h4 + 4 * G6;
+        float v4 = v0 + g4 + 4 * G6;
 
-        float x5 = x0 - i5 + 5 * G6;
-        float y5 = y0 - j5 + 5 * G6;
-        float z5 = z0 - k5 + 5 * G6;
-        float w5 = w0 - l5 + 5 * G6;
-        float u5 = u0 - h5 + 5 * G6;
-        float v5 = v0 - g5 + 5 * G6;
+        float x5 = x0 + i5 + 5 * G6;
+        float y5 = y0 + j5 + 5 * G6;
+        float z5 = z0 + k5 + 5 * G6;
+        float w5 = w0 + l5 + 5 * G6;
+        float u5 = u0 + h5 + 5 * G6;
+        float v5 = v0 + g5 + 5 * G6;
 
         float x6 = x0 - 1 + 6 * G6;
         float y6 = y0 - 1 + 6 * G6;
@@ -664,9 +670,16 @@ public class SimplexNoise extends RawNoise {
         float u6 = u0 - 1 + 6 * G6;
         float v6 = v0 - 1 + 6 * G6;
 
+        i *= X6;
+        j *= Y6;
+        k *= Z6;
+        l *= W6;
+        h *= U6;
+        g *= V6;
+
         n0 = LIMIT6 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0 - u0 * u0 - v0 * v0;
         if (n0 > 0.0f) {
-            final int hash = hash256(i, j, k, l, h, g, seed) << 3;
+            final int hash = hashPrimed256(i, j, k, l, h, g, seed) << 3;
             n0 *= n0;
             n += n0 * n0 * (GRADIENTS_6D[hash] * x0 + GRADIENTS_6D[hash + 1] * y0 + GRADIENTS_6D[hash + 2] * z0 +
                     GRADIENTS_6D[hash + 3] * w0 + GRADIENTS_6D[hash + 4] * u0 + GRADIENTS_6D[hash + 5] * v0);
@@ -674,7 +687,7 @@ public class SimplexNoise extends RawNoise {
 
         n1 = LIMIT6 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1 - u1 * u1 - v1 * v1;
         if (n1 > 0.0f) {
-            final int hash = hash256(i + i1, j + j1, k + k1, l + l1, h + h1, g + g1, seed) << 3;
+            final int hash = hashPrimed256(i + (i1 & X6), j + (j1 & Y6), k + (k1 & Z6), l + (l1 & W6), h + (h1 & U6), g + (g1 & V6), seed) << 3;
             n1 *= n1;
             n += n1 * n1 * (GRADIENTS_6D[hash] * x1 + GRADIENTS_6D[hash + 1] * y1 + GRADIENTS_6D[hash + 2] * z1 +
                     GRADIENTS_6D[hash + 3] * w1 + GRADIENTS_6D[hash + 4] * u1 + GRADIENTS_6D[hash + 5] * v1);
@@ -682,7 +695,7 @@ public class SimplexNoise extends RawNoise {
 
         n2 = LIMIT6 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2 - u2 * u2 - v2 * v2;
         if (n2 > 0.0f) {
-            final int hash = hash256(i + i2, j + j2, k + k2, l + l2, h + h2, g + g2, seed) << 3;
+            final int hash = hashPrimed256(i + (i2 & X6), j + (j2 & Y6), k + (k2 & Z6), l + (l2 & W6), h + (h2 & U6), g + (g2 & V6), seed) << 3;
             n2 *= n2;
             n += n2 * n2 * (GRADIENTS_6D[hash] * x2 + GRADIENTS_6D[hash + 1] * y2 + GRADIENTS_6D[hash + 2] * z2 +
                     GRADIENTS_6D[hash + 3] * w2 + GRADIENTS_6D[hash + 4] * u2 + GRADIENTS_6D[hash + 5] * v2);
@@ -690,7 +703,7 @@ public class SimplexNoise extends RawNoise {
 
         n3 = LIMIT6 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3 - u3 * u3 - v3 * v3;
         if (n3 > 0.0f) {
-            final int hash = hash256(i + i3, j + j3, k + k3, l + l3, h + h3, g + g3, seed) << 3;
+            final int hash = hashPrimed256(i + (i3 & X6), j + (j3 & Y6), k + (k3 & Z6), l + (l3 & W6), h + (h3 & U6), g + (g3 & V6), seed) << 3;
             n3 *= n3;
             n += n3 * n3 * (GRADIENTS_6D[hash] * x3 + GRADIENTS_6D[hash + 1] * y3 + GRADIENTS_6D[hash + 2] * z3 +
                     GRADIENTS_6D[hash + 3] * w3 + GRADIENTS_6D[hash + 4] * u3 + GRADIENTS_6D[hash + 5] * v3);
@@ -698,7 +711,7 @@ public class SimplexNoise extends RawNoise {
 
         n4 = LIMIT6 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4 - u4 * u4 - v4 * v4;
         if (n4 > 0.0f) {
-            final int hash = hash256(i + i4, j + j4, k + k4, l + l4, h + h4, g + g4, seed) << 3;
+            final int hash = hashPrimed256(i + (i4 & X6), j + (j4 & Y6), k + (k4 & Z6), l + (l4 & W6), h + (h4 & U6), g + (g4 & V6), seed) << 3;
             n4 *= n4;
             n += n4 * n4 * (GRADIENTS_6D[hash] * x4 + GRADIENTS_6D[hash + 1] * y4 + GRADIENTS_6D[hash + 2] * z4 +
                     GRADIENTS_6D[hash + 3] * w4 + GRADIENTS_6D[hash + 4] * u4 + GRADIENTS_6D[hash + 5] * v4);
@@ -706,7 +719,7 @@ public class SimplexNoise extends RawNoise {
 
         n5 = LIMIT6 - x5 * x5 - y5 * y5 - z5 * z5 - w5 * w5 - u5 * u5 - v5 * v5;
         if (n5 > 0.0f) {
-            final int hash = hash256(i + i5, j + j5, k + k5, l + l5, h + h5, g + g5, seed) << 3;
+            final int hash = hashPrimed256(i + (i5 & X6), j + (j5 & Y6), k + (k5 & Z6), l + (l5 & W6), h + (h5 & U6), g + (g5 & V6), seed) << 3;
             n5 *= n5;
             n += n5 * n5 * (GRADIENTS_6D[hash] * x5 + GRADIENTS_6D[hash + 1] * y5 + GRADIENTS_6D[hash + 2] * z5 +
                     GRADIENTS_6D[hash + 3] * w5 + GRADIENTS_6D[hash + 4] * u5 + GRADIENTS_6D[hash + 5] * v5);
@@ -714,7 +727,7 @@ public class SimplexNoise extends RawNoise {
 
         n6 = LIMIT6 - x6 * x6 - y6 * y6 - z6 * z6 - w6 * w6 - u6 * u6 - v6 * v6;
         if (n6 > 0.0f) {
-            final int hash = hash256(i + 1, j + 1, k + 1, l + 1, h + 1, g + 1, seed) << 3;
+            final int hash = hashPrimed256(i + X6, j + Y6, k + Z6, l + W6, h + U6, g + V6, seed) << 3;
             n6 *= n6;
             n += n6 * n6 * (GRADIENTS_6D[hash] * x6 + GRADIENTS_6D[hash + 1] * y6 + GRADIENTS_6D[hash + 2] * z6 +
                     GRADIENTS_6D[hash + 3] * w6 + GRADIENTS_6D[hash + 4] * u6 + GRADIENTS_6D[hash + 5] * v6);

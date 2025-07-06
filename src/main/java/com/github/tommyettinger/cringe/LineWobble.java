@@ -86,6 +86,7 @@ public final class LineWobble {
         value *= value * (1 - value - value + 2); // won't go outside 0f to 1f range
         return ((1f - value) * start + value * end) * 0x0.ffffffp-63f;
     }
+
     /**
      * Sway smoothly using bicubic interpolation between 4 points (the two integers before t and the two after).
      * This pretty much never produces steep changes between peaks and valleys; this may make it more useful for things
@@ -496,5 +497,131 @@ public final class LineWobble {
         end -= (int)end + 0.5f;
         start += end * value + 1;
         return (start - (int)start);
+    }
+
+
+    public static class WobbleNoise extends RawWobbleNoise {
+
+        public WobbleNoise() {
+        }
+
+        public WobbleNoise(int seed) {
+            this.seed = seed;
+        }
+
+        @Override
+        public float getNoiseWithSeed(float x, int seed) {
+            return wobble(x, seed);
+        }
+
+        @Override
+        public WobbleNoise copy() {
+            return new WobbleNoise(seed);
+        }
+
+        @Override
+        public String getTag() {
+            return "WobbleNoise";
+        }
+    }
+    
+    public static class BicubicWobbleNoise extends RawWobbleNoise {
+
+        public BicubicWobbleNoise() {
+        }
+
+        public BicubicWobbleNoise(int seed) {
+            this.seed = seed;
+        }
+
+        @Override
+        public float getNoiseWithSeed(float x, int seed) {
+            return bicubicWobble(x, seed);
+        }
+
+        @Override
+        public BicubicWobbleNoise copy() {
+            return new BicubicWobbleNoise(seed);
+        }
+
+        @Override
+        public String getTag() {
+            return "BicubicWobbleNoise";
+        }
+    }
+
+    public static class SmoothWobbleNoise extends RawWobbleNoise {
+
+        public SmoothWobbleNoise() {
+        }
+
+        public SmoothWobbleNoise(int seed) {
+            this.seed = seed;
+        }
+
+        @Override
+        public float getNoiseWithSeed(float x, int seed) {
+            return smoothWobble(x, seed);
+        }
+
+        @Override
+        public SmoothWobbleNoise copy() {
+            return new SmoothWobbleNoise(seed);
+        }
+
+        @Override
+        public String getTag() {
+            return "SmoothWobbleNoise";
+        }
+    }
+
+    public static class SplineWobbleNoise extends RawWobbleNoise {
+
+        public SplineWobbleNoise() {
+        }
+
+        public SplineWobbleNoise(int seed) {
+            this.seed = seed;
+        }
+
+        @Override
+        public float getNoiseWithSeed(float x, int seed) {
+            return splineWobble(x, seed);
+        }
+
+        @Override
+        public SplineWobbleNoise copy() {
+            return new SplineWobbleNoise(seed);
+        }
+
+        @Override
+        public String getTag() {
+            return "SplineWobbleNoise";
+        }
+    }
+
+    public static class TrigWobbleNoise extends RawWobbleNoise {
+
+        public TrigWobbleNoise() {
+        }
+
+        public TrigWobbleNoise(int seed) {
+            this.seed = seed;
+        }
+
+        @Override
+        public float getNoiseWithSeed(float x, int seed) {
+            return trigWobble(x, seed);
+        }
+
+        @Override
+        public TrigWobbleNoise copy() {
+            return new TrigWobbleNoise(seed);
+        }
+
+        @Override
+        public String getTag() {
+            return "TrigWobbleNoise";
+        }
     }
 }

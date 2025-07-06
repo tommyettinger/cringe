@@ -177,8 +177,7 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
      * Returns a String constant that should uniquely identify this RawNoise as well as possible; usually this is just
      * the class name.
      * If a duplicate tag is already registered and {@link Serializer#register(RawNoise)} attempts to register the same
-     * tag again, a message is printed to {@code System.err}. The default implementation returns the String
-     * {@code (NO)}, which is already registered in Serializer to a null value. Implementing this is required for any
+     * tag again, a message is printed to {@code System.err}. Implementing this is required for any
      * usage of Serializer.
      * @return a short String constant that identifies this RawNoise type
      */
@@ -494,6 +493,12 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
             register(new SorbetNoise(1, 1));
             register(new ValueNoise(1));
 
+            register(new LineWobble.BicubicWobbleNoise(1));
+            register(new LineWobble.SmoothWobbleNoise(1));
+            register(new LineWobble.SplineWobbleNoise(1));
+            register(new LineWobble.TrigWobbleNoise(1));
+            register(new LineWobble.WobbleNoise(1));
+
             register(new ContinuousNoise(new ValueNoise(1)));
         }
 
@@ -550,7 +555,7 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
          * @return a new Array containing each RawNoise instance this has registered, copied
          */
         public static Array<RawNoise> getAll() {
-            Array<RawNoise> noises = new Array<>(true, NOISE_BY_TAG.size);
+            Array<RawNoise> noises = new Array<>(true, NOISE_BY_TAG.size, RawNoise.class);
             for(RawNoise n : NOISE_BY_TAG.values()){
                 if(n == null || "ContinuousNoise".equals(n.getTag())) continue;
                 noises.add(n.copy());

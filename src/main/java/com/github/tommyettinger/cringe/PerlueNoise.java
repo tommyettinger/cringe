@@ -27,7 +27,8 @@ import static com.github.tommyettinger.cringe.PointHasher.*;
 
 /**
  * A mix of "Classic" Perlin noise, written by Ken Perlin before he created Simplex Noise, with value noise calculated
- * at the same time. This uses quintic interpolation throughout (which was an improvement found in Simplex Noise), and
+ * at the same time. This uses cubic interpolation throughout (instead of the quintic interpolation used in Simplex
+ * Noise, because cubic looks a little smoother and doesn't alternate as badly between sharp change and low change), and
  * has a single {@code int} seed. Perlue Noise can have significant grid-aligned and 45-degree-diagonal artifacts when
  * too few octaves are used, but sometimes this is irrelevant, such as when sampling 3D noise on the surface of a
  * sphere. These artifacts sometimes manifest as "waves" of quickly-changing and then slowly-changing noise, when 3D
@@ -695,5 +696,13 @@ public class PerlueNoise extends RawNoise {
     private static final int X4 = 0x1B69E1, Y4 = 0x177C0B, Z4 = 0x141E5D, W4 = 0x113C31;
     private static final int X5 = 0x1C3361, Y5 = 0x18DA39, Z5 = 0x15E6DB, W5 = 0x134D29, U5 = 0x110281;
     private static final int X6 = 0x1CC1C5, Y6 = 0x19D7AF, Z6 = 0x173935, W6 = 0x14DEAF, U6 = 0x12C139, V6 = 0x10DAA3;
+
+    // These are new, and are all 21-bit probable primes.
+    public static final int
+        X2 = 0x1827F5, Y2 = 0x123C3B,
+        X3 = 0x1A36BF, Y3 = 0x157931, Z3 = 0x119749,
+        X4 = 0x1B69E5, Y4 = 0x177C1F, Z4 = 0x141E75, W4 = 0x113C33,
+        X5 = 0x1C3367, Y5 = 0x18DA39, Z5 = 0x15E6E3, W5 = 0x134D49, U5 = 0x110281,
+        X6 = 0x1CC205, Y6 = 0x19D7B5, Z6 = 0x173935, W6 = 0x14DEC5, U6 = 0x12C139, V6 = 0x10DAAD;
 */
 }

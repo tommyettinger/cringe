@@ -600,6 +600,6 @@ float cyclicNoise(vec3 p){
 
     @Override
     public String toHumanReadableString() {
-        return getTag() + " with seed " + getSeed() + ", frequency " + frequency + ",  and " + octaves + " internal octaves";
+        return getTag() + " with seed " + getSeed() + ", frequency " + frequency + ", and " + octaves + " internal octaves";
     }
 }

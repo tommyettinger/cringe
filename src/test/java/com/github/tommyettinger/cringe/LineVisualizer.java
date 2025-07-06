@@ -47,12 +47,12 @@ public class LineVisualizer extends ApplicationAdapter {
             LineWobble::splineWobble,                                                                        //2
             LineWobble::trigWobble,                                                                          //3
             LineWobble::smoothWobble,                                                                        //4
-            (f, i) -> LineWobble.wobble(f, i * 0x9E3779B97F4A7C15L),                                         //5
-            (f, i) -> LineWobble.bicubicWobble(f, i * 0x9E3779B97F4A7C15L),                                  //6
-            (f, i) -> LineWobble.splineWobble(f, i * 0x9E3779B97F4A7C15L),                                   //7
-            (f, i) -> LineWobble.trigWobble(f, i * 0x9E3779B97F4A7C15L),                                     //8
-            (f, i) -> LineWobble.smoothWobble(f, i * 0x9E3779B97F4A7C15L),                                   //9
-            (f, i) -> MathSupport.cbrt(LineWobble.bicubicWobble(f, i))                                       //10
+            (f, i) -> LineWobble.wobble(f, i * 0x9E3779B97F4A7C15L),                                 //5
+            (f, i) -> LineWobble.bicubicWobble(f, i * 0x9E3779B97F4A7C15L),                          //6
+            (f, i) -> LineWobble.splineWobble(f, i * 0x9E3779B97F4A7C15L),                           //7
+            (f, i) -> LineWobble.trigWobble(f, i * 0x9E3779B97F4A7C15L),                             //8
+            (f, i) -> LineWobble.smoothWobble(f, i * 0x9E3779B97F4A7C15L),                           //9
+            (f, i) -> MathSupport.cbrt(LineWobble.bicubicWobble(f, i))                               //10
     };
     public int wobbleCount = wobbles.length;
     public int currentWobble = 1;
@@ -361,7 +361,7 @@ public class LineVisualizer extends ApplicationAdapter {
 
     public static void main(String[] arg) {
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        config.setTitle("Juniper Line Graphing Demo");
+        config.setTitle("Cringe Line Graphing Demo");
         config.setWindowedMode(width, height);
         config.useVsync(true);
         config.setForegroundFPS(120);

@@ -41,28 +41,32 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.*;
  */
 public class NoisePreviewGenerator extends ApplicationAdapter {
 
-    private static final boolean ACTUALLY_RENDER_GIF = false;
+    private static final boolean ACTUALLY_RENDER_GIF = true;
     private static final boolean ACTUALLY_RENDER_PNG_1D = true;
-    private static final boolean ACTUALLY_RENDER_PNG = false;
+    private static final boolean ACTUALLY_RENDER_PNG = true;
 
     public interface FloatToFloatFunction {
         float applyAsFloat(float f);
     }
-    RawNoise[] noises = new RawNoise[]{
-            new CellularNoise(1),
-            new CyclicNoise(1, 3),
-            new FoamNoise(1),
-            new HoneyNoise(1),
-            new OpenSimplex2FastNoise(1),
-            new OpenSimplex2SmoothNoise(1),
-            new PerlinNoise(1),
-            new PerlueNoise(1),
-            new SimplexNoise(1),
-            new SorbetNoise(1, 3),
-            new ValueNoise(1),
-    };
-    int noiseIndex = noises.length - 1;
-    private int dim = 1; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
+    RawNoise[] noises =
+//            new RawNoise[]{
+//                    new CellularNoise(1),
+//                    new CyclicNoise(1, 3),
+//                    new FoamNoise(1),
+//                    new HoneyNoise(1),
+//                    new OpenSimplex2FastNoise(1),
+//                    new OpenSimplex2SmoothNoise(1),
+//                    new PerlinNoise(1),
+//                    new PerlueNoise(1),
+//                    new SimplexNoise(1),
+//                    new SorbetNoise(1, 3),
+//                    new ValueNoise(1),
+//            };
+
+            Serializer.getAll().toArray();
+
+    int noiseIndex = 0;
+    private int dim = 0; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
     private int octaves = 1; // starts at 1
     private float freq = 0x1p-4f;
     private final ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, freq, FBM, octaves);
@@ -116,6 +120,7 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
     public void putMap() {
         Gdx.files.local("out/gif/").mkdirs();
         Gdx.files.local("out/noise/").mkdirs();
+        Gdx.files.local("out/noise1d/").mkdirs();
 
         FileHandle gifFile = Gdx.files.local("out/gif/" + noise.stringSerialize().replace('`', '_') + ".gif");
         FileHandle pngFile = Gdx.files.local("out/noise/" + noise.stringSerialize().replace('`', '_') + ".png");

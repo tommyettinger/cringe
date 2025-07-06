@@ -3,8 +3,8 @@ package com.github.tommyettinger.cringe;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
-import org.apache.fury.Fury;
-import org.apache.fury.config.Language;
+import org.apache.fory.Fory;
+import org.apache.fory.config.Language;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -48,20 +48,20 @@ public class SerializationTest {
     }
 
     @Test
-    public void testGdxRandomFury() {
-        Fury fury = Fury.builder().withLanguage(Language.JAVA).build();
-        fury.register(RandomDistinct64.class);
-        fury.register(RandomXMX256.class);
-        fury.register(RandomAce320.class);
-        fury.register(RandomChop128.class);
+    public void testGdxRandomFory() {
+        Fory fory = Fory.builder().withLanguage(Language.JAVA).build();
+        fory.register(RandomDistinct64.class);
+        fory.register(RandomXMX256.class);
+        fory.register(RandomAce320.class);
+        fory.register(RandomChop128.class);
         List<GdxRandom> all = Arrays.asList(new RandomDistinct64(-1L), new RandomXMX256(-1L), new RandomAce320(-1L), new RandomChop128(-1L));
         for (GdxRandom r : all) {
             GdxRandom cpy = r.copy();
-            byte[] s = fury.serializeJavaObject(r);
+            byte[] s = fory.serializeJavaObject(r);
             r.nextLong();
             long rl = r.nextLong();
             r.setSeed(rl);
-            GdxRandom de = fury.deserializeJavaObject(s, r.getClass());
+            GdxRandom de = fory.deserializeJavaObject(s, r.getClass());
             System.out.println(cpy + "   " + de);
             de.nextLong();
             long dl = de.nextLong();
@@ -88,18 +88,18 @@ public class SerializationTest {
     }
 
     @Test
-    public void testGapShufflerFury() {
-        Fury fury = Fury.builder().withLanguage(Language.JAVA).build();
-        fury.register(Array.class);
-        fury.register(RandomAce320.class);
-        fury.register(GapShuffler.class);
+    public void testGapShufflerFory() {
+        Fory fory = Fory.builder().withLanguage(Language.JAVA).build();
+        fory.register(Array.class);
+        fory.register(RandomAce320.class);
+        fory.register(GapShuffler.class);
         GapShuffler<String> orig = new GapShuffler<>(
                 new String[]{"IT'S", "PEANUT", "BUTTER", "JELLY", "TIME"}, new RandomAce320(123));
         GapShuffler<String> cpy = new GapShuffler<>(orig);
-        byte[] ser = fury.serializeJavaObject(orig);
+        byte[] ser = fory.serializeJavaObject(orig);
         orig.next();
         String ores = orig.next();
-        GapShuffler<?> dser = fury.deserializeJavaObject(ser, GapShuffler.class);
+        GapShuffler<?> dser = fory.deserializeJavaObject(ser, GapShuffler.class);
         dser.next();
         String dres = (String) dser.next();
         Assert.assertEquals("Failure with " + cpy, ores, dres);
@@ -125,15 +125,15 @@ public class SerializationTest {
     }
 
     @Test
-    public void testWeightedTableFury() {
-        Fury fury = Fury.builder().withLanguage(Language.JAVA).build();
-        fury.register(RandomAce320.class);
-        fury.register(WeightedTable.class);
+    public void testWeightedTableFory() {
+        Fory fory = Fory.builder().withLanguage(Language.JAVA).build();
+        fory.register(RandomAce320.class);
+        fory.register(WeightedTable.class);
         WeightedTable orig = new WeightedTable(new RandomAce320(123), 1.1f, 2.2f, 3.3f, 4.4f, 5.5f), cpy = orig.copy();
-        byte[] ser = fury.serializeJavaObject(orig);
+        byte[] ser = fory.serializeJavaObject(orig);
         orig.random();
         int ores = orig.random();
-        WeightedTable dser = fury.deserializeJavaObject(ser, WeightedTable.class);
+        WeightedTable dser = fory.deserializeJavaObject(ser, WeightedTable.class);
         System.out.println(cpy + "   " + dser.toString());
         dser.random();
         int dres = dser.random();
@@ -180,19 +180,19 @@ public class SerializationTest {
     }
 
     @Test
-    public void testUniqueIdentifierFury() {
-        Fury fury = Fury.builder().withLanguage(Language.JAVA).build();
-        fury.register(UniqueIdentifier.class);
-        fury.register(UniqueIdentifier.Generator.class);
+    public void testUniqueIdentifierFory() {
+        Fory fory = Fory.builder().withLanguage(Language.JAVA).build();
+        fory.register(UniqueIdentifier.class);
+        fory.register(UniqueIdentifier.Generator.class);
         UniqueIdentifier orig = UniqueIdentifier.next();
-        byte[] ser = fury.serializeJavaObject(orig);
-        UniqueIdentifier dser = fury.deserializeJavaObject(ser, UniqueIdentifier.class);
+        byte[] ser = fory.serializeJavaObject(orig);
+        UniqueIdentifier dser = fory.deserializeJavaObject(ser, UniqueIdentifier.class);
         System.out.println(orig + " deserializes to " + dser);
         Assert.assertEquals("Failure with " + dser, orig, dser);
-        byte[] serG = fury.serializeJavaObject(UniqueIdentifier.GENERATOR);
+        byte[] serG = fory.serializeJavaObject(UniqueIdentifier.GENERATOR);
         UniqueIdentifier.next();
         orig = UniqueIdentifier.next();
-        UniqueIdentifier.GENERATOR = fury.deserializeJavaObject(serG, UniqueIdentifier.Generator.class);
+        UniqueIdentifier.GENERATOR = fory.deserializeJavaObject(serG, UniqueIdentifier.Generator.class);
         UniqueIdentifier.next();
         dser = UniqueIdentifier.next();
         Assert.assertEquals(orig, dser);
@@ -226,14 +226,14 @@ public class SerializationTest {
     }
 
     @Test
-    public void testRawNoiseFury() {
-        Fury fury = Fury.builder().withLanguage(Language.JAVA).build();
+    public void testRawNoiseFory() {
+        Fory fory = Fory.builder().withLanguage(Language.JAVA).build();
         Array<RawNoise> all = RawNoise.Serializer.getAll();
         for (RawNoise r : all) {
-            fury.register(r.getClass());
-            byte[] s = fury.serializeJavaObject(r);
+            fory.register(r.getClass());
+            byte[] s = fory.serializeJavaObject(r);
             float rl = r.getNoise(0.2f, 0.3f, 0.5f);
-            RawNoise de = fury.deserializeJavaObject(s, r.getClass());
+            RawNoise de = fory.deserializeJavaObject(s, r.getClass());
             System.out.println(r + "   " + de);
             float dl = de.getNoise(0.2f, 0.3f, 0.5f);
             Assert.assertEquals("Failure with " + s, rl, dl, 0.0001f);
@@ -256,16 +256,16 @@ public class SerializationTest {
     }
 
     @Test
-    public void testContinuousNoiseFury() {
-        Fury fury = Fury.builder().withLanguage(Language.JAVA).build();
-        fury.register(ContinuousNoise.class);
+    public void testContinuousNoiseFory() {
+        Fory fory = Fory.builder().withLanguage(Language.JAVA).build();
+        fory.register(ContinuousNoise.class);
         Array<RawNoise> all = RawNoise.Serializer.getAll();
         for (RawNoise rn : all) {
-            fury.register(rn.getClass());
+            fory.register(rn.getClass());
             ContinuousNoise cn = new ContinuousNoise(rn, 1234, 0.3f, ContinuousNoise.WARP, 3);
-            byte[] s = fury.serializeJavaObject(cn);
+            byte[] s = fory.serializeJavaObject(cn);
             float rl = cn.getNoise(0.2f, 0.3f, 0.5f);
-            RawNoise de = fury.deserializeJavaObject(s, cn.getClass());
+            RawNoise de = fory.deserializeJavaObject(s, cn.getClass());
             System.out.println(cn + "   " + de);
             float dl = de.getNoise(0.2f, 0.3f, 0.5f);
             Assert.assertEquals("Failure with " + s, rl, dl, 0.0001f);

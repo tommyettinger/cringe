@@ -143,7 +143,7 @@ with like
 
 or `Kryo` 4 bianry storaeg usign [kryo-more](https://github.com/tommyettinger/kryo-more)
 
-or `Fury` 4 moar bianry storaeg from [teh apache foudnatoin](https://fury.apache.org), but also liek, out of teh box!!!
+or ~~furry~~ ~~fury~~ `Fory` 4 moar bianry storaeg from [teh apache foudnatoin](https://fory.apache.org), but also liek, out of teh box!!!
 
 or sometimes stuff has codes that liek wriets 2 a String or reads frm 1
 

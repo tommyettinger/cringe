@@ -19,7 +19,7 @@ import java.util.Random;
  * produced to see repeating line patterns in R2 that aren't present in Halton sequences.
  * <br>
  * All PointSequence subclasses can be serialized using libGDX Json or with anything compatible with
- * {@link Externalizable}, such as Apache Fury. They can be iterated over like any {@link Iterable}, or they can be
+ * {@link Externalizable}, such as Apache Fory. They can be iterated over like any {@link Iterable}, or they can be
  * treated as an {@link Iterator}; both return {@code V} items.
  *
  * @param <V> the libGDX {@link Vector} type of points, such as {@link Vector2} or {@link Vector3}
@@ -93,7 +93,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
      * use {@link #nextInto(Vector2)} to fill an existing Vector2 with what would otherwise be allocated by
      * {@link #next()}.
      * <br>
-     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fory, as well as anything else that
      * understands the {@link Externalizable} interface.
      */
     public static class Halton2 extends PointSequence<Vector2> {
@@ -208,7 +208,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
      * use {@link #nextInto(Vector3)} to fill an existing Vector3 with what would otherwise be allocated by
      * {@link #next()}.
      * <br>
-     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fory, as well as anything else that
      * understands the {@link Externalizable} interface.
      */
     public static class Halton3 extends PointSequence<Vector3> {
@@ -331,7 +331,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
      * use {@link #nextInto(Vector4)} to fill an existing Vector4 with what would otherwise be allocated by
      * {@link #next()}.
      * <br>
-     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fory, as well as anything else that
      * understands the {@link Externalizable} interface.
      */
     public static class Halton4 extends PointSequence<Vector4> {
@@ -464,7 +464,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
      * use {@link #nextInto(Vector5)} to fill an existing Vector5 with what would otherwise be allocated by
      * {@link #next()}.
      * <br>
-     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fory, as well as anything else that
      * understands the {@link Externalizable} interface.
      */
     public static class Halton5 extends PointSequence<Vector5> {
@@ -606,7 +606,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
      * use {@link #nextInto(Vector6)} to fill an existing Vector6 with what would otherwise be allocated by
      * {@link #next()}.
      * <br>
-     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fory, as well as anything else that
      * understands the {@link Externalizable} interface.
      */
     public static class Halton6 extends PointSequence<Vector6> {
@@ -756,7 +756,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
      * use {@link #nextInto(Vector2)} to fill an existing Vector2 with what would otherwise be allocated by
      * {@link #next()}.
      * <br>
-     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fory, as well as anything else that
      * understands the {@link Externalizable} interface.
      */
     public static class R2 extends PointSequence<Vector2> {
@@ -876,7 +876,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
      * use {@link #nextInto(Vector3)} to fill an existing Vector3 with what would otherwise be allocated by
      * {@link #next()}.
      * <br>
-     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fory, as well as anything else that
      * understands the {@link Externalizable} interface.
      */
     public static class R3 extends PointSequence<Vector3> {
@@ -1008,7 +1008,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
      * use {@link #nextInto(Vector4)} to fill an existing Vector4 with what would otherwise be allocated by
      * {@link #next()}.
      * <br>
-     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fory, as well as anything else that
      * understands the {@link Externalizable} interface.
      */
     public static class R4 extends PointSequence<Vector4> {
@@ -1152,7 +1152,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
      * use {@link #nextInto(Vector5)} to fill an existing Vector5 with what would otherwise be allocated by
      * {@link #next()}.
      * <br>
-     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fory, as well as anything else that
      * understands the {@link Externalizable} interface.
      */
     public static class R5 extends PointSequence<Vector5> {
@@ -1308,7 +1308,7 @@ public abstract class PointSequence<V extends Vector<V>> implements Iterator<V>,
      * use {@link #nextInto(Vector6)} to fill an existing Vector6 with what would otherwise be allocated by
      * {@link #next()}.
      * <br>
-     * This can be serialized out-of-the-box with libGDX Json or Apache Fury, as well as anything else that
+     * This can be serialized out-of-the-box with libGDX Json or Apache Fory, as well as anything else that
      * understands the {@link Externalizable} interface.
      */
     public static class R6 extends PointSequence<Vector6> {

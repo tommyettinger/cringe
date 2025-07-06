@@ -17,7 +17,7 @@ import java.io.ObjectOutput;
  * <br>
  * This can be serialized out-of-the-box to Strings using {@link #stringSerialize()}, but if you do, so must the
  * {@link #GENERATOR} that produces new UniqueIdentifier instances and ensures they are unique.
- * If you are using Fury or another type of serializer that can use {@link Externalizable} objects, this can be sent
+ * If you are using Fory or another type of serializer that can use {@link Externalizable} objects, this can be sent
  * directly to that without needing any extra serialization code. Like with the String serialization, you must serialize
  * the {@link #GENERATOR} field and restore it when restarting from a serialized state. This can also be serialized as
  * JSON, and so can (and must) the {@link #GENERATOR} that produces new UniqueIdentifier

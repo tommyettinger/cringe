@@ -374,7 +374,7 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T>, Json.Serializab
     /**
      * Requires the deserializer to be able to read in an {@link Array} of {@code T} items, as well as a
      * {@link GdxRandom}. These typically need to be registered before a GapShuffler can be written.
-     * If you are using Apache Fury, the concrete subclass of GdxRandom is required to be registered (typically this is
+     * If you are using Apache Fory, the concrete subclass of GdxRandom is required to be registered (typically this is
      * {@link RandomAce320}), but GdxRandom itself does not need to be registered.
      *
      * @param out the stream to write the object to
@@ -395,7 +395,7 @@ public class GapShuffler<T> implements Iterator<T>, Iterable<T>, Json.Serializab
     /**
      * Requires the deserializer to be able to read in an {@link Array} of {@code T} items, as well as a
      * {@link GdxRandom}. These typically need to be registered before a GapShuffler can be read in.
-     * If you are using Apache Fury, the concrete subclass of GdxRandom is required to be registered (typically this is
+     * If you are using Apache Fory, the concrete subclass of GdxRandom is required to be registered (typically this is
      * {@link RandomAce320}), but GdxRandom itself does not need to be registered.
      *
      * @param in the stream to read data from in order to restore the object

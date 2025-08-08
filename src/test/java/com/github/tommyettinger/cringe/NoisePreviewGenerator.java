@@ -41,29 +41,30 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.*;
  */
 public class NoisePreviewGenerator extends ApplicationAdapter {
 
-    private static final boolean ACTUALLY_RENDER_GIF = true;
-    private static final boolean ACTUALLY_RENDER_PNG_1D = true;
-    private static final boolean ACTUALLY_RENDER_PNG = true;
+    private static final boolean ACTUALLY_RENDER_GIF = false;
+    private static final boolean ACTUALLY_RENDER_PNG_1D = false;
+    private static final boolean ACTUALLY_RENDER_PNG = false;
+    private static final boolean ACTUALLY_RENDER_SLICES = true;
 
     public interface FloatToFloatFunction {
         float applyAsFloat(float f);
     }
     RawNoise[] noises =
-//            new RawNoise[]{
+            new RawNoise[]{
 //                    new CellularNoise(1),
-//                    new CyclicNoise(1, 3),
-//                    new FoamNoise(1),
-//                    new HoneyNoise(1),
+                    new CyclicNoise(1, 3),
+                    new FoamNoise(1),
+                    new HoneyNoise(1),
 //                    new OpenSimplex2FastNoise(1),
 //                    new OpenSimplex2SmoothNoise(1),
-//                    new PerlinNoise(1),
-//                    new PerlueNoise(1),
-//                    new SimplexNoise(1),
-//                    new SorbetNoise(1, 3),
-//                    new ValueNoise(1),
-//            };
+                    new PerlinNoise(1),
+                    new PerlueNoise(1),
+                    new SimplexNoise(1),
+                    new SorbetNoise(1, 3),
+                    new ValueNoise(1),
+            };
 
-            Serializer.getAll().toArray();
+//            Serializer.getAll().toArray();
 
     int noiseIndex = 0;
     private int dim = 0; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions
@@ -182,6 +183,50 @@ public class NoisePreviewGenerator extends ApplicationAdapter {
             png.write(pngFile, p);
 
             p.dispose();
+        }
+        if (ACTUALLY_RENDER_SLICES) {
+            int w = width, h = height;
+            Pixmap p2 = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+            Pixmap p3 = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+            Pixmap p4 = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+            Pixmap p5 = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+            Pixmap p6 = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+            FileHandle d2 = Gdx.files.local("out/noise2D/" + noise.stringSerialize().replace('`', '_') + ".png");
+            FileHandle d3 = Gdx.files.local("out/noise3D/" + noise.stringSerialize().replace('`', '_') + ".png");
+            FileHandle d4 = Gdx.files.local("out/noise4D/" + noise.stringSerialize().replace('`', '_') + ".png");
+            FileHandle d5 = Gdx.files.local("out/noise5D/" + noise.stringSerialize().replace('`', '_') + ".png");
+            FileHandle d6 = Gdx.files.local("out/noise6D/" + noise.stringSerialize().replace('`', '_') + ".png");
+            float color;
+            for (int x = 0; x < w; x++) {
+                for (int y = 0; y < h; y++) {
+                    color = prepare.applyAsFloat(noise.getNoise(x, y));
+                    p2.setColor(color, color, color, 1f);
+                    p2.drawPixel(x, y);
+                    color = prepare.applyAsFloat(noise.getNoise(x, y, 1f));
+                    p3.setColor(color, color, color, 1f);
+                    p3.drawPixel(x, y);
+                    color = prepare.applyAsFloat(noise.getNoise(x, y, 1f, 1f));
+                    p4.setColor(color, color, color, 1f);
+                    p4.drawPixel(x, y);
+                    color = prepare.applyAsFloat(noise.getNoise(x, y, 1f, 1f, 1f));
+                    p5.setColor(color, color, color, 1f);
+                    p5.drawPixel(x, y);
+                    color = prepare.applyAsFloat(noise.getNoise(x, y, 1f, 1f, 1f, 1f));
+                    p6.setColor(color, color, color, 1f);
+                    p6.drawPixel(x, y);
+                }
+            }
+            png.write(d2, p2);
+            png.write(d3, p3);
+            png.write(d4, p4);
+            png.write(d5, p5);
+            png.write(d6, p6);
+
+            p2.dispose();
+            p3.dispose();
+            p4.dispose();
+            p5.dispose();
+            p6.dispose();
         }
     }
 

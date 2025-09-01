@@ -54,8 +54,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
         Serializer.register(new WigglyNoise(1, 3));
     }
     RawNoise[] noises = new RawNoise[]{
-            /*  0 */ new LoamNoise(1),
-            /*  1 */ new FoamNoise(1),
+            /*  0 */ new FoamNoise(1),
+            /*  1 */ new TomeNoise(1),
             /*  2 */ new PerlinNoise(1),
             /*  3 */ new PerlueNoise(1),
             /*  4 */ new SimplexNoise(1),
@@ -72,6 +72,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
             /* 15 */ new CellularNoise(1, CellularNoise.NoiseType.DISTANCE_VALUE),
             /* 16 */ new CellularExperimentalNoise(1, CellularNoise.NoiseType.DISTANCE_VALUE),
             /* 17 */ new ValueNoise(1),
+            /* 18 */ new LoamNoise(1),
     };
     int noiseIndex = 0;
     private int dim = 1; // this can be 0, 1, 2, 3, 4, OR 5; add 1 to get the actual dimensions

@@ -221,7 +221,7 @@ public class PerlinNoise extends RawNoise {
         return
                 equalize(lerp(lerp(gradCoord2D(seed, x0, y0, xf, yf), gradCoord2D(seed, x0+X_2, y0, xf - 1, yf), xa),
                                 lerp(gradCoord2D(seed, x0, y0+Y_2, xf, yf-1), gradCoord2D(seed, x0+X_2, y0+Y_2, xf - 1, yf - 1), xa),
-                                ya) * SCALE2, EQ_ADD_2, EQ_MUL_2);//* 0.875;// * 1.4142;
+                                ya) * SCALE2, EQ_ADD_2, EQ_MUL_2);
     }
 
     @Override

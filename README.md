@@ -37,6 +37,8 @@ all the stuff from mathutils is here 2 but like instance methods on a gdxrandom
 
 u get the picture
 
+[docz boyee](https://tommyettinger.github.io/cringe/apidocs/)
+
 # o yeh
 
 theres this other stuff now
@@ -77,7 +79,7 @@ each 1 has liek a diff flavor i guess?
 
 an those 2 use liek `RotationTools` but u prolly dont have 2 lololol
 
-`PerlueNoise` is liek Perlin but aslo makin Value at teh saem tiem liek, an then woop woop mixes em up!
+`PerlueNoise` is liek Perlin but aslo makin Value at teh saem tiem liek, an then woop woop mixz em up!
 
 `OpenSimplex2FastNoise` is tht fancy OpenSimplex2 thgin in fassssst moddddde
 
@@ -127,7 +129,7 @@ but i think this new stuf is p. cool
 
 `PointSequence.Halton2` is a 2D one an u can cnofgiure its bases or smth
 
-`PointSequence.R2` what evne is an R liek omg. but it also maeks a buncha 2D poitns an thye wont be cloes
+`PointSequence.R2` what evne is a R liek omg. but it also maeks a buncha 2D poitns an thye wont be cloes
 
 theres like a lot more Ds 4 each of thees, 3D an 4D an 5D an 6D wowowow
 
@@ -152,6 +154,12 @@ im not drukn ur drnuk
 heeheeeeeeee
 
 bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+
+sry
+
+it wont hapen agen
+
+*wonks at u*
 
 # get
 
@@ -253,6 +261,8 @@ noise classes are more inter-dependent; most RawNoise types use `LineWobble` to 
 `FoamNoise` and `HoneyNoise` call `ValueNoise` methods directly. Meanwhile, `SorbetNoise` inherits from `CyclicNoise`,
 and there's lots of other connections. More noise classes have been added more recently.
 To use the noise, you should probably have a dependency on all of `cringe`.
+[You can preview all noise types in 1D and 2D here.](https://github.com/tommyettinger/cringe/blob/main/docs/Noise.md)
+That page also links to 3D previews as animated GIFs (2D with time as the third dimension).
 
 This also adds `Vector5` and `Vector6` to the `Vector2` through `Vector4` libGDX provides, and the `PointSequence`
 class' implementations can generate the appropriate type of Vector for a given dimension. `PointSequence` produces

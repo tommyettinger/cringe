@@ -116,7 +116,6 @@ public class LineVisualizer extends ApplicationAdapter {
             @Override
             public boolean keyDown(int keycode) {
                 switch (keycode) {
-                    case SPACE:
                     case H: // higher seed
                         seed++;
                         title = "On mode " + currentMode + " with wobble " + currentWobble + " at speed " + speed + " with seed " + seed;
@@ -135,6 +134,7 @@ public class LineVisualizer extends ApplicationAdapter {
                         System.out.println(title);
                         if (!keepGoing) putMap();
                         break;
+                    case SPACE:
                     case P: // pause
                         keepGoing = !keepGoing;
                         break;

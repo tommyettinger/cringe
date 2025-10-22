@@ -35,8 +35,10 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tommyettinger.anim8.AnimatedGif;
 import com.github.tommyettinger.anim8.Dithered;
 import com.github.tommyettinger.anim8.PaletteReducer;
+import com.github.tommyettinger.anim8.QualityPalette;
 
 import static com.badlogic.gdx.Input.Keys.*;
+import static com.badlogic.gdx.graphics.GL20.GL_LINES;
 import static com.badlogic.gdx.graphics.GL20.GL_POINTS;
 import static com.github.tommyettinger.cringe.ColorSupport.*;
 import static com.github.tommyettinger.cringe.ContinuousNoise.*;
@@ -119,9 +121,9 @@ public class PalettedNoiseVisualizer extends ApplicationAdapter {
         }
 
         gif = new AnimatedGif();
-        gif.setDitherAlgorithm(Dithered.DitherAlgorithm.WREN);
+        gif.setDitherAlgorithm(Dithered.DitherAlgorithm.NONE);
         gif.setDitherStrength(0.2f);
-        gif.palette = new PaletteReducer(gray256);
+        gif.palette = new QualityPalette(gray256);
 
         InputAdapter input = new InputAdapter() {
             @Override
@@ -213,7 +215,6 @@ public class PalettedNoiseVisualizer extends ApplicationAdapter {
 
                             file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + "_1D.gif");
                             System.out.println("Writing to file:\n" + file);
-                            gif.setFastAnalysis(true);
                             gif.palette.analyze(frames);
                             gif.write(file, frames, 60);
                             for (int i = 0; i < frames.size; i++) {
@@ -387,23 +388,31 @@ public class PalettedNoiseVisualizer extends ApplicationAdapter {
 
 
 
-        renderer.begin(view.getCamera().combined, GL_POINTS);
         float bright, c = ctr * 16f;
         switch (dim) {
-            case 0:
+            case 0: {
                 c *= 0.5f;
+                float x, y;
+                bright = 4095f / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
+                float da = 4095f * 0.0625f;
+                x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + c, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+                y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+
                 // c and ctr are both about the same counter, they advance by a tiny float every frame.
+                renderer.begin(view.getCamera().combined, GL_LINES);
                 for (int d = 4096; d < 8192; d++) {
                     bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
-                    float da = d * 0.0625f;
-                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + c, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
-                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
-                    // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
-                    // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
+                    da = d * 0.0625f;
                     ColorSupport.hsb2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright * 1.2f - 0.2f, 1f);
                     renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
                     renderer.vertex(x, y, 0);
+                    x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + c, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+                    y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+                    // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
+                    // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
+                    renderer.vertex(x, y, 0);
                 }
+                renderer.vertex(x, y, 0);
 //                for (int x = 0; x < width; x++) {
 //                    for (int y = 0; y < height; y++) {
 //                        bright = prepare.applyAsFloat(noise.getNoiseWithSeed(Math.abs(x - width * 0.5f) + Math.abs(y - height * 0.5f) - c, noise.seed));
@@ -411,8 +420,10 @@ public class PalettedNoiseVisualizer extends ApplicationAdapter {
 //                        renderer.vertex(x, y, 0);
 //                    }
 //                }
+            }
                 break;
             case 1:
+                renderer.begin(view.getCamera().combined, GL_POINTS);
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
                         bright = prepare.applyAsFloat(noise.getNoiseWithSeed(x + c, y + c, noise.getSeed()));
@@ -422,6 +433,7 @@ public class PalettedNoiseVisualizer extends ApplicationAdapter {
                 }
                 break;
             case 2:
+                renderer.begin(view.getCamera().combined, GL_POINTS);
                 for (int x = 0; x < width; x++) {
                     for (int y = 0; y < height; y++) {
                         bright = prepare.applyAsFloat(noise.getNoiseWithSeed(x, y, c, noise.getSeed()));
@@ -431,6 +443,7 @@ public class PalettedNoiseVisualizer extends ApplicationAdapter {
                 }
                 break;
             case 3:
+                renderer.begin(view.getCamera().combined, GL_POINTS);
                 for (int x = 0; x < width; x++) {
                     float xc = MathUtils.cosDeg(360 * x * iWidth) * 64 + c, xs = MathUtils.sinDeg(360 * x * iWidth) * 64 + c;
                     for (int y = 0; y < height; y++) {
@@ -442,6 +455,7 @@ public class PalettedNoiseVisualizer extends ApplicationAdapter {
                 }
                 break;
             case 4: {
+                renderer.begin(view.getCamera().combined, GL_POINTS);
                 for (int x = 0; x < width; x++) {
                     float xc = MathUtils.cosDeg(360 * x * iWidth) * 64, xs = MathUtils.sinDeg(360 * x * iWidth) * 64;
                     for (int y = 0; y < height; y++) {
@@ -454,6 +468,7 @@ public class PalettedNoiseVisualizer extends ApplicationAdapter {
             }
                 break;
             case 5: {
+                renderer.begin(view.getCamera().combined, GL_POINTS);
                 for (int x = 0; x < width; x++) {
                     float xc = MathUtils.cosDeg(360 * x * iWidth) * 64 + c, xs = MathUtils.sinDeg(360 * x * iWidth) * 64 + c;
                     for (int y = 0; y < height; y++) {

@@ -231,6 +231,8 @@ public class SerializationTest {
         Array<RawNoise> all = RawNoise.Serializer.getAll();
         for (RawNoise r : all) {
             fory.register(r.getClass());
+        }
+        for (RawNoise r : all) {
             byte[] s = fory.serializeJavaObject(r);
             float rl = r.getNoise(0.2f, 0.3f, 0.5f);
             RawNoise de = fory.deserializeJavaObject(s, r.getClass());
@@ -262,6 +264,8 @@ public class SerializationTest {
         Array<RawNoise> all = RawNoise.Serializer.getAll();
         for (RawNoise rn : all) {
             fory.register(rn.getClass());
+        }
+        for (RawNoise rn : all) {
             ContinuousNoise cn = new ContinuousNoise(rn, 1234, 0.3f, ContinuousNoise.WARP, 3);
             byte[] s = fory.serializeJavaObject(cn);
             float rl = cn.getNoise(0.2f, 0.3f, 0.5f);

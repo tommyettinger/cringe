@@ -14,13 +14,16 @@ import com.badlogic.gdx.utils.NumberUtils;
  * <br>
  * All of these ways so far will preserve patterns in the input, so inputs close to the lowest possible input (0.0 for
  * probit(), {@link Long#MIN_VALUE} for normal(), {@link Integer#MIN_VALUE} for normalF()) will produce the lowest
- * possible output (-38.46740568497968 for probit(), -38.467454509186325 for probitD() and probitL(), or -13.003068 for
+ * possible output (-38.467454509186325 for probitD() and probitL(), or -13.003068 for
  * probitF() and probitI()), and similarly for the highest possible inputs producing the highest possible outputs.
  * <br>
  * There's also {@link #normal(long)}, which uses the
  * <a href="https://en.wikipedia.org/wiki/Ziggurat_algorithm">Ziggurat method</a> and does not preserve input patterns.
- * {@link #normal(long)} is a little faster than {@link #probitL(long)}, but the Ziggurat-based normal() might have some
- * small quality issues with some inputs that have patterns, like counters.
+ * {@link #normal(long)} is faster than {@link #probitL(long)}, but the Ziggurat-based normal() will have quality
+ * issues with some inputs that have patterns; it should be given random long inputs. For normal-distributed floats,
+ * {@link #normalRough(long)} gets quite close to a good normal distribution given a uniformly random long input.
+ * {@link #normalRougher(long)} isn't as close; the distribution it has is "pointy" on top instead of rounded.
+ * Both normalRough and normalRougher have a maximum output of 7.92908, and a minimum of -7.92908 .
  */
 public final class Distributor {
 
@@ -253,6 +256,77 @@ public final class Distributor {
         /* (Zero-indexed ) bits 8, 9, and 10 aren't used in the calculations for idx
          * or u, so we use bit 9 as a sign bit here. */
         return Math.copySign(u, 256L - (state & 512L));
+    }
+
+
+    /**
+     * Returns a Gaussian ("normally") distributed {@code float} value
+     * with mean {@code 0.0} and standard deviation {@code 1.0} based
+     * on the input {@code x}, which should be a uniformly-distributed
+     * {@code long} value. This is a medium-quality approximation. It
+     * is not likely to be distinguished from a correct Gaussian
+     * distribution by a human, but could be distinguishable to a machine.
+     * <p>
+     * This uses an imperfect approximation, but one that is much faster than
+     * the Box-Muller transform, Marsaglia Polar method, or a transform using the
+     * probit function. Like {@link Distributor#normal(long)}, this does not
+     * preserve any relationship between input {@code x} and the results it returns.
+     * This is different from {@link Distributor#probitI(int)} in that way.
+     * <p>
+     * This can't produce as extreme results in extremely-rare cases as methods
+     * like Box-Muller and Marsaglia Polar can. All possible results are between
+     * {@code -7.92908} and {@code 7.92908}, inclusive. This method is fairly
+     * accurate to the normal distribution; the center has a rounded top.
+     * <p>
+     * <a href="https://marc-b-reynolds.github.io/distribution/2021/03/18/CheapGaussianApprox.html">Credit
+     * to Marc B. Reynolds</a> for coming up with this clever fusion of the
+     * already-bell-curved bit count and two triangular distributions to smooth
+     * it out. Using one random long split into four parts instead of two
+     * random longs being needed is the contribution here.
+     * Using x * x + x is another contribution; it's slightly faster.
+     *
+     * @param x any long; should be close to uniformly-random to get a normal-distributed results
+     * @return an approximately Gaussian-distributed float between -7.92908 and 7.92908, inclusive
+     */
+    public static float normalRough (final long x) {
+        final long c = Long.bitCount(x) - 32L << 16;
+        final long u = x * x + x; /* Note, this is always even, but it is unlikely to matter. */
+        return 0x1.fb760cp-19f * (c + (short)(u) - (u >> 48) - (short)(u >> 32) - (short)(u >> 16));
+    }
+
+    /**
+     * Returns a Gaussian ("normally") distributed {@code float} value
+     * with mean {@code 0.0} and standard deviation {@code 1.0} based
+     * on the input {@code x}, which should be a uniformly-distributed
+     * {@code long} value. This is a low-quality approximation. It can
+     * be visually distinguished from a correct Gaussian distributed
+     * variable once enough samples are shown.
+     * <p>
+     * This uses an imperfect approximation, but one that is much faster than
+     * the Box-Muller transform, Marsaglia Polar method, or a transform using the
+     * probit function. Like {@link Distributor#normal(long)}, this does not
+     * preserve any relationship between input {@code x} and the results it returns.
+     * This is different from {@link Distributor#probitI(int)} in that way.
+     * <p>
+     * This can't produce as extreme results in extremely-rare cases as methods
+     * like Box-Muller and Marsaglia Polar can. All possible results are between
+     * {@code -7.92908} and {@code 7.92908}, inclusive. This method isn't as
+     * accurate to the normal distribution; the center has a pointed top rather
+     * than a rounded one.
+     * <p>
+     * <a href="https://marc-b-reynolds.github.io/distribution/2021/03/18/CheapGaussianApprox.html">Credit
+     * to Marc B. Reynolds</a> for coming up with this clever fusion of the
+     * already-bell-curved bit count and a triangular distribution to smooth
+     * it out. Using one random long instead of two is the contribution here.
+     * Using x * x + x is another contribution; it's slightly faster.
+     *
+     * @param x any long; should be close to uniformly-random to get a normal-distributed results
+     * @return an approximately Gaussian-distributed float between -7.92908 and 7.92908, inclusive
+     */
+    public static float normalRougher (final long x) {
+        final long c = Long.bitCount(x) - 32L << 32;
+        final long u = x * x + x; /* Note, this is always even, but it is unlikely to matter. */
+        return 0x1.fb760cp-35f * (c + (u & 0xFFFFFFFFL) - (u >>> 32));
     }
 
     /**

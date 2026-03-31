@@ -34,7 +34,8 @@ package com.github.tommyettinger.cringe;
  * dimension and axis you're working with, and you would normally add 1 when working with a "hash" method, you can add
  * a prime number from this class' constants, such as {@link #X2} or {@link #Z3}, instead and use a "hashPrimed" method.
  * This should be faster by avoiding quite a bit of multiplication in the long run. Multiplication tends to be
- * substantially slower than addition with ints, so this can be a boost to performance.
+ * substantially slower than addition with ints, so this can be a boost to performance when hashing points needs to be
+ * done many times per frame.
  * <br>
  * The only case where this can return different results on GWT than on a desktop or
  * mobile JVM is when the inputs are GWT-specific out-of-range JS Numbers appearing to be ints, and that's a problem

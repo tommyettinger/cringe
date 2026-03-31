@@ -21,8 +21,9 @@ import com.badlogic.gdx.utils.Json;
 import java.io.Externalizable;
 
 /**
- * Defines the core operations to generate continuous noise with a specific algorithm, and declares what properties of
- * noise are supported by that algorithm.
+ * A specialized RawNoise that only needs {@link #getNoiseWithSeed(float, int)}, {@link #copy()}, and {@link #getTag()}
+ * implemented. This is meant to be used with 1D noise algorithms from {@link LineWobble}. The implementations of 2D
+ * through 6D noise here are likely to be sub-par compared to algorithms meant to work in those dimensions.
  */
 public abstract class RawWobbleNoise extends RawNoise implements Json.Serializable, Externalizable {
     public int seed = 1;

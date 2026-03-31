@@ -81,7 +81,7 @@ public final class Scramblers {
      * It is currently unknown if this has any fixed-points (inputs that produce an identical output), but
      * a step is taken at the start of the function to eliminate one major known fixed-point at 0.
      * <br>
-     * Care has been taken to make this return the same results on GWT as it does elsewhere
+     * Care has been taken to make this return the same results on GWT as it does elsewhere.
      * <br>
      * This uses the <a href="https://github.com/skeeto/hash-prospector#three-round-functions">third unary hash</a> in
      * the three-round function table, but XORs the input with 0xFB8FAC03L before using the hash.
@@ -214,37 +214,45 @@ public final class Scramblers {
     }
 
     /**
-     * Big constant 0. Used by {@link #hash64(long, CharSequence)}, and taken from
+     * Big constant 0; primarily internal.
+     * Used by {@link #hash64(long, CharSequence)}, and taken from
      * <a href="https://github.com/wangyi-fudan/wyhash">wyhash</a> (in an earlier version).
      */
     public static final long b0 = 0xA0761D6478BD642FL;
     /**
-     * Big constant 1. Used by {@link #hash64(long, CharSequence)}, and taken from
+     * Big constant 1; primarily internal.
+     * Used by {@link #hash64(long, CharSequence)}, and taken from
      * <a href="https://github.com/wangyi-fudan/wyhash">wyhash</a> (in an earlier version).
      */
     public static final long b1 = 0xE7037ED1A0B428DBL;
     /**
-     * Big constant 2. Used by {@link #hash64(long, CharSequence)}, and taken from
+     * Big constant 2; primarily internal.
+     * Used by {@link #hash64(long, CharSequence)}, and taken from
      * <a href="https://github.com/wangyi-fudan/wyhash">wyhash</a> (in an earlier version).
      */
     public static final long b2 = 0x8EBC6AF09C88C6E3L;
     /**
-     * Big constant 3. Used by {@link #hash64(long, CharSequence)}, and taken from
+     * Big constant 3; primarily internal.
+     * Used by {@link #hash64(long, CharSequence)}, and taken from
      * <a href="https://github.com/wangyi-fudan/wyhash">wyhash</a> (in an earlier version).
      */
     public static final long b3 = 0x589965CC75374CC3L;
     /**
-     * Big constant 4. Used by {@link #hash64(long, CharSequence)}, and taken from
+     * Big constant 4; primarily internal.
+     * Used by {@link #hash64(long, CharSequence)}, and taken from
      * <a href="https://github.com/wangyi-fudan/wyhash">wyhash</a> (in an earlier version).
      */
     public static final long b4 = 0x1D8E4E27C47D124FL;
     /**
-     * Big constant 5. Used by {@link #hash64(long, CharSequence)}, and taken from
+     * Big constant 5; primarily internal.
+     * Used by {@link #hash64(long, CharSequence)}, and taken from
      * <a href="https://github.com/wangyi-fudan/wyhash">wyhash</a> (in an earlier version).
      */
     public static final long b5 = 0xEB44ACCAB455D165L;
 
     /**
+     * A primarily-internal method used to mix two long arguments into one long result. The low 32 bits of each input
+     * are more important than the high 32 bits of either input.
      * Takes two arguments that are technically longs, and should be very different, and uses them to get a result
      * that is technically a long and mixes the bits of the inputs. The arguments and result are only technically
      * longs because their lower 32 bits matter much more than their upper 32, and giving just any long won't work.

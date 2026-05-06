@@ -15,7 +15,8 @@ import java.security.GeneralSecurityException;
 
 /**
  * An encrypted FileHandle that uses {@link javax.crypto.Cipher} (using AES) to encrypt and decrypt files.
- * This is probably incompatible with everywhere except for desktop.
+ * This is probably incompatible with every platform except for desktop.
+ * Uses the FileHandle's path (or name, if it is an absolute path) to determine its initialization vector.
  * <br>
  * Based off <a href="https://gist.github.com/MobiDevelop/6389767">a gist by MobiDevelop</a>.
  */
@@ -36,12 +37,13 @@ public final class AESFileHandle extends FileHandle {
 		this.fh = file;
 		this.key = expandKeyphrase(keyphrase);
 	}
+
 	/**
 	 * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
 	 * encrypted data from the wrapped FileHandle.
 	 *
 	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
-	 * @param key a 32-element byte array used exactly
+	 * @param key a 32-element byte array clone()-ed and used exactly
 	 */
 	public AESFileHandle(FileHandle file, byte[] key) {
 		this.fh = file;
@@ -86,7 +88,8 @@ public final class AESFileHandle extends FileHandle {
 	 * @return ciphertext, after modifications
 	 */
 	private byte[] encrypt(byte[] plaintext, int plainOffset, byte[] ciphertext, int cipherOffset, int textLength) {
-		IvParameterSpec iv = new IvParameterSpec(fh.path().getBytes(StandardCharsets.UTF_8));
+		IvParameterSpec iv = new IvParameterSpec(
+				(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()).getBytes(StandardCharsets.UTF_8));
 		SecretKeySpec sKeySpec = new SecretKeySpec(key, "AES");
 
 		try {
@@ -114,7 +117,8 @@ public final class AESFileHandle extends FileHandle {
 	 * @param textLength how many byte items to read and encrypt from plaintext
 	 */
 	private byte[] encryptInPlace(byte[] plaintext, int plainOffset, int textLength) {
-		IvParameterSpec iv = new IvParameterSpec(fh.path().getBytes(StandardCharsets.UTF_8));
+		IvParameterSpec iv = new IvParameterSpec(
+				(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()).getBytes(StandardCharsets.UTF_8));
 		SecretKeySpec sKeySpec = new SecretKeySpec(key, "AES");
 
         try {
@@ -143,7 +147,8 @@ public final class AESFileHandle extends FileHandle {
 	 * @param textLength how many byte items to read and decrypt from ciphertext
 	 */
 	private byte[] decryptInPlace(byte[] ciphertext, int cipherOffset, int textLength) {
-		IvParameterSpec iv = new IvParameterSpec(fh.path().getBytes(StandardCharsets.UTF_8));
+		IvParameterSpec iv = new IvParameterSpec(
+				(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()).getBytes(StandardCharsets.UTF_8));
 		SecretKeySpec sKeySpec = new SecretKeySpec(key, "AES");
 
 		try {
@@ -180,7 +185,8 @@ public final class AESFileHandle extends FileHandle {
 
 	@Override
 	public OutputStream write(final boolean append) {
-		IvParameterSpec iv = new IvParameterSpec(fh.path().getBytes(StandardCharsets.UTF_8));
+		IvParameterSpec iv = new IvParameterSpec(
+				(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()).getBytes(StandardCharsets.UTF_8));
 		SecretKeySpec sKeySpec = new SecretKeySpec(key, "AES");
 
 		try {

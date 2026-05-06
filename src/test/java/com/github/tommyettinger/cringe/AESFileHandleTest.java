@@ -26,6 +26,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Base64Coder;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -49,9 +50,11 @@ public class AESFileHandleTest extends ApplicationAdapter {
         Gdx.gl.glDisable(GL20.GL_BLEND);
         renderer = new SpriteBatch();
         view = new ScreenViewport();
-        FileHandle plain = Gdx.files.internal("Cat_Portrait.png");
-        FileHandle mystery = Gdx.files.local("Cat_Portrait.png");
-        texture = new Texture(plain);
+        FileHandle cat = Gdx.files.internal("Cat_Portrait.png");
+        FileHandle foam = Gdx.files.internal("Foam_Noise.png");
+        FileHandle catEncrypted = Gdx.files.local("out/Cat_Portrait.png");
+        FileHandle foamEncrypted = Gdx.files.local("out/Foam_Noise.png");
+        texture = new Texture(cat);
 
         InputAdapter input = new InputAdapter() {
             @Override
@@ -78,23 +81,41 @@ public class AESFileHandleTest extends ApplicationAdapter {
                         System.out.println(Base64Coder.encode(k));
                         break;
                     case R:
-                        if(mystery.exists()) {
-                            try {
-                                t = new Texture(new AESFileHandle(mystery, k));
-                            } catch (Exception e){
-                                System.out.println("Failed to read " + mystery);
-                                break;
+                        if(MathUtils.randomBoolean()) {
+                            if (catEncrypted.exists()) {
+                                try {
+                                    t = new Texture(new AESFileHandle(catEncrypted, k));
+                                } catch (Exception e) {
+                                    System.out.println("Failed to read " + catEncrypted);
+                                    break;
+                                }
+                                texture.dispose();
+                                texture = t;
                             }
-                            texture.dispose();
-                            texture = t;
+                        } else {
+                            if (foamEncrypted.exists()) {
+                                try {
+                                    t = new Texture(new AESFileHandle(foamEncrypted, k));
+                                } catch (Exception e) {
+                                    System.out.println("Failed to read " + foamEncrypted);
+                                    break;
+                                }
+                                texture.dispose();
+                                texture = t;
+                            }
+
                         }
                         break;
-                    case W:
-                        texture.dispose();
-                        AESFileHandle ciphered = new AESFileHandle(mystery, k);
-                        ciphered.writeBytes(plain.readBytes(), false);
-                        texture = new Texture(ciphered);
+                    case C: {
+                        AESFileHandle ciphered = new AESFileHandle(catEncrypted, k);
+                        ciphered.writeBytes(cat.readBytes(), false);
                         break;
+                    }
+                    case F: {
+                        AESFileHandle ciphered = new AESFileHandle(foamEncrypted, k);
+                        ciphered.writeBytes(foam.readBytes(), false);
+                        break;
+                    }
                     case Q: // quit
                     case ESCAPE: {
                         Gdx.app.exit();

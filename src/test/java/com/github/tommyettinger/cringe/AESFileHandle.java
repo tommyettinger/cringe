@@ -56,7 +56,7 @@ public final class AESFileHandle extends FileHandle {
 	 * encrypted data from the wrapped FileHandle.
 	 *
 	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
-	 * @param key a 32-element byte array clone()-ed and used exactly
+	 * @param key a 16-element byte array clone()-ed and used exactly
 	 */
 	public AESFileHandle(FileHandle file, byte[] key) {
 		this.fh = file;
@@ -64,28 +64,28 @@ public final class AESFileHandle extends FileHandle {
 	}
 
 	/**
-	 * Given a CharSequence key such as a String, this grows that initial key into a 256-bit expanded key (a
-	 * {@code byte[32]}).
+	 * Given a CharSequence key such as a String, this grows that initial key into a 128-bit expanded key (a
+	 * {@code byte[16]}).
 	 * <br>
 	 * This simply returns {@code expandKeyphrase(-1L, keyphrase)}.
 	 *
 	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
-	 * @return a 32-item byte array that should, of course, be kept secret to be used cryptographically
+	 * @return a 16-item byte array that should, of course, be kept secret to be used cryptographically
 	 */
-	private static byte[] expandKeyphrase(CharSequence keyphrase) {
+	public static byte[] expandKeyphrase(CharSequence keyphrase) {
 		return expandKeyphrase(-1L, keyphrase);
 	}
 
 	/**
-	 * Given a CharSequence key such as a String, this grows that initial key into a 256-bit expanded key (a
-	 * {@code byte[32]}).
+	 * Given a CharSequence key such as a String, this grows that initial key into a 128-bit expanded key (a
+	 * {@code byte[16]}).
 	 * @param seed any long, which will be used to change the resulting key
 	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
-	 * @return a 32-item byte array that should, of course, be kept secret to be used cryptographically
+	 * @return a 16-item byte array that should, of course, be kept secret to be used cryptographically
 	 */
-	private static byte[] expandKeyphrase(final long seed, CharSequence keyphrase) {
+	public static byte[] expandKeyphrase(final long seed, CharSequence keyphrase) {
 		if(keyphrase == null) keyphrase = "You should really do a better job at selecting a keyphrase!";
-		final byte[] k = new byte[32];
+		final byte[] k = new byte[16];
 		long sc;
 		k[0] = (byte) (sc = Scramblers.scramble(Scramblers.hash64(seed, keyphrase)));
 		for (int i = 1; i < k.length; i++) {
@@ -116,11 +116,11 @@ public final class AESFileHandle extends FileHandle {
 	 */
 	private byte[] encrypt(byte[] plaintext, int plainOffset, byte[] ciphertext, int cipherOffset, int textLength) {
 		IvParameterSpec iv = new IvParameterSpec(
-				(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()).getBytes(StandardCharsets.UTF_8));
+				expandKeyphrase(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()));
 		SecretKeySpec sKeySpec = new SecretKeySpec(key, "AES");
 
 		try {
-			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+			Cipher cipher = Cipher.getInstance("AES_128/OFB/NoPadding");
 			cipher.init(Cipher.DECRYPT_MODE, sKeySpec, iv);
 			cipher.doFinal(plaintext, plainOffset, textLength, ciphertext, cipherOffset);
 		} catch (GeneralSecurityException e) {
@@ -145,11 +145,11 @@ public final class AESFileHandle extends FileHandle {
 	 */
 	private byte[] encryptInPlace(byte[] plaintext, int plainOffset, int textLength) {
 		IvParameterSpec iv = new IvParameterSpec(
-				(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()).getBytes(StandardCharsets.UTF_8));
+				expandKeyphrase(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()));
 		SecretKeySpec sKeySpec = new SecretKeySpec(key, "AES");
 
         try {
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            Cipher cipher = Cipher.getInstance("AES_128/OFB/NoPadding");
 			cipher.init(Cipher.ENCRYPT_MODE, sKeySpec, iv);
 			return cipher.doFinal(plaintext, plainOffset, textLength);
         } catch (GeneralSecurityException e) {
@@ -175,11 +175,11 @@ public final class AESFileHandle extends FileHandle {
 	 */
 	private byte[] decryptInPlace(byte[] ciphertext, int cipherOffset, int textLength) {
 		IvParameterSpec iv = new IvParameterSpec(
-				(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()).getBytes(StandardCharsets.UTF_8));
+				expandKeyphrase(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()));
 		SecretKeySpec sKeySpec = new SecretKeySpec(key, "AES");
 
 		try {
-			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+			Cipher cipher = Cipher.getInstance("AES_128/OFB/NoPadding");
 			cipher.init(Cipher.DECRYPT_MODE, sKeySpec, iv);
 			return cipher.doFinal(ciphertext, cipherOffset, textLength);
 		} catch (GeneralSecurityException e) {
@@ -217,7 +217,7 @@ public final class AESFileHandle extends FileHandle {
 		SecretKeySpec sKeySpec = new SecretKeySpec(key, "AES");
 
 		try {
-			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+			Cipher cipher = Cipher.getInstance("AES_128/OFB/NoPadding");
 			cipher.init(Cipher.ENCRYPT_MODE, sKeySpec, iv);
 			return new CipherOutputStream(fh.write(append), cipher);
 		} catch (GeneralSecurityException e) {

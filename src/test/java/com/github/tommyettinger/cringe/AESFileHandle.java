@@ -16,7 +16,11 @@ import java.security.GeneralSecurityException;
 /**
  * An encrypted FileHandle that uses {@link javax.crypto.Cipher} (using AES) to encrypt and decrypt files.
  * This is probably incompatible with every platform except for desktop.
- * Uses the FileHandle's path (or name, if it is an absolute path) to determine its initialization vector.
+ * Uses a hash of the FileHandle's name and file length in bytes to determine its initialization vector, which is...
+ * probably a bad idea. You should use unique file names for inputs to this. On the plus side, using just file names
+ * allows you to move encrypted files to different directories without them breaking, though renaming them will break
+ * them. This also means the file extension must stay the same even for encrypted files, which won't be valid examples
+ * of their file type.
  * <br>
  * Based off <a href="https://gist.github.com/MobiDevelop/6389767">a gist by MobiDevelop</a>.
  */
@@ -116,7 +120,7 @@ public final class AESFileHandle extends FileHandle {
 	 */
 	private byte[] encrypt(byte[] plaintext, int plainOffset, byte[] ciphertext, int cipherOffset, int textLength) {
 		IvParameterSpec iv = new IvParameterSpec(
-				expandKeyphrase(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()));
+				expandKeyphrase(fh.length(), fh.name()));
 		SecretKeySpec sKeySpec = new SecretKeySpec(key, "AES");
 
 		try {
@@ -145,7 +149,7 @@ public final class AESFileHandle extends FileHandle {
 	 */
 	private byte[] encryptInPlace(byte[] plaintext, int plainOffset, int textLength) {
 		IvParameterSpec iv = new IvParameterSpec(
-				expandKeyphrase(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()));
+				expandKeyphrase(fh.length(), fh.name()));
 		SecretKeySpec sKeySpec = new SecretKeySpec(key, "AES");
 
         try {
@@ -175,7 +179,7 @@ public final class AESFileHandle extends FileHandle {
 	 */
 	private byte[] decryptInPlace(byte[] ciphertext, int cipherOffset, int textLength) {
 		IvParameterSpec iv = new IvParameterSpec(
-				expandKeyphrase(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()));
+				expandKeyphrase(fh.length(), fh.name()));
 		SecretKeySpec sKeySpec = new SecretKeySpec(key, "AES");
 
 		try {
@@ -213,7 +217,7 @@ public final class AESFileHandle extends FileHandle {
 	@Override
 	public OutputStream write(final boolean append) {
 		IvParameterSpec iv = new IvParameterSpec(
-				(fh.type() == Files.FileType.Absolute ? fh.name() : fh.path()).getBytes(StandardCharsets.UTF_8));
+				expandKeyphrase(fh.length(), fh.name()));
 		SecretKeySpec sKeySpec = new SecretKeySpec(key, "AES");
 
 		try {

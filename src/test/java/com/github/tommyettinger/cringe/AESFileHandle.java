@@ -31,6 +31,19 @@ public final class AESFileHandle extends FileHandle {
 	 * encrypted data from the wrapped FileHandle.
 	 *
 	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
+	 * @param seed any long, which will be used to change the resulting key
+	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
+	 */
+	public AESFileHandle(FileHandle file, long seed, CharSequence keyphrase) {
+		this.fh = file;
+		this.key = expandKeyphrase(seed, keyphrase);
+	}
+
+	/**
+	 * Creates a EncryptedFileHandle that can write encrypted data to the wrapped FileHandle or read and decrypt
+	 * encrypted data from the wrapped FileHandle.
+	 *
+	 * @param file the FileHandle to wrap; may be any type, such as {@link Files.FileType#Internal}
 	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
 	 */
 	public AESFileHandle(FileHandle file, CharSequence keyphrase) {
@@ -53,14 +66,28 @@ public final class AESFileHandle extends FileHandle {
 	/**
 	 * Given a CharSequence key such as a String, this grows that initial key into a 256-bit expanded key (a
 	 * {@code byte[32]}).
+	 * <br>
+	 * This simply returns {@code expandKeyphrase(-1L, keyphrase)}.
+	 *
 	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
 	 * @return a 32-item byte array that should, of course, be kept secret to be used cryptographically
 	 */
 	private static byte[] expandKeyphrase(CharSequence keyphrase) {
+		return expandKeyphrase(-1L, keyphrase);
+	}
+
+	/**
+	 * Given a CharSequence key such as a String, this grows that initial key into a 256-bit expanded key (a
+	 * {@code byte[32]}).
+	 * @param seed any long, which will be used to change the resulting key
+	 * @param keyphrase a typically-sentence-to-paragraph-length CharSequence, such as a String, that will be used to generate keys
+	 * @return a 32-item byte array that should, of course, be kept secret to be used cryptographically
+	 */
+	private static byte[] expandKeyphrase(final long seed, CharSequence keyphrase) {
 		if(keyphrase == null) keyphrase = "You should really do a better job at selecting a keyphrase!";
-		byte[] k = new byte[32];
+		final byte[] k = new byte[32];
 		long sc;
-		k[0] = (byte) (sc = Scramblers.scramble(Scramblers.hash64(keyphrase.length(), keyphrase)));
+		k[0] = (byte) (sc = Scramblers.scramble(Scramblers.hash64(seed, keyphrase)));
 		for (int i = 1; i < k.length; i++) {
 			k[i] = (byte)(sc = Scramblers.scramble(Scramblers.hash64(sc^i, keyphrase)));
 		}

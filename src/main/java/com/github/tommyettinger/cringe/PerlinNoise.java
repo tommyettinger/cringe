@@ -43,11 +43,11 @@ import static com.github.tommyettinger.cringe.GradientVectors.*;
 public class PerlinNoise extends RawNoise {
     public static final PerlinNoise instance = new PerlinNoise();
 
-    public static final float SCALE2 = 1.41421330f; //towardsZero(1f/ (float) Math.sqrt(2f / 4f));
-    public static final float SCALE3 = 1.15470030f; //towardsZero(1f/ (float) Math.sqrt(3f / 4f));
-    public static final float SCALE4 = 0.99999990f; //towardsZero(1f)                            ;
-    public static final float SCALE5 = 0.89442706f; //towardsZero(1f/ (float) Math.sqrt(5f / 4f));
-    public static final float SCALE6 = 0.81649643f; //towardsZero(1f/ (float) Math.sqrt(6f / 4f));
+    public static final float SCALE2 = 1.41421330f;
+    public static final float SCALE3 = 1.15470030f;
+    public static final float SCALE4 = 0.99999990f;
+    public static final float SCALE5 = 0.89442706f;
+    public static final float SCALE6 = 0.81649643f;
 
     public static final float EQ_ADD_2 = 1.0f/1.75f;
     public static final float EQ_ADD_3 = 0.8f/1.75f;
@@ -62,19 +62,6 @@ public class PerlinNoise extends RawNoise {
     public static final float EQ_MUL_6 = 1.0555973f;
 
     public int seed;
-
-//    private final float[] eqMul = {
-//            calculateEqualizeAdjustment(eqAdd0),
-//            calculateEqualizeAdjustment(eqAdd1),
-//            calculateEqualizeAdjustment(eqAdd2),
-//            calculateEqualizeAdjustment(eqAdd3),
-//            calculateEqualizeAdjustment(eqAdd4),
-//    };
-
-//    public static float towardsZero(float x) {
-//        final int bits = NumberUtils.floatToIntBits(x), sign = bits & 0x80000000;
-//        return NumberUtils.intBitsToFloat(Math.max(0, (bits ^ sign) - 2) | sign);
-//    }
 
     public PerlinNoise() {
         this(0x1337BEEF);

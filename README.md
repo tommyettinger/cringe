@@ -163,17 +163,17 @@ it wont hapen agen
 
 # get
 
-The easiest way to use this library was to copy files from the source code.
-... But, that was only in the earliest versions. In 0.1.0 and newer, you should probably use
-Gradle (or Maven or whatever your chosen build tool is) to depend on cringe.
+You should probably use Gradle (or Maven or whatever your chosen build tool is) to depend on cringe.
 
-You can depend on the library as a whole, using it as a normal Gradle or Maven dependency.
+You can depend on the library as a whole, using it as a normal Gradle or Maven dependency, with JitPack.io as the
+repository. JitPack.io is added by default in gdx-liftoff projects, and it's easy to add to other projects; see
+[their documentation](https://jitpack.io/#tommyettinger/cringe).
 
-`api "com.github.tommyettinger:cringe:0.3.0"`
+`api "com.github.tommyettinger:cringe:0.3.1"`
 
 If you use GWT, then your GWT module needs to depend on:
 
-`implementation "com.github.tommyettinger:cringe:0.3.0:sources"`
+`implementation "com.github.tommyettinger:cringe:0.3.1:sources"`
 
 GWT also needs this `inherits` line added to your `GdxDefinition.gwt.xml` file, with the other inherits lines:
 
@@ -186,8 +186,11 @@ The four [GdxRandom](src/main/java/com/github/tommyettinger/cringe/GdxRandom.jav
 [RandomDistinct64](src/main/java/com/github/tommyettinger/cringe/RandomDistinct64.java),
 [RandomXMX256](src/main/java/com/github/tommyettinger/cringe/RandomXMX256.java)),
 and [RandomChop128](src/main/java/com/github/tommyettinger/cringe/RandomChop128.java))
-can be used as drop-in replacements for `java.util.Random` or an
-almost-identical replacement for libGDX's `RandomXS128`.
+can be used as drop-in replacements for `java.util.Random` or an almost-identical replacement for
+libGDX's `RandomXS128`. These can't easily be copied into your sources, though; they extend `GdxRandom`, and use
+`Compatibility` so they work on GWT. Because of how `Compatibility` works, you should really depend on this library
+using your build tool if you target GWT. If you don't target GWT, everything used in `Compatibility` calls normal Java
+code, usually from the JDK standard library; on GWT, those calls get replaced by ones that GWT can use.
 
 The different GdxRandom implementations differ in various properties. All are high-quality statistically, passing
 the PractRand battery of tests to 64TB of tested data. They each have different "periods," meaning the number of random

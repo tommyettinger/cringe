@@ -47,15 +47,16 @@ public class LineVisualizer extends ApplicationAdapter {
             LineWobble::splineWobble,                                                                        //2
             LineWobble::trigWobble,                                                                          //3
             LineWobble::smoothWobble,                                                                        //4
-            (f, i) -> LineWobble.wobble(f, i * 0x9E3779B97F4A7C15L),                                 //5
-            (f, i) -> LineWobble.bicubicWobble(f, i * 0x9E3779B97F4A7C15L),                          //6
-            (f, i) -> LineWobble.splineWobble(f, i * 0x9E3779B97F4A7C15L),                           //7
-            (f, i) -> LineWobble.trigWobble(f, i * 0x9E3779B97F4A7C15L),                             //8
-            (f, i) -> LineWobble.smoothWobble(f, i * 0x9E3779B97F4A7C15L),                           //9
-            (f, i) -> MathSupport.cbrt(LineWobble.bicubicWobble(f, i))                               //10
+            (f, i) -> LineWobble.wobble(f, i * 0x9E3779B97F4A7C15L),                               //5
+            (f, i) -> LineWobble.bicubicWobble(f, i * 0x9E3779B97F4A7C15L),                        //6
+            (f, i) -> LineWobble.splineWobble(f, i * 0x9E3779B97F4A7C15L),                         //7
+            (f, i) -> LineWobble.trigWobble(f, i * 0x9E3779B97F4A7C15L),                           //8
+            (f, i) -> LineWobble.smoothWobble(f, i * 0x9E3779B97F4A7C15L),                         //9
+            (f, i) -> MathSupport.cbrt(LineWobble.bicubicWobble(f, i)),                            //10
+            (f, i) -> MathUtils.sin(f + 2 * LineWobble.bicubicWobble(f, i)),                       //11
     };
     public int wobbleCount = wobbles.length;
-    public int currentWobble = 1;
+    public int currentWobble = 11;
     public int octaves = 1;
 
 
@@ -325,31 +326,6 @@ public class LineVisualizer extends ApplicationAdapter {
         y = Math.min(Math.max(Math.abs(y * 6f - 3f) - 1f, 0f), 1f);
         z = Math.min(Math.max(Math.abs(z * 6f - 3f) - 1f, 0f), 1f);
         return Color.toFloatBits(x, y, z, 1f);
-    }
-    /**
-     * Converts the four HSBA/HSVA components, each in the 0.0 to 1.0 range, to a packed float color in ABGR7888 format.
-     * I brought this over from colorful-gdx's FloatColors class. I can't recall where I got the original HSL(A) code
-     * from, but there's a strong chance it was written by cypherdare/cyphercove for their color space comparison.
-     * HSV and HSB are synonyms; it makes a little more sense to call the third channel brightness.
-     * The {@code h} parameter for hue can be lower than 0.0 or higher than 1.0 because the hue "wraps around;" only the
-     * fractional part of h is used. The other parameters must be between 0.0 and 1.0 (inclusive) to make sense.
-     *
-     * @param h hue, from 0.0 to 1.0
-     * @param s saturation, from 0.0 to 1.0
-     * @param b brightness, from 0.0 to 1.0
-     * @param a alpha, from 0.0 to 1.0
-     * @return a packed float color in the format libGDX uses, ABGR7888
-     */
-    public static float hsb2rgb(final float h, final float s, final float b, final float a) {
-        float hue = h - MathUtils.floor(h);
-        float x = Math.min(Math.max(Math.abs(hue * 6f - 3f) - 1f, 0f), 1f);
-        float y = hue + (2f / 3f);
-        float z = hue + (1f / 3f);
-        y -= (int) y;
-        z -= (int) z;
-        y = Math.min(Math.max(Math.abs(y * 6f - 3f) - 1f, 0f), 1f);
-        z = Math.min(Math.max(Math.abs(z * 6f - 3f) - 1f, 0f), 1f);
-        return Color.toFloatBits(b * MathUtils.lerp(1f, x, s), b * MathUtils.lerp(1f, y, s), b * MathUtils.lerp(1f, z, s), a);
     }
 
     @Override

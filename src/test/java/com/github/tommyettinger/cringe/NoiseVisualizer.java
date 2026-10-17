@@ -160,7 +160,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                                 float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                                 ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f) * 0.3f, 1f);
                                 p.setColor(tempColor);
-                                p.drawCircle((int) x, (int) y, 3);
+                                p.fillCircle((int) x, (int) y, 3);
                             }
                             for (int d = 4096; d < 10000; d++) {
                                 float da = d * 0.05f;
@@ -169,7 +169,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                                 float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                                 ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f) * 0.55f, 1f);
                                 p.setColor(tempColor);
-                                p.drawCircle((int) x, (int) y, 2);
+                                p.fillCircle((int) x, (int) y, 2);
                             }
                             for (int d = 4096; d < 10000; d++) {
                                 float da = d * 0.05f;
@@ -186,13 +186,15 @@ public class NoiseVisualizer extends ApplicationAdapter {
 
                         file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + "_1D.gif");
                         System.out.println("Writing to file:\n" + file);
+                        gif.setDitherAlgorithm(Dithered.DitherAlgorithm.NONE);
                         gif.palette.analyzeHueWise(frames);
                         gif.write(file, frames, 60);
                         for (int i = 0; i < frames.size; i++) {
                             frames.get(i).dispose();
                         }
                         frames.clear();
-                    break;
+                        gif.setDitherAlgorithm(Dithered.DitherAlgorithm.LOAF);
+                        break;
                     case W:
                         if(dim == 0) {
                             for (int c = 0; c < 1024; c++) {
@@ -207,7 +209,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                                     float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                                     ColorSupport.hsb2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright * 1.2f - 0.2f, 1f);
                                     p.setColor(tempColor);
-                                    p.drawCircle((int) x, (int)y, 2);
+                                    p.fillCircle((int) x, (int)y, 2);
                                 }
                                 frames.add(p);
                             }
@@ -215,13 +217,14 @@ public class NoiseVisualizer extends ApplicationAdapter {
 
                             file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + "_1D.gif");
                             System.out.println("Writing to file:\n" + file);
-                            gif.setFastAnalysis(true);
+                            gif.setDitherAlgorithm(Dithered.DitherAlgorithm.NONE);
                             gif.palette.analyze(frames);
                             gif.write(file, frames, 60);
                             for (int i = 0; i < frames.size; i++) {
                                 frames.get(i).dispose();
                             }
                             frames.clear();
+                            gif.setDitherAlgorithm(Dithered.DitherAlgorithm.LOAF);
                         } else {
                             Color t = tempColor;
                             for (int i = 1; i < 256; i++) {

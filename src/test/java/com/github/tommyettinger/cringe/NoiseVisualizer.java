@@ -412,6 +412,39 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                     // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
                     // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
+                    ColorSupport.hsb2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright * 0.6f - 0.2f, 1f);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x-1, y, 0);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x+1, y, 0);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x, y-1, 0);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x, y+1, 0);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x-1, y-1, 0);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x+1, y+1, 0);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x+1, y-1, 0);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x-1, y+1, 0);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x-2, y, 0);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x+2, y, 0);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x, y-2, 0);
+                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.vertex(x, y+2, 0);
+                }
+                for (int d = 4096; d < 8192; d++) {
+                    bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
+                    float da = d * 0.0625f;
+                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + c, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+                    // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
+                    // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
                     ColorSupport.hsb2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright * 1.2f - 0.2f, 1f);
                     renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
                     renderer.vertex(x, y, 0);

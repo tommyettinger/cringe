@@ -152,22 +152,22 @@ public class NoiseVisualizer extends ApplicationAdapter {
                             Pixmap p = new Pixmap(width, height, Pixmap.Format.RGBA8888);
                             p.setColor(Color.BLACK);
                             p.fill();
-                            float cc = c * 0.2f;
+                            float cc = c * 0.2f, ccc = cc * 0.02f;
+//                            for (int d = 4096; d < 10000; d++) {
+//                                float da = d * 0.05f;
+//                                float bright = d / 9999f;
+//                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+//                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+//                                ColorSupport.hsb2rgb(tempColor, hue + bright + ccc, 1f, bright * 0.6f - 0.2f, 1f);
+//                                p.setColor(tempColor);
+//                                p.fillCircle((int) x, (int) y, 3);
+//                            }
                             for (int d = 4096; d < 10000; d++) {
                                 float da = d * 0.05f;
                                 float bright = d / 9999f;
                                 float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
                                 float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
-                                ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f) * 0.3f, 1f);
-                                p.setColor(tempColor);
-                                p.fillCircle((int) x, (int) y, 3);
-                            }
-                            for (int d = 4096; d < 10000; d++) {
-                                float da = d * 0.05f;
-                                float bright = d / 9999f;
-                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
-                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
-                                ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright - 0.2f) * 0.55f, 1f);
+                                ColorSupport.hsb2rgb(tempColor, hue + bright + ccc, 1f, bright * 0.9f - 0.2f, 1f);
                                 p.setColor(tempColor);
                                 p.fillCircle((int) x, (int) y, 2);
                             }
@@ -176,7 +176,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                                 float bright = d / 9999f;
                                 float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
                                 float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
-                                ColorSupport.hsl2rgb(tempColor, hue + bright + cc * 0.02f, 1f, (bright * 0.4f + 0.5f), 1f);
+                                ColorSupport.hsb2rgb(tempColor, hue + bright + ccc, 1f, Math.min(1f, bright * 1.4f), 1f);
                                 p.setColor(tempColor);
                                 p.drawPixel((int) x, (int) y);
                             }
@@ -186,14 +186,12 @@ public class NoiseVisualizer extends ApplicationAdapter {
 
                         file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + "_1D.gif");
                         System.out.println("Writing to file:\n" + file);
-                        gif.setDitherAlgorithm(Dithered.DitherAlgorithm.NONE);
-                        gif.palette.analyzeHueWise(frames);
+                        gif.palette.analyze(frames);
                         gif.write(file, frames, 60);
                         for (int i = 0; i < frames.size; i++) {
                             frames.get(i).dispose();
                         }
                         frames.clear();
-                        gif.setDitherAlgorithm(Dithered.DitherAlgorithm.LOAF);
                         break;
                     case W:
                         if(dim == 0) {
@@ -217,14 +215,12 @@ public class NoiseVisualizer extends ApplicationAdapter {
 
                             file = Gdx.files.local("out/" + noise.stringSerialize() + "_" + System.currentTimeMillis() + "_1D.gif");
                             System.out.println("Writing to file:\n" + file);
-                            gif.setDitherAlgorithm(Dithered.DitherAlgorithm.NONE);
                             gif.palette.analyze(frames);
                             gif.write(file, frames, 60);
                             for (int i = 0; i < frames.size; i++) {
                                 frames.get(i).dispose();
                             }
                             frames.clear();
-                            gif.setDitherAlgorithm(Dithered.DitherAlgorithm.LOAF);
                         } else {
                             Color t = tempColor;
                             for (int i = 1; i < 256; i++) {

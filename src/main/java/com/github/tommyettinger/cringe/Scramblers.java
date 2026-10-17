@@ -78,18 +78,21 @@ public final class Scramblers {
      * Given an int {@code x}, this randomly scrambles x, so it is (almost always) a very different int.
      * This can take any int and can return any int.
      * <br>
-     * It is currently unknown if this has any fixed-points (inputs that produce an identical output), but
-     * a step is taken at the start of the function to eliminate one major known fixed-point at 0.
+     * This has no fixed-points (inputs that produce an identical output), checked by exhaustive testing on all inputs.
      * <br>
      * Care has been taken to make this return the same results on GWT as it does elsewhere.
      * <br>
      * This uses the <a href="https://github.com/skeeto/hash-prospector#three-round-functions">third unary hash</a> in
-     * the three-round function table, but XORs the input with 0xFB8FAC03L before using the hash.
+     * the three-round function table, but XORs the input with 0xFB8FAC01 before using the hash.
+     * The initial XOR value changed after version 0.3.1; you can get identical results to before by calling
+     * {@code Scramblers.scrambleInt((x) ^ 2)} instead of {@code Scramblers.scrambleInt(x)}. The results in 0.3.1 and
+     * earlier have two fixed-points instead of none.
+     *
      * @param x any int, to be scrambled
      * @return a scrambled int derived from {@code x}
      */
     public static int scrambleInt(int x) {
-        x ^= 0xFB8FAC03;
+        x ^= 0xFB8FAC01;
         x ^= x >>> 16;
         x = Compatibility.imul(x, 0x236F7153);
         x ^= x >>> 12;

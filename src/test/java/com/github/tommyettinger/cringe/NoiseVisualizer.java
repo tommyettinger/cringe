@@ -396,7 +396,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
 
 
         renderer.begin(view.getCamera().combined, GL_POINTS);
-        float bright, c = ctr * 16f;
+        float bright, c = ctr * 16f, ccc = ctr * 0.15f;
         switch (dim) {
             case 0:
                 c *= 0.5f;
@@ -408,30 +408,30 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                     // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
                     // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
-                    ColorSupport.hsb2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright * 0.6f - 0.2f, 1f);
-                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    // packing tempColor to its float bits avoids recalculating that conversion 45056 extra times.
+                    float packed = ColorSupport.hsb2rgb(tempColor, hue + bright + ccc, 1f, bright * 0.9f - 0.2f, 1f).toFloatBits();
                     renderer.vertex(x-1, y, 0);
-                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.color(packed);
                     renderer.vertex(x+1, y, 0);
-                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.color(packed);
                     renderer.vertex(x, y-1, 0);
-                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.color(packed);
                     renderer.vertex(x, y+1, 0);
-                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.color(packed);
                     renderer.vertex(x-1, y-1, 0);
-                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.color(packed);
                     renderer.vertex(x+1, y+1, 0);
-                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.color(packed);
                     renderer.vertex(x+1, y-1, 0);
-                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.color(packed);
                     renderer.vertex(x-1, y+1, 0);
-                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.color(packed);
                     renderer.vertex(x-2, y, 0);
-                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.color(packed);
                     renderer.vertex(x+2, y, 0);
-                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.color(packed);
                     renderer.vertex(x, y-2, 0);
-                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    renderer.color(packed);
                     renderer.vertex(x, y+2, 0);
                 }
                 for (int d = 4096; d < 8192; d++) {
@@ -441,8 +441,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
                     float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                     // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
                     // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
-                    ColorSupport.hsb2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright * 1.2f - 0.2f, 1f);
-                    renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
+                    ColorSupport.hsb2rgb(tempColor, hue + bright + ccc, 1f, Math.min(1f, bright * 1.4f), 1f);
+                    renderer.color(tempColor);
                     renderer.vertex(x, y, 0);
                 }
 //                for (int x = 0; x < width; x++) {

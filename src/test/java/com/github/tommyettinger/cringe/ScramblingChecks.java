@@ -316,12 +316,46 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void mainAENX(String[] args){
         int idx = 0;
         for (int a = 0; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (scrambleInt(idx + a) ^ ~a))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Minus-decrement-encrypt-XOR.
+     * <br>
+     * 0x8AC4B1C0 is a fixed-point for a=9.
+     * 0x9BF24130 is a fixed-point for a=9.
+     * 0xB2F6B700 is a fixed-point for a=9.
+     * 0x3A69BBC1 is a fixed-point for a=10.
+     * 0xF1B88A25 is a fixed-point for a=10.
+     * 0x8AC4B1C2 is a fixed-point for a=11.
+     * 0x9BF24132 is a fixed-point for a=11.
+     * 0xB2F6B702 is a fixed-point for a=11.
+     * 0x8AC4B1C4 is a fixed-point for a=13.
+     * 0x9BF24134 is a fixed-point for a=13.
+     * 0xB2F6B704 is a fixed-point for a=13.
+     * 0x3A69BBC5 is a fixed-point for a=14.
+     * 0x8AC4B1C6 is a fixed-point for a=15.
+     * 0x9BF24136 is a fixed-point for a=15.
+     * 0xB2F6B706 is a fixed-point for a=15.
+     *
+     * @param args
+     */
+    public static void main(String[] args){
+        int idx = 0;
+        for (int a = 0; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleInt(idx - a - 1) ^ a))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

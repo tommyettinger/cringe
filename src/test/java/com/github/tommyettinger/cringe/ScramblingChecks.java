@@ -222,6 +222,26 @@ public class ScramblingChecks {
     }
 
     /**
+     * Add-encrypt-minus-decrement.
+     * <br>
+     * NO FIXED-POINTS! Can also use {@code (encrypt(idx + a) + ~a)}
+     *
+     * @param args
+     */
+    public static void main(String[] args){
+        int idx = 0;
+        for (int a = 0; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleInt(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
      * Xor-encrypt-add has predictable fixed-points at {@code a} and sometimes more.
      * <br>
      * 0x00000001 is a fixed-point for a=1.
@@ -363,7 +383,7 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void mainNEM(String[] args){
         int idx = 0;
         for (int a = 1; a < 16; a++) {
             for (int i = 0; i < 16; i++) {

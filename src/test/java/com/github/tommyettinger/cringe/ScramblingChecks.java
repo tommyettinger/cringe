@@ -208,12 +208,63 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void mainAEM(String[] args){
         int idx = 0;
         for (int a = 1; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (scrambleInt(idx + a) - a))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Xor-encrypt-add has predictable fixed-points at {@code a} and sometimes more.
+     * <br>
+     * 0x00000001 is a fixed-point for a=1.
+     * 0xA26E8047 is a fixed-point for a=1.
+     * 0xDAC33354 is a fixed-point for a=1.
+     * 0x00000002 is a fixed-point for a=2.
+     * 0x37B8EFA9 is a fixed-point for a=2.
+     * 0x00000003 is a fixed-point for a=3.
+     * 0xDAC33356 is a fixed-point for a=3.
+     * 0x00000004 is a fixed-point for a=4.
+     * 0x00000005 is a fixed-point for a=5.
+     * 0x00000006 is a fixed-point for a=6.
+     * 0x05DC4BC1 is a fixed-point for a=6.
+     * 0x29A00EC9 is a fixed-point for a=6.
+     * 0x37B8EFAD is a fixed-point for a=6.
+     * 0x00000007 is a fixed-point for a=7.
+     * 0x00000008 is a fixed-point for a=8.
+     * 0x54F4B63F is a fixed-point for a=8.
+     * 0x61C43937 is a fixed-point for a=8.
+     * 0xA26E804E is a fixed-point for a=8.
+     * 0x00000009 is a fixed-point for a=9.
+     * 0xA26E804F is a fixed-point for a=9.
+     * 0xDAC3335C is a fixed-point for a=9.
+     * 0x0000000A is a fixed-point for a=10.
+     * 0x44394305 is a fixed-point for a=10.
+     * 0x0000000B is a fixed-point for a=11.
+     * 0xDAC3335E is a fixed-point for a=11.
+     * 0x0000000C is a fixed-point for a=12.
+     * 0x0000000D is a fixed-point for a=13.
+     * 0x8A06FD30 is a fixed-point for a=13.
+     * 0x0000000E is a fixed-point for a=14.
+     * 0x05DC4BC9 is a fixed-point for a=14.
+     * 0x0000000F is a fixed-point for a=15.
+     * 0x8A06FD32 is a fixed-point for a=15.
+     *
+     * @param args
+     */
+    public static void main(String[] args){
+        int idx = 0;
+        for (int a = 1; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleInt(idx ^ a) + a))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

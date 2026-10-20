@@ -578,6 +578,11 @@ public class ScramblingChecks {
     /**
      * XOR with {@code a} before passing to scrambleInt().
      * <br>
+     * 0x1B32410C is a fixed-point for a=-1.
+     * 0x7F419D57 is a fixed-point for a=-1.
+     * 0x00000000 is a fixed-point for a=0.
+     * 0x54F4B637 is a fixed-point for a=0.
+     * 0xA26E8046 is a fixed-point for a=0.
      * 0x17FD53DC is a fixed-point for a=2.
      * 0x9384DF05 is a fixed-point for a=4.
      * 0xE4F04311 is a fixed-point for a=4.
@@ -595,7 +600,7 @@ public class ScramblingChecks {
      */
     public static void mainPreXor(String[] args){
         int idx = 0;
-        for (int a = 1; a < 16; a++) {
+        for (int a = -1; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (scrambleInt(idx ^ a)))
@@ -609,6 +614,11 @@ public class ScramblingChecks {
     /**
      * XOR with {@code a} after passing to scrambleInt().
      * <br>
+     * 0x80BE62A8 is a fixed-point for a=-1.
+     * 0xE4CDBEF3 is a fixed-point for a=-1.
+     * 0x00000000 is a fixed-point for a=0.
+     * 0x54F4B637 is a fixed-point for a=0.
+     * 0xA26E8046 is a fixed-point for a=0.
      * 0x17FD53DE is a fixed-point for a=2.
      * 0x9384DF01 is a fixed-point for a=4.
      * 0xE4F04315 is a fixed-point for a=4.
@@ -628,7 +638,7 @@ public class ScramblingChecks {
      */
     public static void mainPostXor(String[] args){
         int idx = 0;
-        for (int a = 1; a < 16; a++) {
+        for (int a = -1; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (scrambleInt(idx) ^ a))

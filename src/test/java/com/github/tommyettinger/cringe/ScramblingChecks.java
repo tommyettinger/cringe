@@ -330,12 +330,45 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void mainNEX(String[] args){
         int idx = 0;
         for (int a = 1; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (scrambleInt(~idx) ^ a))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * NOT-Encrypt-Minus.
+     * <br>
+     * 0x796D5548 is a fixed-point for a=1.
+     * 0xFFFFFFFF is a fixed-point for a=1.
+     * 0xEF301BF0 is a fixed-point for a=2.
+     * 0x757F9AED is a fixed-point for a=4.
+     * 0x2A9A3447 is a fixed-point for a=5.
+     * 0x7C6962A2 is a fixed-point for a=5.
+     * 0xA594226D is a fixed-point for a=8.
+     * 0xAC82C534 is a fixed-point for a=8.
+     * 0x34F36FA1 is a fixed-point for a=10.
+     * 0xFDFC850F is a fixed-point for a=11.
+     * 0x78C5788C is a fixed-point for a=14.
+     * 0x9B1DE486 is a fixed-point for a=14.
+     * 0x66940A60 is a fixed-point for a=15.
+     * 0x823A2A74 is a fixed-point for a=15.
+     *
+     * @param args
+     */
+    public static void main(String[] args){
+        int idx = 0;
+        for (int a = 1; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleInt(~idx) - a))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

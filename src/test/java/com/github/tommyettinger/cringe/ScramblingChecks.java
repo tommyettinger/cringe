@@ -137,12 +137,45 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void mainPreXor(String[] args){
         int idx = 0;
         for (int a = 1; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (scrambleInt(idx ^ a)))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * XOR with {@code a} after passing to scrambleInt().
+     * <br>
+     * 0x17FD53DE is a fixed-point for a=2.
+     * 0x9384DF01 is a fixed-point for a=4.
+     * 0xE4F04315 is a fixed-point for a=4.
+     * 0xD43A4C32 is a fixed-point for a=6.
+     * 0xDAC33355 is a fixed-point for a=6.
+     * 0x4428DE46 is a fixed-point for a=7.
+     * 0x8329E33C is a fixed-point for a=7.
+     * 0x8B3C89E9 is a fixed-point for a=10.
+     * 0x681470D7 is a fixed-point for a=11.
+     * 0x29A00ECF is a fixed-point for a=12.
+     * 0x37B8EFAB is a fixed-point for a=12.
+     * 0x976BF758 is a fixed-point for a=12.
+     * <br>
+     * The fixed-points for pre- and post-XOR are just one XOR with {@code a} apart.
+     *
+     * @param args
+     */
+    public static void main(String[] args){
+        int idx = 0;
+        for (int a = 1; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleInt(idx) ^ a))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

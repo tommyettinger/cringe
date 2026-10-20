@@ -293,6 +293,41 @@ public class ScramblingChecks {
      * 0x852B346F is a fixed-point for a=14.
      * 0xD1B5D799 is a fixed-point for a=14.
      * 0xDECA3C51 is a fixed-point for a=15.
+     *
+     * @param args
+     */
+    public static void mainNEA(String[] args){
+        int idx = 0;
+        for (int a = 1; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleInt(~idx) + a))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * NOT-encrypt-XOR.
+     * <br>
+     * 0x773D1C2F is a fixed-point for a=1.
+     * 0x796D5548 is a fixed-point for a=1.
+     * 0xC9E08ACF is a fixed-point for a=1.
+     * 0xD37BECDB is a fixed-point for a=2.
+     * 0xEF301BF0 is a fixed-point for a=2.
+     * 0xF6484DBF is a fixed-point for a=3.
+     * 0x2B0288C6 is a fixed-point for a=5.
+     * 0x7C6962A2 is a fixed-point for a=5.
+     * 0xAC82C534 is a fixed-point for a=8.
+     * 0x2111917A is a fixed-point for a=9.
+     * 0x34F36FA1 is a fixed-point for a=10.
+     * 0x2A9A3447 is a fixed-point for a=11.
+     * 0x852B346F is a fixed-point for a=14.
+     * 0x0566B1F9 is a fixed-point for a=15.
+     * 0x66940A60 is a fixed-point for a=15.
+     *
      * @param args
      */
     public static void main(String[] args){
@@ -300,7 +335,7 @@ public class ScramblingChecks {
         for (int a = 1; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
-                    if (idx == (scrambleInt(~idx) + a))
+                    if (idx == (scrambleInt(~idx) ^ a))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

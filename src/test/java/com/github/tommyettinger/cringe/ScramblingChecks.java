@@ -282,13 +282,15 @@ public class ScramblingChecks {
      * <br>
      * Importantly for this function, just decrementing idx is enough to ensure it has no fixed-points.
      * I'm not sure if this works for all encrypt() functions...
+     * <br>
+     * Checked 2304 somewhat-random values for {@code a}, and none had fixed-points.
      *
      * @param args
      */
     public static void main(String[] args) {
-        int idx = 0, a = 0x9E3779B9 * 16 * 16;
+        int idx = 0, a = 0x9E3779B9 * 16 * (16 + 128);
         for (int b = 0; b < 16; b++) {
-            for (int c = 0; c < 16; c++) {
+            for (int c = 0; c < 128; c++) {
 
 
 //        for (int a = -16; a < 16; a++) {

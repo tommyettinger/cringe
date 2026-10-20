@@ -279,12 +279,49 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void mainXENX(String[] args){
         int idx = 0;
         for (int a = 0; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (scrambleInt(idx ^ a) ^ ~a))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Add-Encrypt-(NOT-XOR) has very strange results, with some patterns but not reliable ones.
+     * <br>
+     * 0x80BE62A8 is a fixed-point for a=0.
+     * 0xE4CDBEF3 is a fixed-point for a=0.
+     * 0xE4CDBEF2 is a fixed-point for a=1.
+     * 0xE4CDBEF1 is a fixed-point for a=2.
+     * 0xE4CDBEF0 is a fixed-point for a=3.
+     * 0x537D3AC7 is a fixed-point for a=4.
+     * 0x5A6BDD8E is a fixed-point for a=4.
+     * 0x537D3AC6 is a fixed-point for a=5.
+     * 0x537D3AC5 is a fixed-point for a=6.
+     * 0x5A6BDD8C is a fixed-point for a=6.
+     * 0x537D3AC4 is a fixed-point for a=7.
+     * 0x80BE62A0 is a fixed-point for a=8.
+     * 0x074F513F is a fixed-point for a=9.
+     * 0x074F513D is a fixed-point for a=11.
+     * 0x5A6BDD86 is a fixed-point for a=12.
+     * 0x074F513B is a fixed-point for a=13.
+     * 0x5A6BDD84 is a fixed-point for a=14.
+     * 0x074F5139 is a fixed-point for a=15.
+     *
+     * @param args
+     */
+    public static void main(String[] args){
+        int idx = 0;
+        for (int a = 0; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleInt(idx + a) ^ ~a))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

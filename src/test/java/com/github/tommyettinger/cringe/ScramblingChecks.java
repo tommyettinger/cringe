@@ -120,6 +120,42 @@ public class ScramblingChecks {
     }
 
     /**
+     * Add-encrypt-add has fewer and less-predictable fixed-points than XEX.
+     * Some values for {@code a} have no fixed-points.
+     * <br>
+     * 0x17FD53DD is a fixed-point for a=1.
+     * 0xDAC33354 is a fixed-point for a=1.
+     * 0x37B8EFA9 is a fixed-point for a=2.
+     * 0x976BF756 is a fixed-point for a=2.
+     * 0xE4F04313 is a fixed-point for a=2.
+     * 0x8B3C89E6 is a fixed-point for a=3.
+     * 0x05DC4BC1 is a fixed-point for a=6.
+     * 0x29A00EC9 is a fixed-point for a=6.
+     * 0x61C43937 is a fixed-point for a=8.
+     * 0x44394305 is a fixed-point for a=10.
+     * 0xB9B81C49 is a fixed-point for a=10.
+     * 0xD401EE73 is a fixed-point for a=10.
+     * 0x792F1D68 is a fixed-point for a=12.
+     * 0xE753463C is a fixed-point for a=12.
+     * 0x79248A69 is a fixed-point for a=13.
+     * 0x8A06FD30 is a fixed-point for a=13.
+     *
+     * @param args
+     */
+    public static void main(String[] args){
+        int idx = 0;
+        for (int a = 1; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleInt(idx + a) + a))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
      * XOR with {@code a} before passing to scrambleInt().
      * <br>
      * 0x17FD53DC is a fixed-point for a=2.
@@ -170,7 +206,7 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void mainPostXor(String[] args){
         int idx = 0;
         for (int a = 1; a < 16; a++) {
             for (int i = 0; i < 16; i++) {

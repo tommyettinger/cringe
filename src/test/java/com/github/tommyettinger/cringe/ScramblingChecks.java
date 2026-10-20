@@ -285,17 +285,24 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args){
-        int idx = 0;
+    public static void main(String[] args) {
+        int idx = 0, a = 0x9E3779B9 * 16 * 16;
+        for (int b = 0; b < 16; b++) {
+            for (int c = 0; c < 16; c++) {
+
+
 //        for (int a = -16; a < 16; a++) {
-         for (int a = 1; a != 0; a<<=1) {
+//        for (int a = 1; a != 0; a<<=1) {
+                a += 0x9E3779B9;
                 for (int i = 0; i < 16; i++) {
-                for (int j = 0; j < 0x10000000; j++) {
-                    if (idx == (scrambleInt(idx + a) - a - 1))
-                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
-                    idx++;
+                    for (int j = 0; j < 0x10000000; j++) {
+                        if (idx == (scrambleInt(idx + a) - a - 1))
+                            System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                        idx++;
+                    }
                 }
             }
+            System.out.println("Completed " + (b + 1) + " of 16.");
         }
     }
 

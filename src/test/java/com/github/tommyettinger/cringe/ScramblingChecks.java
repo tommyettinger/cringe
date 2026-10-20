@@ -55,9 +55,74 @@ public class ScramblingChecks {
     }
 
     /**
-     * In 0.3.1: 0xBD0F4FA9 and 0xE7AFC875 are fixed-points for scrambleInt().
+     * Testing the xor-encrypt-xor system with the same xor value on both sides:
+     * 0x00000001 is a fixed-point for a=1.
+     * 0x54F4B636 is a fixed-point for a=1.
+     * 0xA26E8047 is a fixed-point for a=1.
+     * 0x00000002 is a fixed-point for a=2.
+     * 0x54F4B635 is a fixed-point for a=2.
+     * 0xA26E8044 is a fixed-point for a=2.
+     * 0x00000003 is a fixed-point for a=3.
+     * 0x54F4B634 is a fixed-point for a=3.
+     * 0xA26E8045 is a fixed-point for a=3.
+     * 0x00000004 is a fixed-point for a=4.
+     * 0x54F4B633 is a fixed-point for a=4.
+     * 0xA26E8042 is a fixed-point for a=4.
+     * 0x00000005 is a fixed-point for a=5.
+     * 0x54F4B632 is a fixed-point for a=5.
+     * 0xA26E8043 is a fixed-point for a=5.
+     * 0x00000006 is a fixed-point for a=6.
+     * 0x54F4B631 is a fixed-point for a=6.
+     * 0xA26E8040 is a fixed-point for a=6.
+     * 0x00000007 is a fixed-point for a=7.
+     * 0x54F4B630 is a fixed-point for a=7.
+     * 0xA26E8041 is a fixed-point for a=7.
+     * 0x00000008 is a fixed-point for a=8.
+     * 0x54F4B63F is a fixed-point for a=8.
+     * 0xA26E804E is a fixed-point for a=8.
+     * 0x00000009 is a fixed-point for a=9.
+     * 0x54F4B63E is a fixed-point for a=9.
+     * 0xA26E804F is a fixed-point for a=9.
+     * 0x0000000A is a fixed-point for a=10.
+     * 0x54F4B63D is a fixed-point for a=10.
+     * 0xA26E804C is a fixed-point for a=10.
+     * 0x0000000B is a fixed-point for a=11.
+     * 0x54F4B63C is a fixed-point for a=11.
+     * 0xA26E804D is a fixed-point for a=11.
+     * 0x0000000C is a fixed-point for a=12.
+     * 0x54F4B63B is a fixed-point for a=12.
+     * 0xA26E804A is a fixed-point for a=12.
+     * 0x0000000D is a fixed-point for a=13.
+     * 0x54F4B63A is a fixed-point for a=13.
+     * 0xA26E804B is a fixed-point for a=13.
+     * 0x0000000E is a fixed-point for a=14.
+     * 0x54F4B639 is a fixed-point for a=14.
+     * 0xA26E8048 is a fixed-point for a=14.
+     * 0x0000000F is a fixed-point for a=15.
+     * 0x54F4B638 is a fixed-point for a=15.
+     * 0xA26E8049 is a fixed-point for a=15.
+     * <br>
+     * Exactly 3 fixed-points for each, with patterns for each!
+     *
+     * @param args
      */
     public static void main(String[] args){
+        int idx = 0;
+        for (int a = 1; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleInt(idx ^ a) ^ a))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * In 0.3.1: 0xBD0F4FA9 and 0xE7AFC875 are fixed-points for scrambleInt().
+     */
+    public static void mainInt(String[] args){
         int idx = 0;
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 0x10000000; j++) {

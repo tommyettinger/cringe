@@ -142,12 +142,78 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void mainAEA(String[] args){
         int idx = 0;
         for (int a = 1; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (scrambleInt(idx + a) + a))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Add-encrypt-minus (not calling it subtract, since the acronym would be AES) has similar traits to XEX.
+     * <br>
+     * 0x54F4B636 is a fixed-point for a=1.
+     * 0xA26E8045 is a fixed-point for a=1.
+     * 0xFFFFFFFF is a fixed-point for a=1.
+     * 0x54F4B635 is a fixed-point for a=2.
+     * 0xA26E8044 is a fixed-point for a=2.
+     * 0xFFFFFFFE is a fixed-point for a=2.
+     * 0x54F4B634 is a fixed-point for a=3.
+     * 0xA26E8043 is a fixed-point for a=3.
+     * 0xFFFFFFFD is a fixed-point for a=3.
+     * 0x54F4B633 is a fixed-point for a=4.
+     * 0xA26E8042 is a fixed-point for a=4.
+     * 0xFFFFFFFC is a fixed-point for a=4.
+     * 0x54F4B632 is a fixed-point for a=5.
+     * 0xA26E8041 is a fixed-point for a=5.
+     * 0xFFFFFFFB is a fixed-point for a=5.
+     * 0x54F4B631 is a fixed-point for a=6.
+     * 0xA26E8040 is a fixed-point for a=6.
+     * 0xFFFFFFFA is a fixed-point for a=6.
+     * 0x54F4B630 is a fixed-point for a=7.
+     * 0xA26E803F is a fixed-point for a=7.
+     * 0xFFFFFFF9 is a fixed-point for a=7.
+     * 0x54F4B62F is a fixed-point for a=8.
+     * 0xA26E803E is a fixed-point for a=8.
+     * 0xFFFFFFF8 is a fixed-point for a=8.
+     * 0x54F4B62E is a fixed-point for a=9.
+     * 0xA26E803D is a fixed-point for a=9.
+     * 0xFFFFFFF7 is a fixed-point for a=9.
+     * 0x54F4B62D is a fixed-point for a=10.
+     * 0xA26E803C is a fixed-point for a=10.
+     * 0xFFFFFFF6 is a fixed-point for a=10.
+     * 0x54F4B62C is a fixed-point for a=11.
+     * 0xA26E803B is a fixed-point for a=11.
+     * 0xFFFFFFF5 is a fixed-point for a=11.
+     * 0x54F4B62B is a fixed-point for a=12.
+     * 0xA26E803A is a fixed-point for a=12.
+     * 0xFFFFFFF4 is a fixed-point for a=12.
+     * 0x54F4B62A is a fixed-point for a=13.
+     * 0xA26E8039 is a fixed-point for a=13.
+     * 0xFFFFFFF3 is a fixed-point for a=13.
+     * 0x54F4B629 is a fixed-point for a=14.
+     * 0xA26E8038 is a fixed-point for a=14.
+     * 0xFFFFFFF2 is a fixed-point for a=14.
+     * 0x54F4B628 is a fixed-point for a=15.
+     * 0xA26E8037 is a fixed-point for a=15.
+     * 0xFFFFFFF1 is a fixed-point for a=15.
+     * <br>
+     * Exactly 3 fixed-points for each, with patterns for each!
+     *
+     * @param args
+     */
+    public static void main(String[] args){
+        int idx = 0;
+        for (int a = 1; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleInt(idx + a) - a))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

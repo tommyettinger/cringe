@@ -24,6 +24,17 @@ public class ScramblingChecks {
         return x;
     }
 
+    public static int badScramble(int x) {
+        x ^= x >>> 1;
+        x = Compatibility.imul(x, 3);
+        x ^= x >>> 1;
+        x = Compatibility.imul(x, 3);
+        x ^= x >>> 1;
+        x = Compatibility.imul(x, 3);
+        x ^= x >>> 1;
+        return x;
+    }
+
     /**
      * 0x8329E33B is a fixed-point for a=1.
      * 0x17FD53DC is a fixed-point for a=2.
@@ -287,7 +298,7 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainAEMD(String[] args) {
         int idx = 0, a = 0x9E3779B9 * 16 * (16 + 128);
         for (int b = 0; b < 16; b++) {
             for (int c = 0; c < 128; c++) {
@@ -305,6 +316,25 @@ public class ScramblingChecks {
                 }
             }
             System.out.println("Completed " + (b + 1) + " of 16.");
+        }
+    }
+
+    /**
+     * A different encrypt method still has no fixed-points when pre-adding {@code a} and post-adding {@code ~a}.
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+//        for (int a = 1; a != 0; a<<=1) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (badScramble(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
         }
     }
 

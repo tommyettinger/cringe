@@ -95,6 +95,17 @@ public class ScramblingChecks {
         return x;
     }
 
+    public static int badScramble7f(int x) {
+        x ^= x >>> 19;
+        x *= 5;
+        x ^= x >>> 31;
+        x *= 5;
+        x ^= x >>> 19;
+        x *= 5;
+        x ^= x >>> 31;
+        return x;
+    }
+
     public static int badScramble5(int x) {
         x ^= x >>> 1;
         x = Compatibility.imul(x, 3);
@@ -709,6 +720,25 @@ public class ScramblingChecks {
 
     /**
      * No fixed-points! This uses a "bad" scramble that isn't an involution (it multiplies by 3, not -1). AEMD.
+     *
+     * @param args
+     */
+    public static void mainBad7e(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+//        for (int a = 1; a != 0; a<<=1) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (badScramble7e(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Multiplying by 3 and by 5 both work equally well with AEMD scrambles; no fixed-points.
      * 
      * @param args
      */
@@ -718,7 +748,7 @@ public class ScramblingChecks {
 //        for (int a = 1; a != 0; a<<=1) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
-                    if (idx == (badScramble7e(idx + a) - a - 1))
+                    if (idx == (badScramble7f(idx + a) - a - 1))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

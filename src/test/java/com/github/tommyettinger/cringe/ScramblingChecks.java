@@ -115,6 +115,21 @@ public class ScramblingChecks {
         return x;
     }
 
+    /**
+     * Uses three different shift amounts, but always multiplies by 3.
+     *
+     * @param x
+     * @return
+     */
+    public static int badScramble5b(int x) {
+        x ^= x >>> 1;
+        x = Compatibility.imul(x, 3);
+        x ^= x >>> 2;
+        x = Compatibility.imul(x, 3);
+        x ^= x >>> 3;
+        return x;
+    }
+
     public static int badScramble3(int x) {
         x ^= x >>> 1;
         x = Compatibility.imul(x, 3);
@@ -510,6 +525,26 @@ public class ScramblingChecks {
     }
 
     /**
+     * It isn't the number of operations in the scrambler, but if the shifts are all different, AEMD works.
+     * No fixed-points.
+     * 
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+//        for (int a = 1; a != 0; a<<=1) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (badScramble5b(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
      * Fewer fixed-points, but following an obvious pattern here. AEMD with a 3-line scramble.
      * <br>
      * 0x00000011 is a fixed-point for a=-16.
@@ -739,10 +774,10 @@ public class ScramblingChecks {
 
     /**
      * Multiplying by 3 and by 5 both work equally well with AEMD scrambles; no fixed-points.
-     * 
+     *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainBad7f(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
 //        for (int a = 1; a != 0; a<<=1) {

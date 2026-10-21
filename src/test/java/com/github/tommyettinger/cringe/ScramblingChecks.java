@@ -24,9 +24,18 @@ public class ScramblingChecks {
         return x;
     }
 
-    public static int badScramble(int x) {
+    public static int badScramble7(int x) {
         x ^= x >>> 1;
         x = Compatibility.imul(x, 3);
+        x ^= x >>> 1;
+        x = Compatibility.imul(x, 3);
+        x ^= x >>> 1;
+        x = Compatibility.imul(x, 3);
+        x ^= x >>> 1;
+        return x;
+    }
+
+    public static int badScramble5(int x) {
         x ^= x >>> 1;
         x = Compatibility.imul(x, 3);
         x ^= x >>> 1;
@@ -324,13 +333,97 @@ public class ScramblingChecks {
      *
      * @param args
      */
+    public static void mainBad7(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+//        for (int a = 1; a != 0; a<<=1) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (badScramble7(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * There are fixed-points for this scramble with AEMD! They follow a pattern!
+     * <br>
+     * 0xD9B364F3 is a fixed-point for a=-16.
+     * 0xD9B366D9 is a fixed-point for a=-16.
+     * 0xD9B364F2 is a fixed-point for a=-15.
+     * 0xD9B366D8 is a fixed-point for a=-15.
+     * 0xD9B364F1 is a fixed-point for a=-14.
+     * 0xD9B366D7 is a fixed-point for a=-14.
+     * 0xD9B364F0 is a fixed-point for a=-13.
+     * 0xD9B366D6 is a fixed-point for a=-13.
+     * 0xD9B364EF is a fixed-point for a=-12.
+     * 0xD9B366D5 is a fixed-point for a=-12.
+     * 0xD9B364EE is a fixed-point for a=-11.
+     * 0xD9B366D4 is a fixed-point for a=-11.
+     * 0xD9B364ED is a fixed-point for a=-10.
+     * 0xD9B366D3 is a fixed-point for a=-10.
+     * 0xD9B364EC is a fixed-point for a=-9.
+     * 0xD9B366D2 is a fixed-point for a=-9.
+     * 0xD9B364EB is a fixed-point for a=-8.
+     * 0xD9B366D1 is a fixed-point for a=-8.
+     * 0xD9B364EA is a fixed-point for a=-7.
+     * 0xD9B366D0 is a fixed-point for a=-7.
+     * 0xD9B364E9 is a fixed-point for a=-6.
+     * 0xD9B366CF is a fixed-point for a=-6.
+     * 0xD9B364E8 is a fixed-point for a=-5.
+     * 0xD9B366CE is a fixed-point for a=-5.
+     * 0xD9B364E7 is a fixed-point for a=-4.
+     * 0xD9B366CD is a fixed-point for a=-4.
+     * 0xD9B364E6 is a fixed-point for a=-3.
+     * 0xD9B366CC is a fixed-point for a=-3.
+     * 0xD9B364E5 is a fixed-point for a=-2.
+     * 0xD9B366CB is a fixed-point for a=-2.
+     * 0xD9B364E4 is a fixed-point for a=-1.
+     * 0xD9B366CA is a fixed-point for a=-1.
+     * 0xD9B364E3 is a fixed-point for a=0.
+     * 0xD9B366C9 is a fixed-point for a=0.
+     * 0xD9B364E2 is a fixed-point for a=1.
+     * 0xD9B366C8 is a fixed-point for a=1.
+     * 0xD9B364E1 is a fixed-point for a=2.
+     * 0xD9B366C7 is a fixed-point for a=2.
+     * 0xD9B364E0 is a fixed-point for a=3.
+     * 0xD9B366C6 is a fixed-point for a=3.
+     * 0xD9B364DF is a fixed-point for a=4.
+     * 0xD9B366C5 is a fixed-point for a=4.
+     * 0xD9B364DE is a fixed-point for a=5.
+     * 0xD9B366C4 is a fixed-point for a=5.
+     * 0xD9B364DD is a fixed-point for a=6.
+     * 0xD9B366C3 is a fixed-point for a=6.
+     * 0xD9B364DC is a fixed-point for a=7.
+     * 0xD9B366C2 is a fixed-point for a=7.
+     * 0xD9B364DB is a fixed-point for a=8.
+     * 0xD9B366C1 is a fixed-point for a=8.
+     * 0xD9B364DA is a fixed-point for a=9.
+     * 0xD9B366C0 is a fixed-point for a=9.
+     * 0xD9B364D9 is a fixed-point for a=10.
+     * 0xD9B366BF is a fixed-point for a=10.
+     * 0xD9B364D8 is a fixed-point for a=11.
+     * 0xD9B366BE is a fixed-point for a=11.
+     * 0xD9B364D7 is a fixed-point for a=12.
+     * 0xD9B366BD is a fixed-point for a=12.
+     * 0xD9B364D6 is a fixed-point for a=13.
+     * 0xD9B366BC is a fixed-point for a=13.
+     * 0xD9B364D5 is a fixed-point for a=14.
+     * 0xD9B366BB is a fixed-point for a=14.
+     * 0xD9B364D4 is a fixed-point for a=15.
+     * 0xD9B366BA is a fixed-point for a=15.
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
 //        for (int a = 1; a != 0; a<<=1) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
-                    if (idx == (badScramble(idx + a) - a - 1))
+                    if (idx == (badScramble5(idx + a) - a - 1))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

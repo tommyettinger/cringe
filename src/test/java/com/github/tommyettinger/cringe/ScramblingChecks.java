@@ -137,6 +137,13 @@ public class ScramblingChecks {
         return x;
     }
 
+    public static int badScramble3b(int x) {
+        x ^= x >>> 1;
+        x = Compatibility.imul(x, 3);
+        x ^= x >>> 3;
+        return x;
+    }
+
     /**
      * 0x8329E33B is a fixed-point for a=1.
      * 0x17FD53DC is a fixed-point for a=2.
@@ -527,10 +534,10 @@ public class ScramblingChecks {
     /**
      * It isn't the number of operations in the scrambler, but if the shifts are all different, AEMD works.
      * No fixed-points.
-     * 
+     *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainBad5b(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
 //        for (int a = 1; a != 0; a<<=1) {
@@ -589,6 +596,26 @@ public class ScramblingChecks {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (badScramble3(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * A simple 3-line scramble with two different small xorshifts and a multiply in-between works with AEMD!
+     * No fixed-points.
+     * 
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+//        for (int a = 1; a != 0; a<<=1) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (badScramble3b(idx + a) - a - 1))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

@@ -62,6 +62,17 @@ public class ScramblingChecks {
         return x;
     }
 
+    /**
+     * Not an involution, but every one of its component steps is.
+     * @param x
+     * @return
+     */
+    public static int badScramble7d(int x) {
+        x ^= x >>> 19;
+        x = -x;
+        x ^= x >>> 31;
+        x = -x;
+        x ^= x >>> 19;
     public static int badScramble5(int x) {
         x ^= x >>> 1;
         x = Compatibility.imul(x, 3);

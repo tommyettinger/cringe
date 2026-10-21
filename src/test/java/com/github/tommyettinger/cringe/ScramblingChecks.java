@@ -35,12 +35,28 @@ public class ScramblingChecks {
         return x;
     }
 
+    /**
+     * This is an involution, which may explain why it doesn't work with AEMD.
+     * @param x
+     * @return
+     */
     public static int badScramble7b(int x) {
         x ^= x >>> 31;
         x = -x;
         x ^= x >>> 31;
         x = -x;
         x ^= x >>> 31;
+        x = -x;
+        x ^= x >>> 31;
+        return x;
+    }
+
+    public static int badScramble7c(int x) {
+        x ^= x >>> 1;
+        x = -x;
+        x ^= x >>> 31;
+        x = -x;
+        x ^= x >>> 1;
         x = -x;
         x ^= x >>> 31;
         return x;
@@ -540,13 +556,33 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainBad7b(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
 //        for (int a = 1; a != 0; a<<=1) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (badScramble7b(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * 7-line (bad) scramble method, but this one isn't an involution. AEMD, no fixed-points.
+     * {@code badScramble7c} mixes shifts of 1 and 31, and all its multiplies are by -1.
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+//        for (int a = 1; a != 0; a<<=1) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (badScramble7c(idx + a) - a - 1))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

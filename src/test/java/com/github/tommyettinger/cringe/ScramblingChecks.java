@@ -15,20 +15,20 @@ public class ScramblingChecks {
     }
 
     /**
-     * Checking the AEMD technique on MX3: 0x20000000000L or 2199023255552 indices without a fixed-point.
-     * Over 2 trillion, but nowhere near exhaustive.
-     * 
+     * Checking the AEMD technique on MX3: 0x130000000000L or 20890720927744 indices without a fixed-point.
+     * Over 20 trillion, but nowhere near exhaustive.
+     *
      * @param args
      */
     public static void main(String[] args){
-        long idx = 0x20000000000L;
-        for (int i = 0; i < 2048; i++) {
+        long idx = 0x130000000000L;
+        for (int i = 0; i < 16384; i++) {
             for (int j = 0; j < 0x40000000; j++) {
                 if(idx == scramble(idx - 1))
                     System.err.printf("\n\n 0x%016X is a fixed-point.\n\n", idx);
                 idx++;
             }
-            System.out.print((i+1) + "/2048... ");
+            System.out.print((i+1) + "/16384... ");
         }
         System.out.printf("\n\n\nGot through 0x%XL indices.\n", idx);
     }

@@ -13,6 +13,35 @@ public class ScramblingChecks {
         }
         System.out.printf("\n\n\nGot through 0x%XL indices.\n", idx);
     }
+
+    /**
+     * Checking the AEMD technique on MX3: 0x20000000000L or 2199023255552 indices without a fixed-point.
+     * Over 2 trillion, but nowhere near exhaustive.
+     * 
+     * @param args
+     */
+    public static void main(String[] args){
+        long idx = 0x20000000000L;
+        for (int i = 0; i < 2048; i++) {
+            for (int j = 0; j < 0x40000000; j++) {
+                if(idx == scramble(idx - 1))
+                    System.err.printf("\n\n 0x%016X is a fixed-point.\n\n", idx);
+                idx++;
+            }
+            System.out.print((i+1) + "/2048... ");
+        }
+        System.out.printf("\n\n\nGot through 0x%XL indices.\n", idx);
+    }
+    public static long scramble(long x) {
+        x ^= x >>> 32;
+        x *= 0xBEA225F9EB34556DL;
+        x ^= x >>> 29;
+        x *= 0xBEA225F9EB34556DL;
+        x ^= x >>> 32;
+        x *= 0xBEA225F9EB34556DL;
+        return x ^ x >>> 29;
+    }
+
     public static int scrambleInt(int x) {
         x ^= x >>> 16;
         x = Compatibility.imul(x, 0x236F7153);
@@ -606,10 +635,10 @@ public class ScramblingChecks {
     /**
      * A simple 3-line scramble with two different small xorshifts and a multiply in-between works with AEMD!
      * No fixed-points.
-     * 
+     *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainBad3b(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
 //        for (int a = 1; a != 0; a<<=1) {

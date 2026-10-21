@@ -78,6 +78,23 @@ public class ScramblingChecks {
         return x;
     }
 
+    /**
+     * Shifts are involutions, but the multiplications aren't (all by 3).
+     *
+     * @param x
+     * @return
+     */
+    public static int badScramble7e(int x) {
+        x ^= x >>> 19;
+        x *= 3;
+        x ^= x >>> 31;
+        x *= 3;
+        x ^= x >>> 19;
+        x *= 3;
+        x ^= x >>> 31;
+        return x;
+    }
+
     public static int badScramble5(int x) {
         x ^= x >>> 1;
         x = Compatibility.imul(x, 3);
@@ -676,13 +693,32 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainBad7d(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
 //        for (int a = 1; a != 0; a<<=1) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (badScramble7d(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * No fixed-points! This uses a "bad" scramble that isn't an involution (it multiplies by 3, not -1). AEMD.
+     * 
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+//        for (int a = 1; a != 0; a<<=1) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (badScramble7e(idx + a) - a - 1))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

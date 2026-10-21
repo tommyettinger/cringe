@@ -73,6 +73,11 @@ public class ScramblingChecks {
         x ^= x >>> 31;
         x = -x;
         x ^= x >>> 19;
+        x = -x;
+        x ^= x >>> 31;
+        return x;
+    }
+
     public static int badScramble5(int x) {
         x ^= x >>> 1;
         x = Compatibility.imul(x, 3);
@@ -587,13 +592,97 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainBad7c(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
 //        for (int a = 1; a != 0; a<<=1) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (badScramble7c(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * 7-line bad scramble method, with each line an involution but the whole thing not; AEMD.
+     * <br>
+     * 0x80000010 is a fixed-point for a=-16.
+     * 0x80001010 is a fixed-point for a=-16.
+     * 0x8000000F is a fixed-point for a=-15.
+     * 0x8000100F is a fixed-point for a=-15.
+     * 0x8000000E is a fixed-point for a=-14.
+     * 0x8000100E is a fixed-point for a=-14.
+     * 0x8000000D is a fixed-point for a=-13.
+     * 0x8000100D is a fixed-point for a=-13.
+     * 0x8000000C is a fixed-point for a=-12.
+     * 0x8000100C is a fixed-point for a=-12.
+     * 0x8000000B is a fixed-point for a=-11.
+     * 0x8000100B is a fixed-point for a=-11.
+     * 0x8000000A is a fixed-point for a=-10.
+     * 0x8000100A is a fixed-point for a=-10.
+     * 0x80000009 is a fixed-point for a=-9.
+     * 0x80001009 is a fixed-point for a=-9.
+     * 0x80000008 is a fixed-point for a=-8.
+     * 0x80001008 is a fixed-point for a=-8.
+     * 0x80000007 is a fixed-point for a=-7.
+     * 0x80001007 is a fixed-point for a=-7.
+     * 0x80000006 is a fixed-point for a=-6.
+     * 0x80001006 is a fixed-point for a=-6.
+     * 0x80000005 is a fixed-point for a=-5.
+     * 0x80001005 is a fixed-point for a=-5.
+     * 0x80000004 is a fixed-point for a=-4.
+     * 0x80001004 is a fixed-point for a=-4.
+     * 0x80000003 is a fixed-point for a=-3.
+     * 0x80001003 is a fixed-point for a=-3.
+     * 0x80000002 is a fixed-point for a=-2.
+     * 0x80001002 is a fixed-point for a=-2.
+     * 0x80000001 is a fixed-point for a=-1.
+     * 0x80001001 is a fixed-point for a=-1.
+     * 0x80000000 is a fixed-point for a=0.
+     * 0x80001000 is a fixed-point for a=0.
+     * 0x7FFFFFFF is a fixed-point for a=1.
+     * 0x80000FFF is a fixed-point for a=1.
+     * 0x7FFFFFFE is a fixed-point for a=2.
+     * 0x80000FFE is a fixed-point for a=2.
+     * 0x7FFFFFFD is a fixed-point for a=3.
+     * 0x80000FFD is a fixed-point for a=3.
+     * 0x7FFFFFFC is a fixed-point for a=4.
+     * 0x80000FFC is a fixed-point for a=4.
+     * 0x7FFFFFFB is a fixed-point for a=5.
+     * 0x80000FFB is a fixed-point for a=5.
+     * 0x7FFFFFFA is a fixed-point for a=6.
+     * 0x80000FFA is a fixed-point for a=6.
+     * 0x7FFFFFF9 is a fixed-point for a=7.
+     * 0x80000FF9 is a fixed-point for a=7.
+     * 0x7FFFFFF8 is a fixed-point for a=8.
+     * 0x80000FF8 is a fixed-point for a=8.
+     * 0x7FFFFFF7 is a fixed-point for a=9.
+     * 0x80000FF7 is a fixed-point for a=9.
+     * 0x7FFFFFF6 is a fixed-point for a=10.
+     * 0x80000FF6 is a fixed-point for a=10.
+     * 0x7FFFFFF5 is a fixed-point for a=11.
+     * 0x80000FF5 is a fixed-point for a=11.
+     * 0x7FFFFFF4 is a fixed-point for a=12.
+     * 0x80000FF4 is a fixed-point for a=12.
+     * 0x7FFFFFF3 is a fixed-point for a=13.
+     * 0x80000FF3 is a fixed-point for a=13.
+     * 0x7FFFFFF2 is a fixed-point for a=14.
+     * 0x80000FF2 is a fixed-point for a=14.
+     * 0x7FFFFFF1 is a fixed-point for a=15.
+     * 0x80000FF1 is a fixed-point for a=15.
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+//        for (int a = 1; a != 0; a<<=1) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (badScramble7d(idx + a) - a - 1))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

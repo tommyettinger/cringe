@@ -607,6 +607,25 @@ public class ScramblingChecks {
     }
 
     /**
+     * No fixed-points for an AEMD approach on the Lea-like scramble.
+     *
+     * @param args
+     */
+    public static void mainLeaLikeAEMD(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+//        for (int a = 1; a != 0; a<<=1) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (leaScramble(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
      * Fewer fixed-points, but following an obvious pattern here. AEMD with a 3-line scramble.
      * <br>
      * 0x00000011 is a fixed-point for a=-16.

@@ -20,7 +20,7 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void mainLongAEMD(String[] args){
         long idx = 0x130000000000L;
         for (int i = 0; i < 16384; i++) {
             for (int j = 0; j < 0x40000000; j++) {
@@ -156,6 +156,15 @@ public class ScramblingChecks {
         x ^= x >>> 2;
         x = Compatibility.imul(x, 3);
         x ^= x >>> 3;
+        return x;
+    }
+
+    public static int leaScramble(int x) {
+        x ^= x >>> 16;
+        x *= 0xb09322e3;
+        x ^= x >>> 16;
+        x *= 0xb09322e3;
+        x ^= x >>> 16;
         return x;
     }
 
@@ -576,6 +585,23 @@ public class ScramblingChecks {
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }
+            }
+        }
+    }
+
+    /**
+     * 0x00000000 is a fixed-point for the Lea-like scramble.
+     * 0x87455BF2 is a fixed-point for the Lea-like scramble.
+     * 0xDF559521 is a fixed-point for the Lea-like scramble.
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 0x10000000; j++) {
+                if (idx == (leaScramble(idx)))
+                    System.err.printf("0x%08X is a fixed-point for the Lea-like scramble.\n", idx);
+                idx++;
             }
         }
     }

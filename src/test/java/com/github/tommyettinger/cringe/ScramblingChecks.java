@@ -53,6 +53,17 @@ public class ScramblingChecks {
         return x;
     }
 
+    public static int scrambleIntMx3Alt(int x) {
+        x ^= x >>> 15;
+        x = Compatibility.imul(x, 0xEB34556D);
+        x ^= x >>> 13;
+        x = Compatibility.imul(x, 0xEB34556D);
+        x ^= x >>> 17;
+        x = Compatibility.imul(x, 0xEB34556D);
+        x ^= x >>> 14;
+        return x;
+    }
+
     public static int scrambleInt(int x) {
         x ^= x >>> 16;
         x = Compatibility.imul(x, 0x236F7153);
@@ -481,7 +492,89 @@ public class ScramblingChecks {
      * AEMD does NOT avoid fixed-points when using MX3's style of 7-line interleave of shifts by 16, multiplications by
      * one constant, and shifts by 13. This likely carries over to long math on shifts by 32 and 29.
      * <br>
+     * 0x6AE20537 is a fixed-point for a=-16.
+     * 0x6AE20536 is a fixed-point for a=-15.
+     * 0x6AE20535 is a fixed-point for a=-14.
+     * 0x6AE20534 is a fixed-point for a=-13.
+     * 0x6AE20533 is a fixed-point for a=-12.
+     * 0x6AE20532 is a fixed-point for a=-11.
+     * 0x6AE20531 is a fixed-point for a=-10.
+     * 0x6AE20530 is a fixed-point for a=-9.
+     * 0x6AE2052F is a fixed-point for a=-8.
+     * 0x6AE2052E is a fixed-point for a=-7.
+     * 0x6AE2052D is a fixed-point for a=-6.
+     * 0x6AE2052C is a fixed-point for a=-5.
+     * 0x6AE2052B is a fixed-point for a=-4.
+     * 0x6AE2052A is a fixed-point for a=-3.
+     * 0x6AE20529 is a fixed-point for a=-2.
+     * 0x6AE20528 is a fixed-point for a=-1.
+     * 0x6AE20527 is a fixed-point for a=0.
+     * 0x6AE20526 is a fixed-point for a=1.
+     * 0x6AE20525 is a fixed-point for a=2.
+     * 0x6AE20524 is a fixed-point for a=3.
+     * 0x6AE20523 is a fixed-point for a=4.
+     * 0x6AE20522 is a fixed-point for a=5.
+     * 0x6AE20521 is a fixed-point for a=6.
+     * 0x6AE20520 is a fixed-point for a=7.
+     * 0x6AE2051F is a fixed-point for a=8.
+     * 0x6AE2051E is a fixed-point for a=9.
+     * 0x6AE2051D is a fixed-point for a=10.
+     * 0x6AE2051C is a fixed-point for a=11.
+     * 0x6AE2051B is a fixed-point for a=12.
+     * 0x6AE2051A is a fixed-point for a=13.
+     * 0x6AE20519 is a fixed-point for a=14.
+     * 0x6AE20518 is a fixed-point for a=15.
      *
+     * @param args
+     */
+    public static void mainIntMx3Like(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleIntMx3Like(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Using the same multiplier seems to be a problem for MX3 with AEMD, even with 4 different shifts.
+     * <br>
+     * 0x78014473 is a fixed-point for a=-16.
+     * 0x78014472 is a fixed-point for a=-15.
+     * 0x78014471 is a fixed-point for a=-14.
+     * 0x78014470 is a fixed-point for a=-13.
+     * 0x7801446F is a fixed-point for a=-12.
+     * 0x7801446E is a fixed-point for a=-11.
+     * 0x7801446D is a fixed-point for a=-10.
+     * 0x7801446C is a fixed-point for a=-9.
+     * 0x7801446B is a fixed-point for a=-8.
+     * 0x7801446A is a fixed-point for a=-7.
+     * 0x78014469 is a fixed-point for a=-6.
+     * 0x78014468 is a fixed-point for a=-5.
+     * 0x78014467 is a fixed-point for a=-4.
+     * 0x78014466 is a fixed-point for a=-3.
+     * 0x78014465 is a fixed-point for a=-2.
+     * 0x78014464 is a fixed-point for a=-1.
+     * 0x78014463 is a fixed-point for a=0.
+     * 0x78014462 is a fixed-point for a=1.
+     * 0x78014461 is a fixed-point for a=2.
+     * 0x78014460 is a fixed-point for a=3.
+     * 0x7801445F is a fixed-point for a=4.
+     * 0x7801445E is a fixed-point for a=5.
+     * 0x7801445D is a fixed-point for a=6.
+     * 0x7801445C is a fixed-point for a=7.
+     * 0x7801445B is a fixed-point for a=8.
+     * 0x7801445A is a fixed-point for a=9.
+     * 0x78014459 is a fixed-point for a=10.
+     * 0x78014458 is a fixed-point for a=11.
+     * 0x78014457 is a fixed-point for a=12.
+     * 0x78014456 is a fixed-point for a=13.
+     * 0x78014455 is a fixed-point for a=14.
+     * 0x78014454 is a fixed-point for a=15.
      *
      * @param args
      */
@@ -490,7 +583,7 @@ public class ScramblingChecks {
         for (int a = -16; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
-                    if (idx == (scrambleIntMx3Like(idx + a) - a - 1))
+                    if (idx == (scrambleIntMx3Alt(idx + a) - a - 1))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

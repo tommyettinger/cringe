@@ -811,7 +811,7 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainIntHornLikeB(String[] args) {
         int idx = 0;
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 0x10000000; j++) {
@@ -821,6 +821,122 @@ public class ScramblingChecks {
             }
         }
     }
+
+    /**
+     * 3 fixed-points per a-value! With patterns...
+     * <br>
+     * 0x15A576F6 is a fixed-point for a=-16.
+     * 0x173B9FB6 is a fixed-point for a=-16.
+     * 0x24617B7A is a fixed-point for a=-16.
+     * 0x15A576F5 is a fixed-point for a=-15.
+     * 0x173B9FB5 is a fixed-point for a=-15.
+     * 0x24617B79 is a fixed-point for a=-15.
+     * 0x15A576F4 is a fixed-point for a=-14.
+     * 0x173B9FB4 is a fixed-point for a=-14.
+     * 0x24617B78 is a fixed-point for a=-14.
+     * 0x15A576F3 is a fixed-point for a=-13.
+     * 0x173B9FB3 is a fixed-point for a=-13.
+     * 0x24617B77 is a fixed-point for a=-13.
+     * 0x15A576F2 is a fixed-point for a=-12.
+     * 0x173B9FB2 is a fixed-point for a=-12.
+     * 0x24617B76 is a fixed-point for a=-12.
+     * 0x15A576F1 is a fixed-point for a=-11.
+     * 0x173B9FB1 is a fixed-point for a=-11.
+     * 0x24617B75 is a fixed-point for a=-11.
+     * 0x15A576F0 is a fixed-point for a=-10.
+     * 0x173B9FB0 is a fixed-point for a=-10.
+     * 0x24617B74 is a fixed-point for a=-10.
+     * 0x15A576EF is a fixed-point for a=-9.
+     * 0x173B9FAF is a fixed-point for a=-9.
+     * 0x24617B73 is a fixed-point for a=-9.
+     * 0x15A576EE is a fixed-point for a=-8.
+     * 0x173B9FAE is a fixed-point for a=-8.
+     * 0x24617B72 is a fixed-point for a=-8.
+     * 0x15A576ED is a fixed-point for a=-7.
+     * 0x173B9FAD is a fixed-point for a=-7.
+     * 0x24617B71 is a fixed-point for a=-7.
+     * 0x15A576EC is a fixed-point for a=-6.
+     * 0x173B9FAC is a fixed-point for a=-6.
+     * 0x24617B70 is a fixed-point for a=-6.
+     * 0x15A576EB is a fixed-point for a=-5.
+     * 0x173B9FAB is a fixed-point for a=-5.
+     * 0x24617B6F is a fixed-point for a=-5.
+     * 0x15A576EA is a fixed-point for a=-4.
+     * 0x173B9FAA is a fixed-point for a=-4.
+     * 0x24617B6E is a fixed-point for a=-4.
+     * 0x15A576E9 is a fixed-point for a=-3.
+     * 0x173B9FA9 is a fixed-point for a=-3.
+     * 0x24617B6D is a fixed-point for a=-3.
+     * 0x15A576E8 is a fixed-point for a=-2.
+     * 0x173B9FA8 is a fixed-point for a=-2.
+     * 0x24617B6C is a fixed-point for a=-2.
+     * 0x15A576E7 is a fixed-point for a=-1.
+     * 0x173B9FA7 is a fixed-point for a=-1.
+     * 0x24617B6B is a fixed-point for a=-1.
+     * 0x15A576E6 is a fixed-point for a=0.
+     * 0x173B9FA6 is a fixed-point for a=0.
+     * 0x24617B6A is a fixed-point for a=0.
+     * 0x15A576E5 is a fixed-point for a=1.
+     * 0x173B9FA5 is a fixed-point for a=1.
+     * 0x24617B69 is a fixed-point for a=1.
+     * 0x15A576E4 is a fixed-point for a=2.
+     * 0x173B9FA4 is a fixed-point for a=2.
+     * 0x24617B68 is a fixed-point for a=2.
+     * 0x15A576E3 is a fixed-point for a=3.
+     * 0x173B9FA3 is a fixed-point for a=3.
+     * 0x24617B67 is a fixed-point for a=3.
+     * 0x15A576E2 is a fixed-point for a=4.
+     * 0x173B9FA2 is a fixed-point for a=4.
+     * 0x24617B66 is a fixed-point for a=4.
+     * 0x15A576E1 is a fixed-point for a=5.
+     * 0x173B9FA1 is a fixed-point for a=5.
+     * 0x24617B65 is a fixed-point for a=5.
+     * 0x15A576E0 is a fixed-point for a=6.
+     * 0x173B9FA0 is a fixed-point for a=6.
+     * 0x24617B64 is a fixed-point for a=6.
+     * 0x15A576DF is a fixed-point for a=7.
+     * 0x173B9F9F is a fixed-point for a=7.
+     * 0x24617B63 is a fixed-point for a=7.
+     * 0x15A576DE is a fixed-point for a=8.
+     * 0x173B9F9E is a fixed-point for a=8.
+     * 0x24617B62 is a fixed-point for a=8.
+     * 0x15A576DD is a fixed-point for a=9.
+     * 0x173B9F9D is a fixed-point for a=9.
+     * 0x24617B61 is a fixed-point for a=9.
+     * 0x15A576DC is a fixed-point for a=10.
+     * 0x173B9F9C is a fixed-point for a=10.
+     * 0x24617B60 is a fixed-point for a=10.
+     * 0x15A576DB is a fixed-point for a=11.
+     * 0x173B9F9B is a fixed-point for a=11.
+     * 0x24617B5F is a fixed-point for a=11.
+     * 0x15A576DA is a fixed-point for a=12.
+     * 0x173B9F9A is a fixed-point for a=12.
+     * 0x24617B5E is a fixed-point for a=12.
+     * 0x15A576D9 is a fixed-point for a=13.
+     * 0x173B9F99 is a fixed-point for a=13.
+     * 0x24617B5D is a fixed-point for a=13.
+     * 0x15A576D8 is a fixed-point for a=14.
+     * 0x173B9F98 is a fixed-point for a=14.
+     * 0x24617B5C is a fixed-point for a=14.
+     * 0x15A576D7 is a fixed-point for a=15.
+     * 0x173B9F97 is a fixed-point for a=15.
+     * 0x24617B5B is a fixed-point for a=15.
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleIntHornLike(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
 
     /**
      * A different encrypt method still has no fixed-points when pre-adding {@code a} and post-adding {@code ~a}.

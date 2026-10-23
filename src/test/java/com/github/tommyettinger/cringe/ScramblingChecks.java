@@ -733,12 +733,96 @@ public class ScramblingChecks {
      * 0xBFEC6781 is a fixed-point for a=101.
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainQOAIntMx3Alt(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (scrambleIntMx3Alt(idx + (idx * idx | a<<3|5))))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a<<3|5);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Scrambling and then running QOA doesn't help, either.
+     * <br>
+     * 0x021362E8 is a fixed-point for a=-123.
+     * 0x04E5B3C2 is a fixed-point for a=-123.
+     * 0x5DC7A030 is a fixed-point for a=-123.
+     * 0xBC6CDC79 is a fixed-point for a=-123.
+     * 0x021362E8 is a fixed-point for a=-115.
+     * 0x04E5B3C2 is a fixed-point for a=-115.
+     * 0x5DC7A030 is a fixed-point for a=-115.
+     * 0xED54A816 is a fixed-point for a=-115.
+     * 0x021362E8 is a fixed-point for a=-107.
+     * 0x04E5B3C2 is a fixed-point for a=-107.
+     * 0xA70BD74D is a fixed-point for a=-107.
+     * 0xBC6CDC79 is a fixed-point for a=-107.
+     * 0x021362E8 is a fixed-point for a=-99.
+     * 0x04E5B3C2 is a fixed-point for a=-99.
+     * 0x7E0EBDFB is a fixed-point for a=-99.
+     * 0xED54A816 is a fixed-point for a=-99.
+     * 0x021362E8 is a fixed-point for a=-91.
+     * 0xD29801E3 is a fixed-point for a=-91.
+     * 0x021362E8 is a fixed-point for a=-83.
+     * 0xA2B90191 is a fixed-point for a=-83.
+     * 0xBDFD950C is a fixed-point for a=-83.
+     * 0xED54A816 is a fixed-point for a=-83.
+     * 0x021362E8 is a fixed-point for a=-75.
+     * 0x021362E8 is a fixed-point for a=-67.
+     * 0xA2B90191 is a fixed-point for a=-67.
+     * 0xED54A816 is a fixed-point for a=-67.
+     * 0x04E5B3C2 is a fixed-point for a=-59.
+     * 0x5DC7A030 is a fixed-point for a=-59.
+     * 0x94B52DF9 is a fixed-point for a=-59.
+     * 0x04E5B3C2 is a fixed-point for a=-51.
+     * 0x5DC7A030 is a fixed-point for a=-51.
+     * 0xED54A816 is a fixed-point for a=-51.
+     * 0x04E5B3C2 is a fixed-point for a=-43.
+     * 0x94B52DF9 is a fixed-point for a=-43.
+     * 0xA70BD74D is a fixed-point for a=-43.
+     * 0x04E5B3C2 is a fixed-point for a=-35.
+     * 0xED54A816 is a fixed-point for a=-35.
+     * 0xBDFD950C is a fixed-point for a=-19.
+     * 0xED54A816 is a fixed-point for a=-19.
+     * 0xED54A816 is a fixed-point for a=-3.
+     * 0x3A029147 is a fixed-point for a=5.
+     * 0xB77FCCF0 is a fixed-point for a=5.
+     * 0xE330AE12 is a fixed-point for a=5.
+     * 0xE3C4EC6A is a fixed-point for a=5.
+     * 0xB77FCCF0 is a fixed-point for a=13.
+     * 0xCC4B8673 is a fixed-point for a=13.
+     * 0xE330AE12 is a fixed-point for a=13.
+     * 0xE3C4EC6A is a fixed-point for a=13.
+     * 0xE330AE12 is a fixed-point for a=21.
+     * 0xE330AE12 is a fixed-point for a=29.
+     * 0xE330AE12 is a fixed-point for a=37.
+     * 0xCC4B8673 is a fixed-point for a=45.
+     * 0xE330AE12 is a fixed-point for a=45.
+     * 0xE330AE12 is a fixed-point for a=53.
+     * 0xFA2E8136 is a fixed-point for a=53.
+     * 0xA41FE35D is a fixed-point for a=61.
+     * 0xE330AE12 is a fixed-point for a=61.
+     * 0xB2847003 is a fixed-point for a=69.
+     * 0xB77FCCF0 is a fixed-point for a=69.
+     * 0xE3C4EC6A is a fixed-point for a=69.
+     * 0xB77FCCF0 is a fixed-point for a=77.
+     * 0xE3C4EC6A is a fixed-point for a=77.
+     * 0xD2CA5A35 is a fixed-point for a=85.
+     * 0x3D9D76E6 is a fixed-point for a=101.
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    int sc = scrambleIntMx3Alt(idx);
+                    if (idx == sc + (sc * sc | a<<3|5))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a<<3|5);
                     idx++;
                 }

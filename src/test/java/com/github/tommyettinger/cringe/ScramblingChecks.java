@@ -108,6 +108,17 @@ public class ScramblingChecks {
         return x;
     }
 
+    public static int scrambleIntMx3AltF(int x) {
+        x ^= x >>> 16;
+        x = Compatibility.imul(x, 0xEB34556B);
+        x ^= x >>> 16;
+        x = Compatibility.imul(x, 0xEB34556B);
+        x ^= x >>> 16;
+        x = Compatibility.imul(x, 0xEB34556B);
+        x ^= x >>> 16;
+        return x;
+    }
+
     public static int scrambleInt(int x) {
         x ^= x >>> 16;
         x = Compatibility.imul(x, 0x236F7153);
@@ -726,12 +737,31 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainIntMx3AltE(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (scrambleIntMx3AltE(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Shifts are all involutions (all 16) and the multiplications are all by 0xEB34556B, but no fixed-points!
+     * {@link #leaScramble(int)}, which also works with AEMD, also uses a multiplier ending in bits 0b011.
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleIntMx3AltF(idx + a) - a - 1))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

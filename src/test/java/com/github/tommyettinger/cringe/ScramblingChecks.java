@@ -665,6 +665,88 @@ public class ScramblingChecks {
     }
 
     /**
+     * Very unpredictable! Runs idx through QOA before scrambleIntMx3Alt, with strange results.
+     * <br>
+     * 0x0213632B is a fixed-point for a=-123.
+     * 0x04E5B3E5 is a fixed-point for a=-123.
+     * 0x5DC7A063 is a fixed-point for a=-123.
+     * 0xBC6CDCE4 is a fixed-point for a=-123.
+     * 0x0213632B is a fixed-point for a=-115.
+     * 0x04E5B3E5 is a fixed-point for a=-115.
+     * 0x5DC7A063 is a fixed-point for a=-115.
+     * 0xED54A819 is a fixed-point for a=-115.
+     * 0x0213632B is a fixed-point for a=-107.
+     * 0x04E5B3E5 is a fixed-point for a=-107.
+     * 0xA70BD778 is a fixed-point for a=-107.
+     * 0xBC6CDCE4 is a fixed-point for a=-107.
+     * 0x0213632B is a fixed-point for a=-99.
+     * 0x04E5B3E5 is a fixed-point for a=-99.
+     * 0x7E0EBE5E is a fixed-point for a=-99.
+     * 0xED54A819 is a fixed-point for a=-99.
+     * 0x0213632B is a fixed-point for a=-91.
+     * 0xD298023E is a fixed-point for a=-91.
+     * 0x0213632B is a fixed-point for a=-83.
+     * 0xA2B901D4 is a fixed-point for a=-83.
+     * 0xBDFD951F is a fixed-point for a=-83.
+     * 0xED54A819 is a fixed-point for a=-83.
+     * 0x0213632B is a fixed-point for a=-75.
+     * 0x0213632B is a fixed-point for a=-67.
+     * 0xA2B901D4 is a fixed-point for a=-67.
+     * 0xED54A819 is a fixed-point for a=-67.
+     * 0x04E5B3E5 is a fixed-point for a=-59.
+     * 0x5DC7A063 is a fixed-point for a=-59.
+     * 0x94B52E24 is a fixed-point for a=-59.
+     * 0x04E5B3E5 is a fixed-point for a=-51.
+     * 0x5DC7A063 is a fixed-point for a=-51.
+     * 0xED54A819 is a fixed-point for a=-51.
+     * 0x04E5B3E5 is a fixed-point for a=-43.
+     * 0x94B52E24 is a fixed-point for a=-43.
+     * 0xA70BD778 is a fixed-point for a=-43.
+     * 0x04E5B3E5 is a fixed-point for a=-35.
+     * 0xED54A819 is a fixed-point for a=-35.
+     * 0xBDFD951F is a fixed-point for a=-19.
+     * 0xED54A819 is a fixed-point for a=-19.
+     * 0xED54A819 is a fixed-point for a=-3.
+     * 0x1EC08042 is a fixed-point for a=5.
+     * 0x73662B1D is a fixed-point for a=5.
+     * 0xE1ADF823 is a fixed-point for a=5.
+     * 0xFC1BF4D5 is a fixed-point for a=5.
+     * 0x73662B1D is a fixed-point for a=13.
+     * 0x8C36FF46 is a fixed-point for a=13.
+     * 0xE1ADF823 is a fixed-point for a=13.
+     * 0xFC1BF4D5 is a fixed-point for a=13.
+     * 0xFC1BF4D5 is a fixed-point for a=21.
+     * 0xFC1BF4D5 is a fixed-point for a=29.
+     * 0xFC1BF4D5 is a fixed-point for a=37.
+     * 0x8C36FF46 is a fixed-point for a=45.
+     * 0xFC1BF4D5 is a fixed-point for a=45.
+     * 0x9DA72B01 is a fixed-point for a=53.
+     * 0xFC1BF4D5 is a fixed-point for a=53.
+     * 0xE8971F20 is a fixed-point for a=61.
+     * 0xFC1BF4D5 is a fixed-point for a=61.
+     * 0x73662B1D is a fixed-point for a=69.
+     * 0xA3250ABE is a fixed-point for a=69.
+     * 0xE1ADF823 is a fixed-point for a=69.
+     * 0x73662B1D is a fixed-point for a=77.
+     * 0xE1ADF823 is a fixed-point for a=77.
+     * 0xB2DBD5E0 is a fixed-point for a=85.
+     * 0xBFEC6781 is a fixed-point for a=101.
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleIntMx3Alt(idx + (idx * idx | a<<3|5))))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a<<3|5);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
      * Different multipliers means no fixed-points here.
      * @param args
      */
@@ -924,7 +1006,7 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainIntHornLikeAEMD(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
             for (int i = 0; i < 16; i++) {

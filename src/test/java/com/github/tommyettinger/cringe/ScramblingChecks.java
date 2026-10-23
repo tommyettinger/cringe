@@ -130,6 +130,15 @@ public class ScramblingChecks {
         return x;
     }
 
+    public static int scrambleIntHornLike(int x) {
+        x ^= x >>> 16;
+        x += x * x | 99999;
+        x ^= x >>> 16;
+        x += x * x | 99999;
+        x ^= x >>> 16;
+        return x;
+    }
+
     public static int badScramble7(int x) {
         x ^= x >>> 1;
         x = Compatibility.imul(x, 3);
@@ -756,7 +765,7 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainIntMx3AltF(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
@@ -765,6 +774,21 @@ public class ScramblingChecks {
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }
+            }
+        }
+    }
+
+    /**
+     * 0x6D8E6F33 is a fixed-point for scrambleIntHornLike().
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 0x10000000; j++) {
+                if (idx == (scrambleIntHornLike(idx)))
+                    System.err.printf("0x%08X is a fixed-point for scrambleIntHornLike().\n", idx);
+                idx++;
             }
         }
     }

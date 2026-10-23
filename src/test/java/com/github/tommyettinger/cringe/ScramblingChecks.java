@@ -139,6 +139,15 @@ public class ScramblingChecks {
         return x;
     }
 
+    public static int scrambleIntHornLikeB(int x) {
+        x ^= x >>> 16;
+        x += x * x | 0x12345;
+        x ^= x >>> 16;
+        x += x * x | 0x12345;
+        x ^= x >>> 16;
+        return x;
+    }
+
     public static int badScramble7(int x) {
         x ^= x >>> 1;
         x = Compatibility.imul(x, 3);
@@ -779,15 +788,35 @@ public class ScramblingChecks {
     }
 
     /**
+     * Using 99999 (0x1869f) as the OR in each QOA line...
+     * <br>
      * 0x6D8E6F33 is a fixed-point for scrambleIntHornLike().
+     * @param args
+     */
+    public static void mainIntHornLike(String[] args) {
+        int idx = 0;
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 0x10000000; j++) {
+                if (idx == (scrambleIntHornLike(idx)))
+                    System.err.printf("0x%08X is a fixed-point for scrambleIntHornLike().\n", idx);
+                idx++;
+            }
+        }
+    }
+
+    /**
+     * Using 0x12345 as the OR in each QOA line...
+     * <br>
+     * 0x45F45A33 is a fixed-point for scrambleIntHornLikeB().
+     *
      * @param args
      */
     public static void main(String[] args) {
         int idx = 0;
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 0x10000000; j++) {
-                if (idx == (scrambleIntHornLike(idx)))
-                    System.err.printf("0x%08X is a fixed-point for scrambleIntHornLike().\n", idx);
+                if (idx == (scrambleIntHornLikeB(idx)))
+                    System.err.printf("0x%08X is a fixed-point for scrambleIntHornLikeB().\n", idx);
                 idx++;
             }
         }

@@ -86,7 +86,7 @@ public final class Scramblers {
      * the three-round function table, but XORs the input with 0xFB8FAC01 before using the hash.
      * The initial XOR value changed after version 0.3.1; you can get identical results to before by calling
      * {@code Scramblers.scrambleInt((x) ^ 2)} instead of {@code Scramblers.scrambleInt(x)}. The results in 0.3.1 and
-     * earlier have two fixed-points instead of none.
+     * earlier have two fixed-points, 0xBD0F4FA9 and 0xE7AFC875, instead of none.
      *
      * @param x any int, to be scrambled
      * @return a scrambled int derived from {@code x}

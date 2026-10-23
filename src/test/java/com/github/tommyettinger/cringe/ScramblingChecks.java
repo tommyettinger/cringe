@@ -42,6 +42,17 @@ public class ScramblingChecks {
         return x ^ x >>> 29;
     }
 
+    public static int scrambleIntMx3Like(int x) {
+        x ^= x >>> 16;
+        x = Compatibility.imul(x, 0xEB34556D);
+        x ^= x >>> 13;
+        x = Compatibility.imul(x, 0xEB34556D);
+        x ^= x >>> 16;
+        x = Compatibility.imul(x, 0xEB34556D);
+        x ^= x >>> 13;
+        return x;
+    }
+
     public static int scrambleInt(int x) {
         x ^= x >>> 16;
         x = Compatibility.imul(x, 0x236F7153);
@@ -467,6 +478,27 @@ public class ScramblingChecks {
     }
 
     /**
+     * AEMD does NOT avoid fixed-points when using MX3's style of 7-line interleave of shifts by 16, multiplications by
+     * one constant, and shifts by 13. This likely carries over to long math on shifts by 32 and 29.
+     * <br>
+     *
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleIntMx3Like(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
      * A different encrypt method still has no fixed-points when pre-adding {@code a} and post-adding {@code ~a}.
      *
      * @param args
@@ -595,7 +627,7 @@ public class ScramblingChecks {
      * 0xDF559521 is a fixed-point for the Lea-like scramble.
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainLeaLike(String[] args) {
         int idx = 0;
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 0x10000000; j++) {

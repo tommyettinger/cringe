@@ -75,6 +75,17 @@ public class ScramblingChecks {
         return x;
     }
 
+    public static int scrambleIntMx3AltC(int x) {
+        x ^= x >>> 16;
+        x = Compatibility.imul(x, 0xBEA225F9);
+        x ^= x >>> 13;
+        x = Compatibility.imul(x, 0xBEA225F9);
+        x ^= x >>> 13;
+        x = Compatibility.imul(x, 0xBEA225F9);
+        x ^= x >>> 16;
+        return x;
+    }
+
     public static int scrambleInt(int x) {
         x ^= x >>> 16;
         x = Compatibility.imul(x, 0x236F7153);
@@ -606,12 +617,29 @@ public class ScramblingChecks {
      * Different multipliers means no fixed-points here.
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainIntMx3AltB(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (scrambleIntMx3AltB(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * No fixed-points; only rearranges the shifts (16, 13, 13, 16) and uses 0xBEA225F9 as the multiplier three times.
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleIntMx3AltC(idx + a) - a - 1))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

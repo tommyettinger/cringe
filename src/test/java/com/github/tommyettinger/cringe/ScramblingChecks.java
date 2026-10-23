@@ -86,6 +86,17 @@ public class ScramblingChecks {
         return x;
     }
 
+    public static int scrambleIntMx3AltD(int x) {
+        x ^= x >>> 16;
+        x = Compatibility.imul(x, 0xEB34556D);
+        x ^= x >>> 13;
+        x = Compatibility.imul(x, 0xEB34556D);
+        x ^= x >>> 13;
+        x = Compatibility.imul(x, 0xEB34556D);
+        x ^= x >>> 16;
+        return x;
+    }
+
     public static int scrambleInt(int x) {
         x ^= x >>> 16;
         x = Compatibility.imul(x, 0x236F7153);
@@ -634,12 +645,63 @@ public class ScramblingChecks {
      * No fixed-points; only rearranges the shifts (16, 13, 13, 16) and uses 0xBEA225F9 as the multiplier three times.
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainIntMx3AltC(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
                 for (int j = 0; j < 0x10000000; j++) {
                     if (idx == (scrambleIntMx3AltC(idx + a) - a - 1))
+                        System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
+                    idx++;
+                }
+            }
+        }
+    }
+
+    /**
+     * OK, it's something about the multiplier, not the shifts... This has fixed-points in a pattern.
+     * <br>
+     * 0xAAE7F4D0 is a fixed-point for a=-16.
+     * 0xAAE7F4CF is a fixed-point for a=-15.
+     * 0xAAE7F4CE is a fixed-point for a=-14.
+     * 0xAAE7F4CD is a fixed-point for a=-13.
+     * 0xAAE7F4CC is a fixed-point for a=-12.
+     * 0xAAE7F4CB is a fixed-point for a=-11.
+     * 0xAAE7F4CA is a fixed-point for a=-10.
+     * 0xAAE7F4C9 is a fixed-point for a=-9.
+     * 0xAAE7F4C8 is a fixed-point for a=-8.
+     * 0xAAE7F4C7 is a fixed-point for a=-7.
+     * 0xAAE7F4C6 is a fixed-point for a=-6.
+     * 0xAAE7F4C5 is a fixed-point for a=-5.
+     * 0xAAE7F4C4 is a fixed-point for a=-4.
+     * 0xAAE7F4C3 is a fixed-point for a=-3.
+     * 0xAAE7F4C2 is a fixed-point for a=-2.
+     * 0xAAE7F4C1 is a fixed-point for a=-1.
+     * 0xAAE7F4C0 is a fixed-point for a=0.
+     * 0xAAE7F4BF is a fixed-point for a=1.
+     * 0xAAE7F4BE is a fixed-point for a=2.
+     * 0xAAE7F4BD is a fixed-point for a=3.
+     * 0xAAE7F4BC is a fixed-point for a=4.
+     * 0xAAE7F4BB is a fixed-point for a=5.
+     * 0xAAE7F4BA is a fixed-point for a=6.
+     * 0xAAE7F4B9 is a fixed-point for a=7.
+     * 0xAAE7F4B8 is a fixed-point for a=8.
+     * 0xAAE7F4B7 is a fixed-point for a=9.
+     * 0xAAE7F4B6 is a fixed-point for a=10.
+     * 0xAAE7F4B5 is a fixed-point for a=11.
+     * 0xAAE7F4B4 is a fixed-point for a=12.
+     * 0xAAE7F4B3 is a fixed-point for a=13.
+     * 0xAAE7F4B2 is a fixed-point for a=14.
+     * 0xAAE7F4B1 is a fixed-point for a=15.
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        int idx = 0;
+        for (int a = -16; a < 16; a++) {
+            for (int i = 0; i < 16; i++) {
+                for (int j = 0; j < 0x10000000; j++) {
+                    if (idx == (scrambleIntMx3AltD(idx + a) - a - 1))
                         System.err.printf("0x%08X is a fixed-point for a=%d.\n", idx, a);
                     idx++;
                 }

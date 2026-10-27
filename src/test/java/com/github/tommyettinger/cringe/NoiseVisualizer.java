@@ -88,6 +88,10 @@ public class NoiseVisualizer extends ApplicationAdapter {
 //    private static final int width = 256, height = 256;
     private static final float iWidth = 1f/width, iHeight = 1f/height;
 
+    private static final float xFreq = 0.25f;//0.7548776662466927f;
+    private static final float yFreq = xFreq;// 0.5698402909980532f;
+
+
     private Viewport view;
     private float ctr = -256;
     private boolean keepGoing = true;
@@ -147,7 +151,7 @@ public class NoiseVisualizer extends ApplicationAdapter {
                             }
                         }
                         break;
-                    case G:
+                    case G: {
                         for (int c = 0; c < 1024; c++) {
                             Pixmap p = new Pixmap(width, height, Pixmap.Format.RGBA8888);
                             p.setColor(Color.BLACK);
@@ -165,8 +169,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
                             for (int d = 4096; d < 10000; d++) {
                                 float da = d * 0.05f;
                                 float bright = d / 9999f;
-                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
-                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                                 ColorSupport.hsb2rgb(tempColor, hue + bright + ccc, 1f, bright * 0.9f - 0.2f, 1f);
                                 p.setColor(tempColor);
                                 p.fillCircle((int) x, (int) y, 2);
@@ -174,8 +178,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
                             for (int d = 4096; d < 10000; d++) {
                                 float da = d * 0.05f;
                                 float bright = d / 9999f;
-                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
-                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                                 ColorSupport.hsb2rgb(tempColor, hue + bright + ccc, 1f, Math.min(1f, bright * 1.4f), 1f);
                                 p.setColor(tempColor);
                                 p.drawPixel((int) x, (int) y);
@@ -193,18 +197,25 @@ public class NoiseVisualizer extends ApplicationAdapter {
                         }
                         frames.clear();
                         break;
+                    }
                     case W:
                         if(dim == 0) {
+                            // c is counter, it's our time, effectively, but also the current frame.
                             for (int c = 0; c < 1024; c++) {
                                 Pixmap p = new Pixmap(width, height, Pixmap.Format.RGBA8888);
                                 p.setColor(Color.BLACK);
                                 p.fill();
+                                // slower change than the counter
                                 float cc = c * 0.2f;
+                                // roughly 6K points per frame to form the curvy line
                                 for (int d = 4096; d < 10000; d++) {
+                                    // d adjustment; applies to both x and y
                                     float da = d * 0.05f;
+                                    // never more dim than about 0.41 lightness
                                     float bright = d / 9999f;
-                                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
-                                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+                                    // x and y are independent 1D noise calls with different seeds and frequencies
+                                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+                                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                                     ColorSupport.hsb2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright * 1.2f - 0.2f, 1f);
                                     p.setColor(tempColor);
                                     p.fillCircle((int) x, (int)y, 2);
@@ -404,8 +415,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
                 for (int d = 4096; d < 8192; d++) {
                     bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
                     float da = d * 0.0625f;
-                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + c, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
-                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + c, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                     // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
                     // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
                     // packing tempColor to its float bits avoids recalculating that conversion 45056 extra times.
@@ -437,8 +448,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
                 for (int d = 4096; d < 8192; d++) {
                     bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
                     float da = d * 0.0625f;
-                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.7548776662466927f + c, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
-                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * 0.5698402909980532f + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+                    float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + c, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+                    float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
                     // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
                     // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
                     ColorSupport.hsb2rgb(tempColor, hue + bright + ccc, 1f, Math.min(1f, bright * 1.4f), 1f);

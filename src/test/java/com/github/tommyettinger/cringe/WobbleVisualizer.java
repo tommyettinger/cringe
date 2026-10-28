@@ -39,6 +39,8 @@ import static com.badlogic.gdx.Input.Keys.*;
 import static com.badlogic.gdx.graphics.GL20.GL_POINTS;
 import static com.github.tommyettinger.cringe.ColorSupport.*;
 import static com.github.tommyettinger.cringe.ContinuousNoise.*;
+import static com.github.tommyettinger.cringe.NoiseVisualizer.xFreq;
+import static com.github.tommyettinger.cringe.NoiseVisualizer.yFreq;
 
 /**
  */
@@ -65,9 +67,6 @@ public class WobbleVisualizer extends ApplicationAdapter {
     private ImmediateModeRenderer20 renderer;
 
     private static final int width = 512, height = 512;
-
-    private static final float xFreq = 0.25f;//0.7548776662466927f;
-    private static final float yFreq = xFreq;// 0.5698402909980532f;
 
 
     private Viewport view;
@@ -337,11 +336,11 @@ public class WobbleVisualizer extends ApplicationAdapter {
 
 
         renderer.begin(view.getCamera().combined, GL_POINTS);
-        float bright, c = ctr * 8f, ccc = ctr * 0.15f;
+        float bright, c = ctr * 8f, ccc = ctr * 0.3f;
         // c and ctr are both about the same counter, they advance by a tiny float every frame.
         for (int d = 4096; d < 8192; d++) {
             bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
-            float da = d * 0.0625f;
+            float da = d * 0x1p-4f;
             float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + c, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
             float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
             // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
@@ -374,7 +373,7 @@ public class WobbleVisualizer extends ApplicationAdapter {
         }
         for (int d = 4096; d < 8192; d++) {
             bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
-            float da = d * 0.0625f;
+            float da = d * 0x1p-4f;
             float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + c, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
             float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
             // this rotates hue over time and as bright changes (so, as the current dot, d, changes).

@@ -32,6 +32,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import static com.badlogic.gdx.Input.Keys.*;
 import static com.github.tommyettinger.cringe.ColorSupport.*;
+import static com.github.tommyettinger.cringe.NoiseVisualizer.xFreq;
+import static com.github.tommyettinger.cringe.NoiseVisualizer.yFreq;
 
 /**
  */
@@ -233,16 +235,16 @@ public class LineVisualizer extends ApplicationAdapter {
             case 3: {
                 ScreenUtils.clear(Color.DARK_GRAY);
                 renderer.begin(view.getCamera().combined, GL20.GL_POINTS);
-                float c = traveled * 2f;
+                float c = traveled * 2f, ccc = traveled * 0.3f;
                 // c and ctr are both about the same counter, they advance by a tiny float every frame.
                 for (int d = 4096; d < 8192; d++) {
                     float bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
                     float da = d * 0x1p-8f;
-                    float x = (wobble.applyAsFloat(da * 0.7548776662466927f + c, seed) * 0.5f) * bright * width + width * 0.5f;
-                    float y = (wobble.applyAsFloat(da * 0.5698402909980532f + c, ~seed) * 0.5f) * bright * height + height * 0.5f;
+                    float x = (wobble.applyAsFloat(da * xFreq + c, seed) * 0.5f) * bright * width + width * 0.5f;
+                    float y = (wobble.applyAsFloat(da * yFreq + c, ~seed) * 0.5f) * bright * height + height * 0.5f;
                     // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
                     // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
-                    ColorSupport.hsb2rgb(tempColor, hue + bright + traveled * 0.3f, 1f, bright * 1.2f - 0.2f, 1f);
+                    ColorSupport.hsb2rgb(tempColor, hue + bright + ccc, 1f, bright * 1.2f - 0.2f, 1f);
                     renderer.color(tempColor.r, tempColor.g, tempColor.b, 1f);
                     renderer.vertex(x, y, 0);
                 }

@@ -88,8 +88,8 @@ public class NoiseVisualizer extends ApplicationAdapter {
 //    private static final int width = 256, height = 256;
     private static final float iWidth = 1f/width, iHeight = 1f/height;
 
-    private static final float xFreq = 0.25f;//0.7548776662466927f;
-    private static final float yFreq = xFreq;// 0.5698402909980532f;
+    public static final float xFreq = 0.25f;//0.7548776662466927f;
+    public static final float yFreq = xFreq;// 0.5698402909980532f;
 
 
     private Viewport view;

@@ -258,8 +258,8 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
      */
     public float getNoiseWithSeed(float x, float y, int seed) {
         if(!hasEfficientSetSeed()) {
-            float s = seed * 0x1p-16f;
-            return getNoise(x + s, y + s);
+            return getNoise(x + seed * 0x1p-16f,
+                    y + (Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f);
         }
         final int s = getSeed();
         setSeed(seed);
@@ -280,8 +280,9 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
      */
     public float getNoiseWithSeed(float x, float y, float z, int seed) {
         if(!hasEfficientSetSeed()) {
-            float s = seed * 0x1p-16f;
-            return getNoise(x + s, y + s, z + s);
+            return getNoise(x + seed * 0x1p-16f,
+                    y + (seed = Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f,
+                    z + (Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f);
         }
         final int s = getSeed();
         setSeed(seed);
@@ -303,8 +304,10 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
      */
     public float getNoiseWithSeed(float x, float y, float z, float w, int seed) {
         if(!hasEfficientSetSeed()) {
-            float s = seed * 0x1p-16f;
-            return getNoise(x + s, y + s, z + s, w + s);
+            return getNoise(x + seed * 0x1p-16f,
+                    y + (seed = Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f,
+                    z + (seed = Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f,
+                    w + (Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f);
         }
         final int s = getSeed();
         setSeed(seed);
@@ -327,8 +330,11 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
      */
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, int seed) {
         if(!hasEfficientSetSeed()) {
-            float s = seed * 0x1p-16f;
-            return getNoise(x + s, y + s, z + s, w + s, u + s);
+            return getNoise(x + seed * 0x1p-16f,
+                    y + (seed = Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f,
+                    z + (seed = Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f,
+                    w + (seed = Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f,
+                    u + (Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f);
         }
         final int s = getSeed();
         setSeed(seed);
@@ -352,8 +358,12 @@ public abstract class RawNoise implements Json.Serializable, Externalizable {
      */
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
         if(!hasEfficientSetSeed()) {
-            float s = seed * 0x1p-16f;
-            return getNoise(x + s, y + s, z + s, w + s, u + s, v + s);
+            return getNoise(x + seed * 0x1p-16f,
+                    y + (seed = Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f,
+                    z + (seed = Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f,
+                    w + (seed = Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f,
+                    u + (seed = Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f,
+                    v + (Compatibility.imul(seed + 777777777, 0x915f77f5)) * 0x1p-16f);
         }
         final int s = getSeed();
         setSeed(seed);

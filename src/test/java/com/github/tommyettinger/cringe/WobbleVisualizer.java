@@ -93,6 +93,24 @@ public class WobbleVisualizer extends ApplicationAdapter {
     private int preparationIndex = 0;
     private FloatToFloatFunction prepare = PREPARATIONS[preparationIndex];
 
+    public float fbm(float x, final int seed) {
+        float totalPower = (1 << octaves) - 1f, accrued = 0f, frequencyChange = 1 << (octaves - 1);
+        //0x91E10DA5, 0xD1B54A35, and 0xA0F2EC75 are all sections of numbers from MathTools, in some R* sequence.
+        //0x142543 is a subsequence of the bits of 0xd1342543de82ef95, which was found to be a strong LCG multiplier.
+        //XOR with a constant that ends in the bits 101, then multiplying by a constant that ends in the bits 011, is
+        //called an XLCG sometimes, and it is comparable to a normal LCG but has advantages on GWT. Note that the
+        //low-order bits of an (X)LCG are trash, but for generating floats it doesn't matter; they are discarded.
+        //0x1.9E3779B9p-31f is the golden ratio divided by (2 to the 31).
+        float slide = (((seed ^ 0x91E10DA5) * 0x142543 ^ 0xD1B54A35) * 0x142543 ^ 0xA0F2EC75) * 0x1.9E3779B9p-31f + 0.25f;
+//        float slide = (((seed ^ (seed << 19 | seed >>> 13) ^ (seed << 5 | seed >>> 27)) * 0x1D2BC3 ^ 0xD1B54A35) * 0x1D2BC3 ^ 0xD1B54A35) * 0x1p-31f;
+        int power = 1;
+        for (int i = octaves; i > 0; i--, power += power, frequencyChange *= 0.5f) {
+            accrued += noise.wrapped.getNoiseWithSeed(x * frequencyChange + (slide *= 1.6180339887498949f), seed ^ 0x9E3779B9 * octaves) * power;
+        }
+        return accrued / totalPower;
+    }
+
+
     @Override
     public void create() {
         renderer = new ImmediateModeRenderer20(width * height, false, true, 0);
@@ -145,8 +163,10 @@ public class WobbleVisualizer extends ApplicationAdapter {
                             for (int d = 4096; d < 10000; d++) {
                                 float da = d * 0.05f;
                                 float bright = d / 9999f;
-                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
-                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+//                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+//                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+                                float x = ((fbm(da * xFreq + cc, noise.getSeed())) * 0.5f) * bright * width + width * 0.5f;
+                                float y = ((fbm(da * yFreq + cc, ~noise.getSeed())) * 0.5f) * bright * height + height * 0.5f;
                                 ColorSupport.hsb2rgb(tempColor, hue + bright + ccc, 1f, bright * 0.9f - 0.2f, 1f);
                                 p.setColor(tempColor);
                                 p.fillCircle((int) x, (int) y, 2);
@@ -154,8 +174,10 @@ public class WobbleVisualizer extends ApplicationAdapter {
                             for (int d = 4096; d < 10000; d++) {
                                 float da = d * 0.05f;
                                 float bright = d / 9999f;
-                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
-                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+//                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+//                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+                                float x = ((fbm(da * xFreq + cc, noise.getSeed())) * 0.5f) * bright * width + width * 0.5f;
+                                float y = ((fbm(da * yFreq + cc, ~noise.getSeed())) * 0.5f) * bright * height + height * 0.5f;
                                 ColorSupport.hsb2rgb(tempColor, hue + bright + ccc, 1f, Math.min(1f, bright * 1.4f), 1f);
                                 p.setColor(tempColor);
                                 p.drawPixel((int) x, (int) y);
@@ -180,7 +202,7 @@ public class WobbleVisualizer extends ApplicationAdapter {
                             p.setColor(Color.BLACK);
                             p.fill();
                             // slower change than the counter
-                            float cc = c * 0.2f;
+                            float cc = c * 0.2f, ccc = ctr * 0.3f;
                             // roughly 6K points per frame to form the curvy line
                             for (int d = 4096; d < 10000; d++) {
                                 // d adjustment; applies to both x and y
@@ -188,9 +210,12 @@ public class WobbleVisualizer extends ApplicationAdapter {
                                 // never more dim than about 0.41 lightness
                                 float bright = d / 9999f;
                                 // x and y are independent 1D noise calls with different seeds and frequencies
-                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
-                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
-                                ColorSupport.hsb2rgb(tempColor, hue + bright + ctr * 0.3f, 1f, bright * 1.2f - 0.2f, 1f);
+//                                float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + cc, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
+//                                float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + cc, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+                                float x = ((fbm(da * xFreq + cc, noise.getSeed())) * 0.5f) * bright * width + width * 0.5f;
+                                float y = ((fbm(da * yFreq + cc, ~noise.getSeed())) * 0.5f) * bright * height + height * 0.5f;
+
+                                ColorSupport.hsb2rgb(tempColor, hue + bright + ccc, 1f, bright * 1.2f - 0.2f, 1f);
                                 p.setColor(tempColor);
                                 p.fillCircle((int) x, (int) y, 2);
                             }
@@ -336,13 +361,13 @@ public class WobbleVisualizer extends ApplicationAdapter {
 
 
         renderer.begin(view.getCamera().combined, GL_POINTS);
-        float bright, c = ctr * 8f, ccc = ctr * 0.3f;
+        float bright, c = ctr * 0.75f, ccc = c * 0.3f;
         // c and ctr are both about the same counter, they advance by a tiny float every frame.
         for (int d = 4096; d < 8192; d++) {
             bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
-            float da = d * 0x1p-4f;
-            float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + c, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
-            float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+            float da = d * 0x1p-8f;
+            float x = ((fbm(da * xFreq + c, noise.getSeed())) * 0.5f) * bright * width + width * 0.5f;
+            float y = ((fbm(da * yFreq + c, ~noise.getSeed())) * 0.5f) * bright * height + height * 0.5f;
             // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
             // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
             // packing tempColor to its float bits avoids recalculating that conversion 45056 extra times.
@@ -373,9 +398,9 @@ public class WobbleVisualizer extends ApplicationAdapter {
         }
         for (int d = 4096; d < 8192; d++) {
             bright = d / 8191f; // takes bright into the 0.5 to 1.0 range, roughly
-            float da = d * 0x1p-4f;
-            float x = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * xFreq + c, noise.getSeed())) - 0.5f) * bright * width + width * 0.5f;
-            float y = (prepare.applyAsFloat(noise.getNoiseWithSeed(da * yFreq + c, ~noise.getSeed())) - 0.5f) * bright * height + height * 0.5f;
+            float da = d * 0x1p-8f;
+            float x = ((fbm(da * xFreq + c, noise.getSeed())) * 0.5f) * bright * width + width * 0.5f;
+            float y = ((fbm(da * yFreq + c, ~noise.getSeed())) * 0.5f) * bright * height + height * 0.5f;
             // this rotates hue over time and as bright changes (so, as the current dot, d, changes).
             // saturation is always vivid, so 1, and the lightness gets brighter towards newer d (higher d).
             ColorSupport.hsb2rgb(tempColor, hue + bright + ccc, 1f, Math.min(1f, bright * 1.4f), 1f);

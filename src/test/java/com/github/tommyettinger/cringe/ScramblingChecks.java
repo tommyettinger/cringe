@@ -816,7 +816,7 @@ public class ScramblingChecks {
      *
      * @param args
      */
-    public static void main(String[] args) {
+    public static void mainIntMx3AltQOA(String[] args) {
         int idx = 0;
         for (int a = -16; a < 16; a++) {
             for (int i = 0; i < 16; i++) {
@@ -828,6 +828,25 @@ public class ScramblingChecks {
                 }
             }
         }
+    }
+
+    /**
+     * Just checking the total sum of Integer.numberOfLeadingZeros(x) for all int x.
+     * The sum is -1 .
+     * 
+     * @param args
+     */
+    public static void main(String[] args){
+        int sum = 0;
+        int idx = 0;
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 0x10000000; j++) {
+                sum += Integer.numberOfLeadingZeros(idx);
+                idx++;
+            }
+            System.out.println("Completed " + (i+1) + "/16");
+        }
+        System.out.println("Final sum is: " + sum);
     }
 
     /**

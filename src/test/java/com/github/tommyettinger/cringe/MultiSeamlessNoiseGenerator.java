@@ -23,7 +23,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tommyettinger.anim8.FastPNG;
@@ -41,6 +40,10 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.FBM;
 public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
 
     private static final boolean ACTUALLY_RENDER_PNG = true;
+    /**
+     * Doesn't work right now...
+     */
+    private static final boolean WANG_TILES = false;
     private static final boolean TIME_SEED = false;
 
     public interface FloatToFloatFunction {
@@ -110,22 +113,33 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
     }
 
     public void putMap() {
-        Gdx.files.local("out/noiseMultiSeamless/").mkdirs();
+        if(WANG_TILES) Gdx.files.local("out/noiseWang/").mkdirs();
+        else Gdx.files.local("out/noiseMultiSeamless/").mkdirs();
 
         if (ACTUALLY_RENDER_PNG) {
             int w = width, h = height;
-            FileHandle mainPngFile = Gdx.files.local("out/noiseMultiSeamless/" + noise.stringSerialize().replace('`', '-') + "_main.png");
+            FileHandle mainPngFile;
+            if(WANG_TILES) mainPngFile = Gdx.files.local("out/noiseWang/" + noise.stringSerialize().replace('`', '-') + "_Wang.png");
+            else mainPngFile = Gdx.files.local("out/noiseMultiSeamless/" + noise.stringSerialize().replace('`', '-') + "_main.png");
             Pixmap mp = new Pixmap(w * 4, h * 4, Pixmap.Format.RGBA8888);
             for (int z = 0; z < 16; z++) {
 
-                FileHandle pngFile = Gdx.files.local("out/noiseMultiSeamless/" + noise.stringSerialize().replace('`', '-') + "_" + z + ".png");
+                FileHandle pngFile;
+                if(WANG_TILES) pngFile = Gdx.files.local("out/noiseWang/" + noise.stringSerialize().replace('`', '-') + "_" + z + ".png");
+                else pngFile = Gdx.files.local("out/noiseMultiSeamless/" + noise.stringSerialize().replace('`', '-') + "_" + z + ".png");
                 Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                 for (int x = 0; x < w; x++) {
                     for (int y = 0; y < h; y++) {
                         float xx = x * PI2 / w;
                         float yy = y * PI2 / h;
+                        float xw = wangTile(xx, w, z & 3);
+                        float yw = wangTile(yy, h, z >>> 2);
                         float limiter = Math.min(tukeyWindow(xx), tukeyWindow(yy));
-                        float color = prepare.applyAsFloat(noise.getNoise(MathUtils.cos(xx), MathUtils.sin(xx), MathUtils.cos(yy), MathUtils.sin(yy), limiter * LineWobble.bicubicWobble(xx, z), limiter * LineWobble.bicubicWobble(yy, z)));
+                        float color = prepare.applyAsFloat(noise.getNoise(
+                                MathUtils.cos(xx), MathUtils.sin(xx),
+                                MathUtils.cos(yy), MathUtils.sin(yy),
+                                limiter * LineWobble.bicubicWobble(xx, z) + xw,
+                                limiter * LineWobble.bicubicWobble(yy, z) + yw));
                         p.setColor(color, color, color, 1f);
                         p.drawPixel(x, y);
                     }
@@ -138,6 +152,29 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
             png.write(mainPngFile, mp);
             mp.dispose();
         }
+    }
+
+    private float wangTile(float pos, float breadth, int bits) {
+        if(WANG_TILES) {
+            if (pos + pos < breadth) {
+                switch (bits) {
+                    case 0:
+                    case 1:
+                        return -50;
+                    default:
+                        return 100;
+                }
+            } else {
+                switch (bits) {
+                    case 0:
+                    case 3:
+                        return -50;
+                    default:
+                        return 100;
+                }
+            }
+        }
+        return 0;
     }
 
     @Override

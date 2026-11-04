@@ -833,7 +833,7 @@ public class ScramblingChecks {
     /**
      * Just checking the total sum of Integer.numberOfLeadingZeros(x) for all int x.
      * The sum is -1 .
-     * 
+     *
      * @param args
      */
     public static void main(String[] args){

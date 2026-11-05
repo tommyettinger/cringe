@@ -119,6 +119,19 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
     }
 
     /**
+     * Has no seams, but does squash the edges a bit. Is quite varied in the middle quarter of the image.
+     * This has an alpha of 1.0/3.0 .
+     * @param n between 0 and PI2
+     * @return between 0 (at the edges) and 1 (in the center)
+     */
+    private static float tukeyWindowThirdHann(float n){
+        if(n > PI) n = PI2 - n;
+        if(n > PI * (1f/3f)) return 1f;
+        n = 0.5f * (1f - MathUtils.cos(3 * n));
+        return n * n;
+    }
+
+    /**
      * Doesn't really have seams, but also doesn't have much variation.
      * @param n between 0 and PI2
      * @return between 0 (at the edges) and 1 (in the center)
@@ -141,7 +154,8 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
     static {
 //        windowingFunctions.put("Tukey", MultiSeamlessNoiseGenerator::tukeyWindow);
 //        windowingFunctions.put("TukeyQuarter", MultiSeamlessNoiseGenerator::tukeyWindowQuarter);
-        windowingFunctions.put("TukeyThird", MultiSeamlessNoiseGenerator::tukeyWindowThird);
+//        windowingFunctions.put("TukeyThird", MultiSeamlessNoiseGenerator::tukeyWindowThird);
+        windowingFunctions.put("TukeyThirdHann", MultiSeamlessNoiseGenerator::tukeyWindowThirdHann);
 //        windowingFunctions.put("Sine", MultiSeamlessNoiseGenerator::sineWindow);
 //        windowingFunctions.put("SineSqrt", MultiSeamlessNoiseGenerator::sineSqrtWindow);
     }

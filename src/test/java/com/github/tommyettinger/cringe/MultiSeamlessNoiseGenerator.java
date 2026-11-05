@@ -23,6 +23,8 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.OrderedMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tommyettinger.anim8.FastPNG;
@@ -40,10 +42,6 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.FBM;
 public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
 
     private static final boolean ACTUALLY_RENDER_PNG = true;
-    /**
-     * Doesn't work right now...
-     */
-    private static final boolean WANG_TILES = false;
     private static final boolean TIME_SEED = false;
 
     public interface FloatToFloatFunction {
@@ -67,7 +65,7 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
 //            Serializer.getAll().toArray();
 
     int noiseIndex = 0;
-    private static final float scale = 2f;
+    private static final float scale = 1f;
     private final ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, scale, FBM, 1);
 
 //    private static final int width = 512, height = 512;
@@ -77,17 +75,28 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
 
     private FastPNG png;
 
-    public float basicPrepare(float n)
+    public static float basicPrepare(float n)
     {
         return n * 0.5f + 0.5f;
     }
 
-    private final FloatToFloatFunction prepare = this::basicPrepare;
+    private static final FloatToFloatFunction prepare = MultiSeamlessNoiseGenerator::basicPrepare;
 
-    private float tukeyWindow(float n){
+    private static float tukeyWindow(float n){
         if(n > PI) n = PI2 - n;
         if(n > PI * 0.5f) return 1f;
         return 0.5f * (1f - MathUtils.cos(2 * n));
+    }
+
+    private static float sineWindow(float n){
+        return MathUtils.sin(0.5f * n);
+    }
+
+    private static final OrderedMap<String, FloatToFloatFunction> windowingFunctions = new OrderedMap<>(3);
+
+    static {
+        windowingFunctions.put("Tukey", MultiSeamlessNoiseGenerator::tukeyWindow);
+        windowingFunctions.put("Sine", MultiSeamlessNoiseGenerator::sineWindow);
     }
 
     @Override
@@ -113,68 +122,43 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
     }
 
     public void putMap() {
-        if(WANG_TILES) Gdx.files.local("out/noiseWang/").mkdirs();
-        else Gdx.files.local("out/noiseMultiSeamless/").mkdirs();
+
+        Gdx.files.local("out/noiseMultiSeamless/").mkdirs();
 
         if (ACTUALLY_RENDER_PNG) {
             int w = width, h = height;
-            FileHandle mainPngFile;
-            if(WANG_TILES) mainPngFile = Gdx.files.local("out/noiseWang/" + noise.stringSerialize().replace('`', '-') + "_Wang.png");
-            else mainPngFile = Gdx.files.local("out/noiseMultiSeamless/" + noise.stringSerialize().replace('`', '-') + "_main.png");
-            Pixmap mp = new Pixmap(w * 4, h * 4, Pixmap.Format.RGBA8888);
-            for (int z = 0; z < 16; z++) {
+            for (ObjectMap.Entry<String, FloatToFloatFunction> ent : windowingFunctions) {
 
-                FileHandle pngFile;
-                if(WANG_TILES) pngFile = Gdx.files.local("out/noiseWang/" + noise.stringSerialize().replace('`', '-') + "_" + z + ".png");
-                else pngFile = Gdx.files.local("out/noiseMultiSeamless/" + noise.stringSerialize().replace('`', '-') + "_" + z + ".png");
-                Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-                for (int x = 0; x < w; x++) {
-                    for (int y = 0; y < h; y++) {
-                        float xx = x * PI2 / w;
-                        float yy = y * PI2 / h;
-                        float xw = wangTile(xx, w, z & 3);
-                        float yw = wangTile(yy, h, z >>> 2);
-                        float limiter = Math.min(tukeyWindow(xx), tukeyWindow(yy));
-                        float color = prepare.applyAsFloat(noise.getNoise(
-                                MathUtils.cos(xx), MathUtils.sin(xx),
-                                MathUtils.cos(yy), MathUtils.sin(yy),
-                                limiter * LineWobble.bicubicWobble(xx, z) + xw,
-                                limiter * LineWobble.bicubicWobble(yy, z) + yw));
-                        p.setColor(color, color, color, 1f);
-                        p.drawPixel(x, y);
+                FloatToFloatFunction window = ent.value;
+                FileHandle mainPngFile = Gdx.files.local("out/noiseMultiSeamless/" + noise.stringSerialize().replace('`', '-') + "_" + ent.key + "_main.png");
+                Pixmap mp = new Pixmap(w * 4, h * 4, Pixmap.Format.RGBA8888);
+                for (int z = 0; z < 16; z++) {
+
+                    FileHandle pngFile = Gdx.files.local("out/noiseMultiSeamless/" + noise.stringSerialize().replace('`', '-') + "_" + ent.key + "_" + z + ".png");
+                    Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+                    for (int x = 0; x < w; x++) {
+                        for (int y = 0; y < h; y++) {
+                            float xx = x * PI2 / w;
+                            float yy = y * PI2 / h;
+                            float limiter = Math.min(window.applyAsFloat(xx), window.applyAsFloat(yy));
+                            float color = prepare.applyAsFloat(noise.getNoise(
+                                    MathUtils.cos(xx), MathUtils.sin(xx),
+                                    MathUtils.cos(yy), MathUtils.sin(yy),
+                                    limiter * LineWobble.bicubicWobble(xx, z),
+                                    limiter * LineWobble.bicubicWobble(yy, z)));
+                            p.setColor(color, color, color, 1f);
+                            p.drawPixel(x, y);
+                        }
                     }
-                }
-                mp.drawPixmap(p, (z & 3) * w, (z >>> 2) * h);
-                png.write(pngFile, p);
+                    mp.drawPixmap(p, (z & 3) * w, (z >>> 2) * h);
+                    png.write(pngFile, p);
 
-                p.dispose();
-            }
-            png.write(mainPngFile, mp);
-            mp.dispose();
-        }
-    }
-
-    private float wangTile(float pos, float breadth, int bits) {
-        if(WANG_TILES) {
-            if (pos + pos < breadth) {
-                switch (bits) {
-                    case 0:
-                    case 1:
-                        return -50;
-                    default:
-                        return 100;
+                    p.dispose();
                 }
-            } else {
-                switch (bits) {
-                    case 0:
-                    case 3:
-                        return -50;
-                    default:
-                        return 100;
-                }
+                png.write(mainPngFile, mp);
+                mp.dispose();
             }
         }
-        return 0;
     }
 
     @Override

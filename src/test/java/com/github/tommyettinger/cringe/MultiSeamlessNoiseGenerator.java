@@ -82,14 +82,33 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
 
     private static final FloatToFloatFunction prepare = MultiSeamlessNoiseGenerator::basicPrepare;
 
+    /**
+     * Has no seams! Is quite varied in the middle quarter of the image.
+     * @param n between 0 and PI2
+     * @return between 0 (at the edges) and 1 (in the center)
+     */
     private static float tukeyWindow(float n){
         if(n > PI) n = PI2 - n;
         if(n > PI * 0.5f) return 1f;
         return 0.5f * (1f - MathUtils.cos(2 * n));
     }
 
+    /**
+     * Doesn't really have seams, but also doesn't have much variation.
+     * @param n between 0 and PI2
+     * @return between 0 (at the edges) and 1 (in the center)
+     */
     private static float sineWindow(float n){
         return MathUtils.sin(0.5f * n);
+    }
+
+    /**
+     * Has seams!
+     * @param n between 0 and PI2
+     * @return between 0 (at the edges) and 1 (in the center)
+     */
+    private static float sineSqrtWindow(float n){
+        return (float)Math.sqrt(MathUtils.sin(0.5f * n));
     }
 
     private static final OrderedMap<String, FloatToFloatFunction> windowingFunctions = new OrderedMap<>(3);
@@ -97,6 +116,7 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
     static {
         windowingFunctions.put("Tukey", MultiSeamlessNoiseGenerator::tukeyWindow);
         windowingFunctions.put("Sine", MultiSeamlessNoiseGenerator::sineWindow);
+        windowingFunctions.put("SineSqrt", MultiSeamlessNoiseGenerator::sineSqrtWindow);
     }
 
     @Override

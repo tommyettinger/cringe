@@ -42,7 +42,7 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.FBM;
 public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
 
     private static final boolean ACTUALLY_RENDER_PNG = true;
-    private static final boolean TIME_SEED = false;
+    private static final boolean TIME_SEED = true;
 
     public interface FloatToFloatFunction {
         float applyAsFloat(float f);
@@ -65,7 +65,7 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
 //            Serializer.getAll().toArray();
 
     int noiseIndex = 0;
-    private static final float scale = 1f;
+    private static final float scale = 1.618f;
     private final ContinuousNoise noise = new ContinuousNoise(noises[noiseIndex], 1, scale, FBM, 1);
 
 //    private static final int width = 512, height = 512;
@@ -205,8 +205,8 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
                             float color = prepare.applyAsFloat(noise.getNoise(
                                     MathUtils.cos(xx), MathUtils.sin(xx),
                                     MathUtils.cos(yy), MathUtils.sin(yy),
-                                    limiter * LineWobble.bicubicWobble(xx, z),
-                                    limiter * LineWobble.bicubicWobble(yy, z)));
+                                    limiter * LineWobble.wobble(xx, z),
+                                    limiter * LineWobble.wobble(yy, z)));
                             p.setColor(color, color, color, 1f);
                             p.drawPixel(x, y);
                         }

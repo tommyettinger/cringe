@@ -84,6 +84,7 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
 
     /**
      * Has no seams! Is quite varied in the middle quarter of the image.
+     * This has an alpha of 0.5 .
      * @param n between 0 and PI2
      * @return between 0 (at the edges) and 1 (in the center)
      */
@@ -91,6 +92,18 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
         if(n > PI) n = PI2 - n;
         if(n > PI * 0.5f) return 1f;
         return 0.5f * (1f - MathUtils.cos(2 * n));
+    }
+
+    /**
+     * Has no seams, but does squash the edges a bit. Is quite varied in the middle quarter of the image.
+     * This has an alpha of 0.25 .
+     * @param n between 0 and PI2
+     * @return between 0 (at the edges) and 1 (in the center)
+     */
+    private static float tukeyWindowQuarter(float n){
+        if(n > PI) n = PI2 - n;
+        if(n > PI * 0.25f) return 1f;
+        return 0.5f * (1f - MathUtils.cos(4 * n));
     }
 
     /**
@@ -114,9 +127,10 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
     private static final OrderedMap<String, FloatToFloatFunction> windowingFunctions = new OrderedMap<>(3);
 
     static {
-        windowingFunctions.put("Tukey", MultiSeamlessNoiseGenerator::tukeyWindow);
-        windowingFunctions.put("Sine", MultiSeamlessNoiseGenerator::sineWindow);
-        windowingFunctions.put("SineSqrt", MultiSeamlessNoiseGenerator::sineSqrtWindow);
+//        windowingFunctions.put("Tukey", MultiSeamlessNoiseGenerator::tukeyWindow);
+        windowingFunctions.put("TukeyQuarter", MultiSeamlessNoiseGenerator::tukeyWindowQuarter);
+//        windowingFunctions.put("Sine", MultiSeamlessNoiseGenerator::sineWindow);
+//        windowingFunctions.put("SineSqrt", MultiSeamlessNoiseGenerator::sineSqrtWindow);
     }
 
     @Override

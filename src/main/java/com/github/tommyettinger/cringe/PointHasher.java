@@ -132,9 +132,23 @@ public final class PointHasher {
     public static final int V6 = 0x10DAAD;
 
     /**
+     * The prime constants declared in this class as {@link #X2}, {@link #Z3}, and so on, but organized so they are in
+     * arrays from 1D to 6D, with 1 item in the 1D array up to 6 items in the 6D array. This array should not be
+     * modified, but it isn't currently used internally, so nothing would break in this library if you did change it.
+     */
+    public static final int[][] HARMONIOUS_PRIMES = new int[][]{
+            new int[]{X1},
+            new int[]{X2, Y2},
+            new int[]{X3, Y3, Z3},
+            new int[]{X4, Y4, Z4, W4},
+            new int[]{X5, Y5, Z5, W5, U5},
+            new int[]{X6, Y6, Z6, W6, U6, V6},
+    };
+
+    /**
      * A 32-bit point hash that smashes x into s using XOR and multiplications by harmonious numbers,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -148,8 +162,8 @@ public final class PointHasher {
     }
     /**
      * A 32-bit point hash that smashes x and y into s using XOR and multiplications by harmonious numbers,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -164,8 +178,8 @@ public final class PointHasher {
     }
     /**
      * A 32-bit point hash that smashes x, y, and z into s using XOR and multiplications by harmonious numbers,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -182,8 +196,8 @@ public final class PointHasher {
 
     /**
      * A 32-bit point hash that smashes x, y, z, and w into s using XOR and multiplications by harmonious numbers,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -201,8 +215,8 @@ public final class PointHasher {
 
     /**
      * A 32-bit point hash that smashes x, y, z, w, and u into s using XOR and multiplications by harmonious
-     * numbers, then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash,
-     * especially for ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by
+     * numbers, then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
      * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
      * hash used here has been stripped down heavily, both for speed and because unless points are selected
      * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
@@ -222,8 +236,8 @@ public final class PointHasher {
 
     /**
      * A 32-bit point hash that smashes x, y, z, w, u, and v into s using XOR and multiplications by harmonious
-     * numbers, then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash,
-     * especially for ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by
+     * numbers, then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
      * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
      * hash used here has been stripped down heavily, both for speed and because unless points are selected
      * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
@@ -244,8 +258,8 @@ public final class PointHasher {
 
     /**
      * An 8-bit point hash that smashes x into s using XOR and multiplications by harmonious numbers,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -259,8 +273,8 @@ public final class PointHasher {
     }
     /**
      * An 8-bit point hash that smashes x and y into s using XOR and multiplications by harmonious numbers,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -275,8 +289,8 @@ public final class PointHasher {
     }
     /**
      * An 8-bit point hash that smashes x, y, and z into s using XOR and multiplications by harmonious numbers,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -293,8 +307,8 @@ public final class PointHasher {
 
     /**
      * An 8-bit point hash that smashes x, y, z, and w into s using XOR and multiplications by harmonious numbers,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -311,8 +325,8 @@ public final class PointHasher {
     }
     /**
      * An 8-bit point hash that smashes x, y, z, w, and u into s using XOR and multiplications by harmonious
-     * numbers, then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash,
-     * especially for ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by
+     * numbers, then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
      * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
      * hash used here has been stripped down heavily, both for speed and because unless points are selected
      * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
@@ -332,8 +346,8 @@ public final class PointHasher {
 
     /**
      * An 8-bit point hash that smashes x, y, z, w, u, and v into s using XOR and multiplications by harmonious
-     * numbers, then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash,
-     * especially for ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by
+     * numbers, then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
      * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
      * hash used here has been stripped down heavily, both for speed and because unless points are selected
      * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
@@ -354,8 +368,8 @@ public final class PointHasher {
 
     /**
      * A 5-bit point hash that smashes x into s using XOR and multiplications by harmonious numbers,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -369,8 +383,8 @@ public final class PointHasher {
     }
     /**
      * A 5-bit point hash that smashes x and y into s using XOR and multiplications by harmonious numbers,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -385,8 +399,8 @@ public final class PointHasher {
     }
     /**
      * A 5-bit point hash that smashes x, y, and z into s using XOR and multiplications by harmonious numbers,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -403,8 +417,8 @@ public final class PointHasher {
 
     /**
      * A 5-bit point hash that smashes x, y, z, and w into s using XOR and multiplications by harmonious numbers,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -422,8 +436,8 @@ public final class PointHasher {
 
     /**
      * A 5-bit point hash that smashes x, y, z, w, and u into s using XOR and multiplications by harmonious
-     * numbers, then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash,
-     * especially for ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by
+     * numbers, then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
      * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
      * hash used here has been stripped down heavily, both for speed and because unless points are selected
      * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
@@ -443,8 +457,8 @@ public final class PointHasher {
 
     /**
      * A 5-bit point hash that smashes x, y, z, w, u, and v into s using XOR and multiplications by harmonious
-     * numbers, then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash,
-     * especially for ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by
+     * numbers, then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
      * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
      * hash used here has been stripped down heavily, both for speed and because unless points are selected
      * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
@@ -465,8 +479,8 @@ public final class PointHasher {
 
     /**
      * A 32-bit point hash that smashes pre-multiplied x into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -480,8 +494,8 @@ public final class PointHasher {
     }
     /**
      * A 32-bit point hash that smashes pre-multiplied x and y into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -496,8 +510,8 @@ public final class PointHasher {
     }
     /**
      * A 32-bit point hash that smashes pre-multiplied x, y, and z into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -514,8 +528,8 @@ public final class PointHasher {
 
     /**
      * A 32-bit point hash that smashes pre-multiplied x, y, z, and w into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -533,8 +547,8 @@ public final class PointHasher {
 
     /**
      * A 32-bit point hash that smashes pre-multiplied x, y, z, w, and u into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash,
-     * especially for ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
      * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
      * hash used here has been stripped down heavily, both for speed and because unless points are selected
      * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
@@ -554,8 +568,8 @@ public final class PointHasher {
 
     /**
      * A 32-bit point hash that smashes pre-multiplied x, y, z, w, u, and v into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash,
-     * especially for ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
      * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
      * hash used here has been stripped down heavily, both for speed and because unless points are selected
      * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
@@ -576,8 +590,8 @@ public final class PointHasher {
 
     /**
      * An 8-bit point hash that smashes pre-multiplied x into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -591,8 +605,8 @@ public final class PointHasher {
     }
     /**
      * An 8-bit point hash that smashes pre-multiplied x and y into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -607,8 +621,8 @@ public final class PointHasher {
     }
     /**
      * An 8-bit point hash that smashes pre-multiplied x, y, and z into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -625,8 +639,8 @@ public final class PointHasher {
 
     /**
      * An 8-bit point hash that smashes pre-multiplied x, y, z, and w into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -643,8 +657,8 @@ public final class PointHasher {
     }
     /**
      * An 8-bit point hash that smashes pre-multiplied x, y, z, w, and u into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash,
-     * especially for ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
      * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
      * hash used here has been stripped down heavily, both for speed and because unless points are selected
      * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
@@ -664,8 +678,8 @@ public final class PointHasher {
 
     /**
      * An 8-bit point hash that smashes pre-multiplied x, y, z, w, u, and v into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash,
-     * especially for ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
      * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
      * hash used here has been stripped down heavily, both for speed and because unless points are selected
      * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
@@ -686,8 +700,8 @@ public final class PointHasher {
 
     /**
      * A 5-bit point hash that smashes pre-multiplied x into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -701,8 +715,8 @@ public final class PointHasher {
     }
     /**
      * A 5-bit point hash that smashes pre-multiplied x and y into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -717,8 +731,8 @@ public final class PointHasher {
     }
     /**
      * A 5-bit point hash that smashes pre-multiplied x, y, and z into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -735,8 +749,8 @@ public final class PointHasher {
 
     /**
      * A 5-bit point hash that smashes pre-multiplied x, y, z, and w into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
-     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by Pelle Evensen's
      * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
      * been stripped down heavily, both for speed and because unless points are selected specifically to target
      * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
@@ -754,8 +768,8 @@ public final class PointHasher {
 
     /**
      * A 5-bit point hash that smashes pre-multiplied x, y, z, w, and u into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash,
-     * especially for ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
      * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
      * hash used here has been stripped down heavily, both for speed and because unless points are selected
      * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
@@ -775,8 +789,8 @@ public final class PointHasher {
 
     /**
      * A 5-bit point hash that smashes pre-multiplied x, y, z, w, u, and v into s using XOR,
-     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash,
-     * especially for ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
      * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
      * hash used here has been stripped down heavily, both for speed and because unless points are selected
      * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that

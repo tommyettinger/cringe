@@ -20,11 +20,12 @@ package com.github.tommyettinger.cringe;
  * A group of similar methods for getting hashes of points based on int coordinates in 2, 3, 4, 5, or 6 dimensions and
  * an int for state. This hash has high enough quality to be useful as a source of random numbers based on positions.
  * The technique used here owes credit to Pelle Evensen for finding the significant quality increase from using multiple
- * bitwise rotations XORed together, and Martin Roberts for discovering the connection between higher dimensional ranks
- * and the appropriate numbers to gain similar qualities to adding the golden ratio mod 1 in 1D, using what had already
- * been named "harmonious numbers." This class doesn't use the exact harmonious numbers (which are irrational numbers),
- * but instead takes 2 to the 22 divided by that harmonious number and finds the next probable prime greater than or
- * equal to that. Using primes may have advantages when there are lots of products being mixed like this.
+ * bitwise rotations XORed together. Credit also to Martin Roberts for discovering the connection between higher
+ * dimensional ranks and the appropriate numbers to gain similar qualities to adding the golden ratio mod 1 in 1D, using
+ * what had already been named "harmonious numbers." This class doesn't use the exact harmonious numbers (which are
+ * irrational numbers), but instead takes 2 to the 22 divided by that harmonious number and finds the next probable
+ * prime greater than or equal to that. Using primes may have advantages when there are lots of products being mixed
+ * like this.
  * <br>
  * This class offers both "hash" methods like {@link #hashAll(int, int, int)} and "hashPrimed" methods like
  * {@link #hashPrimedAll(int, int, int)}. The "hash" methods will almost always produce very different results when
@@ -38,19 +39,97 @@ package com.github.tommyettinger.cringe;
  * done many times per frame.
  * <br>
  * The only case where this can return different results on GWT than on a desktop or
- * mobile JVM is when the inputs are GWT-specific out-of-range JS Numbers appearing to be ints, and that's a problem
- * with the input rather than the algorithm.
+ * mobile JVM is when the inputs are GWT-specific out-of-range JS Numbers appearing to be ints. That's a problem
+ * with the input, rather than the algorithm.
  */
 public final class PointHasher {
     private PointHasher() {
     }
 
-    public static final int
-        X2 = 0x1827F5, Y2 = 0x123C3B,
-        X3 = 0x1A36BF, Y3 = 0x157931, Z3 = 0x119749,
-        X4 = 0x1B69E5, Y4 = 0x177C1F, Z4 = 0x141E75, W4 = 0x113C33,
-        X5 = 0x1C3367, Y5 = 0x18DA39, Z5 = 0x15E6E3, W5 = 0x134D49, U5 = 0x110281,
-        X6 = 0x1CC205, Y6 = 0x19D7B5, Z6 = 0x173935, W6 = 0x14DEC5, U6 = 0x12C139, V6 = 0x10DAAD;
+    /**
+     * The prime constant 0x13C709 . Multiply x by this in 1 dimension for "hashPrimed" methods.
+     */
+    public static final int X1 = 0x13C709;
+    /**
+     * The prime constant 0x1827F5 . Multiply x by this in 2 dimensions for "hashPrimed" methods.
+     */
+    public static final int X2 = 0x1827F5;
+    /**
+     * The prime constant 0x123C3B . Multiply y by this in 2 dimensions for "hashPrimed" methods.
+     */
+    public static final int Y2 = 0x123C3B;
+    /**
+     * The prime constant 0x1A36BF . Multiply x by this in 3 dimensions for "hashPrimed" methods.
+     */
+    public static final int X3 = 0x1A36BF;
+    /**
+     * The prime constant 0x157931 . Multiply y by this in 3 dimensions for "hashPrimed" methods.
+     */
+    public static final int Y3 = 0x157931;
+    /**
+     * The prime constant 0x119749 . Multiply z by this in 3 dimensions for "hashPrimed" methods.
+     */
+    public static final int Z3 = 0x119749;
+    /**
+     * The prime constant 0x1B69E5 . Multiply x by this in 4 dimensions for "hashPrimed" methods.
+     */
+    public static final int X4 = 0x1B69E5;
+    /**
+     * The prime constant 0x177C1F . Multiply y by this in 4 dimensions for "hashPrimed" methods.
+     */
+    public static final int Y4 = 0x177C1F;
+    /**
+     * The prime constant 0x141E75 . Multiply z by this in 4 dimensions for "hashPrimed" methods.
+     */
+    public static final int Z4 = 0x141E75;
+    /**
+     * The prime constant 0x113C33 . Multiply w by this in 4 dimensions for "hashPrimed" methods.
+     */
+    public static final int W4 = 0x113C33;
+    /**
+     * The prime constant 0x1C3367 . Multiply x by this in 5 dimensions for "hashPrimed" methods.
+     */
+    public static final int X5 = 0x1C3367;
+    /**
+     * The prime constant 0x18DA39 . Multiply y by this in 5 dimensions for "hashPrimed" methods.
+     */
+    public static final int Y5 = 0x18DA39;
+    /**
+     * The prime constant 0x15E6E3 . Multiply z by this in 5 dimensions for "hashPrimed" methods.
+     */
+    public static final int Z5 = 0x15E6E3;
+    /**
+     * The prime constant 0x134D49 . Multiply w by this in 5 dimensions for "hashPrimed" methods.
+     */
+    public static final int W5 = 0x134D49;
+    /**
+     * The prime constant 0x110281 . Multiply u by this in 5 dimensions for "hashPrimed" methods.
+     */
+    public static final int U5 = 0x110281;
+    /**
+     * The prime constant 0x1CC205 . Multiply x by this in 6 dimensions for "hashPrimed" methods.
+     */
+    public static final int X6 = 0x1CC205;
+    /**
+     * The prime constant 0x19D7B5 . Multiply y by this in 6 dimensions for "hashPrimed" methods.
+     */
+    public static final int Y6 = 0x19D7B5;
+    /**
+     * The prime constant 0x173935 . Multiply z by this in 6 dimensions for "hashPrimed" methods.
+     */
+    public static final int Z6 = 0x173935;
+    /**
+     * The prime constant 0x14DEC5 . Multiply w by this in 6 dimensions for "hashPrimed" methods.
+     */
+    public static final int W6 = 0x14DEC5;
+    /**
+     * The prime constant 0x12C139 . Multiply u by this in 6 dimensions for "hashPrimed" methods.
+     */
+    public static final int U6 = 0x12C139;
+    /**
+     * The prime constant 0x10DAAD . Multiply v by this in 6 dimensions for "hashPrimed" methods.
+     */
+    public static final int V6 = 0x10DAAD;
 
     /**
      * A 32-bit point hash that smashes x and y into s using XOR and multiplications by harmonious numbers,

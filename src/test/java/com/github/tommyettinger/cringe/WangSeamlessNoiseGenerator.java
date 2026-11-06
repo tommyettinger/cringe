@@ -132,42 +132,42 @@ public class WangSeamlessNoiseGenerator extends ApplicationAdapter {
                             case 0: switch (u) {
                                 case 0:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), -PI,
                                         cos(yy), sin(yy), -PI)); break;
-                                case 1:  color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * 0.5f), xx - PI,
+                                case 1:  color = prepare.applyAsFloat(noise.getNoise(cos(xx * 0.5f), sin(xx * 0.5f), xx - PI,
                                         cos(yy), sin(yy), -PI)); break;
                                 case 2:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), PI,
                                         cos(yy), sin(yy), -PI)); break;
-                                default: color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * -0.5f), PI - xx,
+                                default: color = prepare.applyAsFloat(noise.getNoise(cos(xx * -0.5f), sin(xx * -0.5f), PI - xx,
                                         cos(yy), sin(yy), -PI)); break;
                             } break;
                             case 1: switch (u) {
                                 case 0:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), -PI,
-                                        1, sin(yy * 0.5f), yy - PI)); break;
-                                case 1:  color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * 0.5f), xx - PI,
-                                        1, sin(yy * 0.5f), yy - PI)); break;
+                                        cos(yy * 0.5f), sin(yy * 0.5f), yy - PI)); break;
+                                case 1:  color = prepare.applyAsFloat(noise.getNoise(cos(xx * 0.5f), sin(xx * 0.5f), xx - PI,
+                                        cos(yy * 0.5f), sin(yy * 0.5f), yy - PI)); break;
                                 case 2:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), PI,
-                                        1, sin(yy * 0.5f), yy - PI)); break;
-                                default: color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * -0.5f), PI - xx,
-                                        1, sin(yy * 0.5f), yy - PI)); break;
+                                        cos(yy * 0.5f), sin(yy * 0.5f), yy - PI)); break;
+                                default: color = prepare.applyAsFloat(noise.getNoise(cos(xx * -0.5f), sin(xx * -0.5f), PI - xx,
+                                        cos(yy * 0.5f), sin(yy * 0.5f), yy - PI)); break;
                             } break;
                             case 2: switch (u) {
                                 case 0:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), -PI,
                                         cos(yy), sin(yy), PI)); break;
-                                case 1:  color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * 0.5f), xx - PI,
+                                case 1:  color = prepare.applyAsFloat(noise.getNoise(cos(xx * 0.5f), sin(xx * 0.5f), xx - PI,
                                         cos(yy), sin(yy), PI)); break;
                                 case 2:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), PI,
                                         cos(yy), sin(yy), PI)); break;
-                                default: color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * -0.5f), PI - xx,
+                                default: color = prepare.applyAsFloat(noise.getNoise(cos(xx * -0.5f), sin(xx * -0.5f), PI - xx,
                                         cos(yy), sin(yy), PI)); break;
                             } break;
                             default: switch (u) {
                                 case 0:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), -PI,
-                                        1, sin(yy * -0.5f), PI - yy)); break;
-                                case 1:  color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * 0.5f), xx - PI,
-                                        1, sin(yy * -0.5f), PI - yy)); break;
+                                        cos(yy * -0.5f), sin(yy * -0.5f), PI - yy)); break;
+                                case 1:  color = prepare.applyAsFloat(noise.getNoise(cos(xx * 0.5f), sin(xx * 0.5f), xx - PI,
+                                        cos(yy * -0.5f), sin(yy * -0.5f), PI - yy)); break;
                                 case 2:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), PI,
-                                        1, sin(yy * -0.5f), PI - yy)); break;
-                                default: color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * -0.5f), PI - xx,
-                                        1, sin(yy * -0.5f), PI - yy)); break;
+                                        cos(yy * -0.5f), sin(yy * -0.5f), PI - yy)); break;
+                                default: color = prepare.applyAsFloat(noise.getNoise(cos(xx * -0.5f), sin(xx * -0.5f), PI - xx,
+                                        cos(yy * -0.5f), sin(yy * -0.5f), PI - yy)); break;
                             } break;
 
                         }

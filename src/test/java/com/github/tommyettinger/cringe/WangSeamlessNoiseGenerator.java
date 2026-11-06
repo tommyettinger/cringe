@@ -124,8 +124,8 @@ public class WangSeamlessNoiseGenerator extends ApplicationAdapter {
                 Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                 for (int x = 0; x < w; x++) {
                     for (int y = 0; y < h; y++) {
-                        float xx = x * PI2 / (w-1);
-                        float yy = y * PI2 / (h-1);
+                        float xx = (x + 0.5f) * PI2 / w;
+                        float yy = (y + 0.5f) * PI2 / h;
 //                        float limiter = Math.min(tukeyWindow(xx), tukeyWindow(yy));
                         float color;
                         switch (v){

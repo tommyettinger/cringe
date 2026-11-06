@@ -132,6 +132,21 @@ public final class PointHasher {
     public static final int V6 = 0x10DAAD;
 
     /**
+     * A 32-bit point hash that smashes x into s using XOR and multiplications by harmonious numbers,
+     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
+     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
+     * been stripped down heavily, both for speed and because unless points are selected specifically to target
+     * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
+     * @param x x position, as an int
+     * @param s any int, a seed to be able to produce many hashes for a given point
+     * @return 32-bit hash of the x point with the given state s
+     */
+    public static int hashAll(int x, int s) {
+        s ^= x * X1;
+        return (s = (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493) ^ s >>> 11;
+    }
+    /**
      * A 32-bit point hash that smashes x and y into s using XOR and multiplications by harmonious numbers,
      * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
      * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
@@ -228,6 +243,21 @@ public final class PointHasher {
     }
 
     /**
+     * An 8-bit point hash that smashes x into s using XOR and multiplications by harmonious numbers,
+     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
+     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
+     * been stripped down heavily, both for speed and because unless points are selected specifically to target
+     * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
+     * @param x x position, as an int
+     * @param s any int, a seed to be able to produce many hashes for a given point
+     * @return 8-bit hash of the x point with the given state s
+     */
+    public static int hash256(int x, int s) {
+        s ^= x * X1;
+        return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493 >>> 24;
+    }
+    /**
      * An 8-bit point hash that smashes x and y into s using XOR and multiplications by harmonious numbers,
      * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
      * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
@@ -322,6 +352,21 @@ public final class PointHasher {
         return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493 >>> 24;
     }
 
+    /**
+     * A 5-bit point hash that smashes x into s using XOR and multiplications by harmonious numbers,
+     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
+     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
+     * been stripped down heavily, both for speed and because unless points are selected specifically to target
+     * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
+     * @param x x position, as an int
+     * @param s any int, a seed to be able to produce many hashes for a given point
+     * @return 5-bit hash of the x point with the given state s
+     */
+    public static int hash32(int x, int s) {
+        s ^= x * X1;
+        return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493 >>> 27;
+    }
     /**
      * A 5-bit point hash that smashes x and y into s using XOR and multiplications by harmonious numbers,
      * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
@@ -419,6 +464,21 @@ public final class PointHasher {
     }
 
     /**
+     * A 32-bit point hash that smashes pre-multiplied x into s using XOR,
+     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
+     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
+     * been stripped down heavily, both for speed and because unless points are selected specifically to target
+     * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
+     * @param x x position, as an int, pre-multiplied by {@link #X1}
+     * @param s any int, a seed to be able to produce many hashes for a given point
+     * @return 32-bit hash of the x point with the given state s
+     */
+    public static int hashPrimedAll(int x, int s) {
+        s ^= x;
+        return (s = (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493) ^ s >>> 11;
+    }
+    /**
      * A 32-bit point hash that smashes pre-multiplied x and y into s using XOR,
      * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
      * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
@@ -515,6 +575,21 @@ public final class PointHasher {
     }
 
     /**
+     * An 8-bit point hash that smashes pre-multiplied x into s using XOR,
+     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
+     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
+     * been stripped down heavily, both for speed and because unless points are selected specifically to target
+     * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
+     * @param x x position, as an int, pre-multiplied by {@link #X1}
+     * @param s any int, a seed to be able to produce many hashes for a given point
+     * @return 8-bit hash of the x point with the given state s
+     */
+    public static int hashPrimed256(int x, int s) {
+        s ^= x;
+        return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493 >>> 24;
+    }
+    /**
      * An 8-bit point hash that smashes pre-multiplied x and y into s using XOR,
      * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
      * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
@@ -609,6 +684,21 @@ public final class PointHasher {
         return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493 >>> 24;
     }
 
+    /**
+     * A 5-bit point hash that smashes pre-multiplied x into s using XOR,
+     * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for
+     * ints, and has slightly fewer collisions in a hash table of points. GWT-optimized. Inspired by Pelle Evensen's
+     * rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary hash used here has
+     * been stripped down heavily, both for speed and because unless points are selected specifically to target
+     * flaws in the hash, it doesn't need the intense resistance to bad inputs that rrxmrrxmsx_0 has.
+     * @param x x position, as an int, pre-multiplied by {@link #X1}
+     * @param s any int, a seed to be able to produce many hashes for a given point
+     * @return 5-bit hash of the x point with the given state s
+     */
+    public static int hashPrimed32(int x, int s) {
+        s ^= x;
+        return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493 >>> 27;
+    }
     /**
      * A 5-bit point hash that smashes pre-multiplied x and y into s using XOR,
      * then runs a simple unary hash on s and returns it. Has better performance than HastyPointHash, especially for

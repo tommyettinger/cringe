@@ -152,7 +152,7 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
     private static final OrderedMap<String, FloatToFloatFunction> windowingFunctions = new OrderedMap<>(3);
 
     static {
-//        windowingFunctions.put("Tukey", MultiSeamlessNoiseGenerator::tukeyWindow);
+        windowingFunctions.put("Tukey", MultiSeamlessNoiseGenerator::tukeyWindow);
 //        windowingFunctions.put("TukeyQuarter", MultiSeamlessNoiseGenerator::tukeyWindowQuarter);
 //        windowingFunctions.put("TukeyThird", MultiSeamlessNoiseGenerator::tukeyWindowThird);
         windowingFunctions.put("TukeyThirdHann", MultiSeamlessNoiseGenerator::tukeyWindowThirdHann);
@@ -199,14 +199,14 @@ public class MultiSeamlessNoiseGenerator extends ApplicationAdapter {
                     Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                     for (int x = 0; x < w; x++) {
                         for (int y = 0; y < h; y++) {
-                            float xx = x * PI2 / w;
-                            float yy = y * PI2 / h;
+                            float xx = (x + 0.5f) * PI2 / w;
+                            float yy = (y + 0.5f) * PI2 / h;
                             float limiter = Math.min(window.applyAsFloat(xx), window.applyAsFloat(yy));
                             float color = prepare.applyAsFloat(noise.getNoise(
                                     MathUtils.cos(xx), MathUtils.sin(xx),
                                     MathUtils.cos(yy), MathUtils.sin(yy),
-                                    limiter * LineWobble.wobble(xx, z),
-                                    limiter * LineWobble.wobble(yy, z)));
+                                    limiter * LineWobble.bicubicWobble(xx, z),
+                                    limiter * LineWobble.bicubicWobble(yy, z)));
                             p.setColor(color, color, color, 1f);
                             p.drawPixel(x, y);
                         }

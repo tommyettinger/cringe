@@ -115,7 +115,9 @@ public class WangSeamlessNoiseGenerator extends ApplicationAdapter {
         if (ACTUALLY_RENDER_PNG) {
             int w = width, h = height, seed = noise.getSeed();
             FileHandle mainPngFile = Gdx.files.local("out/noiseWang/" + noise.stringSerialize().replace('`', '-') + "_Wang.png");
+            FileHandle mainPngFile2 = Gdx.files.local("out/noiseWang/" + noise.stringSerialize().replace('`', '-') + "_Wang2.png");
             Pixmap mp = new Pixmap(w * 4, h * 4, Pixmap.Format.RGBA8888);
+            Pixmap mp2 = new Pixmap(w * 4, h * 4, Pixmap.Format.RGBA8888);
             for (int z = 0; z < 16; z++) {
 
                 FileHandle pngFile = Gdx.files.local("out/noiseWang/" + noise.stringSerialize().replace('`', '-') + "_" + z + ".png");
@@ -132,42 +134,42 @@ public class WangSeamlessNoiseGenerator extends ApplicationAdapter {
                             case 0: switch (u) {
                                 case 0:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), -PI,
                                         cos(yy), sin(yy), -PI)); break;
-                                case 1:  color = prepare.applyAsFloat(noise.getNoise(1 + sin(xx * 0.5f), sin(xx * 0.5f), xx - PI,
+                                case 1:  color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * 0.5f), xx - PI,
                                         cos(yy), sin(yy), -PI)); break;
                                 case 2:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), PI,
                                         cos(yy), sin(yy), -PI)); break;
-                                default: color = prepare.applyAsFloat(noise.getNoise(1 + sin(xx * -0.5f), sin(xx * -0.5f), PI - xx,
+                                default: color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * -0.5f), PI - xx,
                                         cos(yy), sin(yy), -PI)); break;
                             } break;
                             case 1: switch (u) {
                                 case 0:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), -PI,
-                                        1 + sin(yy * 0.5f), sin(yy * 0.5f), yy - PI)); break;
-                                case 1:  color = prepare.applyAsFloat(noise.getNoise(1 + sin(xx * 0.5f), sin(xx * 0.5f), xx - PI,
-                                        1 + sin(yy * 0.5f), sin(yy * 0.5f), yy - PI)); break;
+                                        1, sin(yy * 0.5f), yy - PI)); break;
+                                case 1:  color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * 0.5f), xx - PI,
+                                        1, sin(yy * 0.5f), yy - PI)); break;
                                 case 2:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), PI,
-                                        1 + sin(yy * 0.5f), sin(yy * 0.5f), yy - PI)); break;
-                                default: color = prepare.applyAsFloat(noise.getNoise(1 + sin(xx * -0.5f), sin(xx * -0.5f), PI - xx,
-                                        1 + sin(yy * 0.5f), sin(yy * 0.5f), yy - PI)); break;
+                                        1, sin(yy * 0.5f), yy - PI)); break;
+                                default: color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * -0.5f), PI - xx,
+                                        1, sin(yy * 0.5f), yy - PI)); break;
                             } break;
                             case 2: switch (u) {
                                 case 0:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), -PI,
                                         cos(yy), sin(yy), PI)); break;
-                                case 1:  color = prepare.applyAsFloat(noise.getNoise(1 + sin(xx * 0.5f), sin(xx * 0.5f), xx - PI,
+                                case 1:  color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * 0.5f), xx - PI,
                                         cos(yy), sin(yy), PI)); break;
                                 case 2:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), PI,
                                         cos(yy), sin(yy), PI)); break;
-                                default: color = prepare.applyAsFloat(noise.getNoise(1 + sin(xx * -0.5f), sin(xx * -0.5f), PI - xx,
+                                default: color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * -0.5f), PI - xx,
                                         cos(yy), sin(yy), PI)); break;
                             } break;
                             default: switch (u) {
                                 case 0:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), -PI,
-                                        1 + sin(yy * -0.5f), sin(yy * -0.5f), PI - yy)); break;
-                                case 1:  color = prepare.applyAsFloat(noise.getNoise(1 + sin(xx * 0.5f), sin(xx * 0.5f), xx - PI,
-                                        1 + sin(yy * -0.5f), sin(yy * -0.5f), PI - yy)); break;
+                                        1, sin(yy * -0.5f), PI - yy)); break;
+                                case 1:  color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * 0.5f), xx - PI,
+                                        1, sin(yy * -0.5f), PI - yy)); break;
                                 case 2:  color = prepare.applyAsFloat(noise.getNoise(cos(xx), sin(xx), PI,
-                                        1 + sin(yy * -0.5f), sin(yy * -0.5f), PI - yy)); break;
-                                default: color = prepare.applyAsFloat(noise.getNoise(1 + sin(xx * -0.5f), sin(xx * -0.5f), PI - xx,
-                                        1 + sin(yy * -0.5f), sin(yy * -0.5f), PI - yy)); break;
+                                        1, sin(yy * -0.5f), PI - yy)); break;
+                                default: color = prepare.applyAsFloat(noise.getNoise(1, sin(xx * -0.5f), PI - xx,
+                                        1, sin(yy * -0.5f), PI - yy)); break;
                             } break;
                         }
 
@@ -176,11 +178,13 @@ public class WangSeamlessNoiseGenerator extends ApplicationAdapter {
                     }
                 }
                 mp.drawPixmap(p, (z & 3) * w, (z >>> 2) * h);
+                mp2.drawPixmap(p, ((z < 4 ? ~z : z) & 3) * w, (z >>> 2) * h);
                 png.write(pngFile, p);
 
                 p.dispose();
             }
             png.write(mainPngFile, mp);
+            png.write(mainPngFile2, mp2);
             mp.dispose();
         }
     }

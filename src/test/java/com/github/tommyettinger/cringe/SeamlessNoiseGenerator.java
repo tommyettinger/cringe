@@ -49,6 +49,8 @@ public class SeamlessNoiseGenerator extends ApplicationAdapter {
     public interface FloatToFloatFunction {
         float applyAsFloat(float f);
     }
+    LoopyPerlinNoise raw = new LoopyPerlinNoise(123);
+
     RawNoise[] noises =
             new RawNoise[]{
 ////                    new CellularNoise(1),
@@ -63,7 +65,7 @@ public class SeamlessNoiseGenerator extends ApplicationAdapter {
 //                    new SorbetNoise(1, 3),
 //                    new ValueNoise(1),
 
-                    new LoopyPerlinNoise(123),
+                    raw
             };
 
 //            Serializer.getAll().toArray();
@@ -93,9 +95,9 @@ public class SeamlessNoiseGenerator extends ApplicationAdapter {
         png = new FastPNG();
         int seed = (TIME_SEED) ? (int)Scramblers.scramble(System.nanoTime()) : 1;
 
-        for(RawNoise rn : noises) {
-            noise.setWrapped(rn);
-            noise.setSeed(seed);
+//        for(RawNoise rn : noises) {
+        raw.edge = MathUtils.floor(scale);
+        noise.setWrapped(raw);
             for (int m = 0; m < ContinuousNoise.WARP; m++) {
                 noise.setMode(m);
                 for (int o = 1; o <= 3; o++) {
@@ -103,29 +105,36 @@ public class SeamlessNoiseGenerator extends ApplicationAdapter {
                     putMap();
                 }
             }
-        }
 
         Gdx.app.exit();
     }
 
     public void putMap() {
-        Gdx.files.local("out/noiseSeamless/").mkdirs();
-
-        FileHandle pngFile = Gdx.files.local("out/noiseSeamless/" + noise.stringSerialize().replace('`', '_') + ".png");
-
         if (ACTUALLY_RENDER_PNG) {
+            Gdx.files.local("out/noiseSeamless/").mkdirs();
             int w = width, h = height;
-            Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    float color = prepare.applyAsFloat(noise.getNoise(MathUtils.cos(x * PI2 / w), MathUtils.sin(x * PI2 / w), MathUtils.cos(y * PI2 / h), MathUtils.sin(y * PI2 / h)));
-                    p.setColor(color, color, color, 1f);
-                    p.drawPixel(x, y);
-                }
-            }
-            png.write(pngFile, p);
+            FileHandle mainPngFile = Gdx.files.local("out/noiseSeamless/" + noise.stringSerialize().replace('`', '_') + "_Main.png");
+            Pixmap mp = new Pixmap(w * 4, h * 4, Pixmap.Format.RGBA8888);
+            for (int s = 0; s < 16; s++) {
+                noise.setSeed(s);
 
-            p.dispose();
+                FileHandle pngFile = Gdx.files.local("out/noiseSeamless/" + noise.stringSerialize().replace('`', '_') + ".png");
+
+                Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
+                for (int x = 0; x < w; x++) {
+                    for (int y = 0; y < h; y++) {
+                        float color = prepare.applyAsFloat(noise.getNoise(MathUtils.cos(x * PI2 / w), MathUtils.sin(x * PI2 / w), MathUtils.cos(y * PI2 / h), MathUtils.sin(y * PI2 / h)));
+                        p.setColor(color, color, color, 1f);
+                        p.drawPixel(x, y);
+                    }
+                }
+                mp.drawPixmap(p, (s & 3) * w, (s >>> 2) * h);
+                png.write(pngFile, p);
+
+                p.dispose();
+            }
+            png.write(mainPngFile, mp);
+            mp.dispose();
         }
     }
 

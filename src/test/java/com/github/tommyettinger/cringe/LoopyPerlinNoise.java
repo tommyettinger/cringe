@@ -63,7 +63,7 @@ public class LoopyPerlinNoise extends RawNoise {
 
     public int seed;
 
-    public int edge = 1;
+    public float edge = 1;
 
     public LoopyPerlinNoise() {
         this(0x1337BEEF);
@@ -160,18 +160,18 @@ public class LoopyPerlinNoise extends RawNoise {
     }
     protected float gradCoord4D(int seed, int x, int y, int z, int w,
                                         float xd, float yd, float zd, float wd) {
-        final int hash = PointHasher.hash256(x, y, z, w, (x == edge || z == edge) ? -1111 : seed);
+        final int hash = PointHasher.hash256(x, y, z, w, (x >= edge || z >= edge) ? -1111 : seed);
         return xd * GRADIENTS_4D[hash] + yd * GRADIENTS_4D[hash + 1] + zd * GRADIENTS_4D[hash + 2] + wd * GRADIENTS_4D[hash + 3];
     }
     protected float gradCoord5D(int seed, int x, int y, int z, int w, int u,
                                         float xd, float yd, float zd, float wd, float ud) {
-        final int hash = PointHasher.hash256(x, y, z, w, u, (x == edge || z == edge) ? -1111 : seed);
+        final int hash = PointHasher.hash256(x, y, z, w, u, (x >= edge || z >= edge) ? -1111 : seed);
         return xd * GRADIENTS_5D[hash] + yd * GRADIENTS_5D[hash + 1] + zd * GRADIENTS_5D[hash + 2]
                 + wd * GRADIENTS_5D[hash + 3] + ud * GRADIENTS_5D[hash + 4];
     }
     protected float gradCoord6D(int seed, int x, int y, int z, int w, int u, int v,
                                         float xd, float yd, float zd, float wd, float ud, float vd) {
-        final int hash = PointHasher.hash256(x, y, z, w, u, v, (x == edge || z == edge) ? -1111 : seed);
+        final int hash = PointHasher.hash256(x, y, z, w, u, v, (x >= edge || z >= edge) ? -1111 : seed);
         return xd * GRADIENTS_6D[hash] + yd * GRADIENTS_6D[hash + 1] + zd * GRADIENTS_6D[hash + 2]
                 + wd * GRADIENTS_6D[hash + 3] + ud * GRADIENTS_6D[hash + 4] + vd * GRADIENTS_6D[hash + 5];
     }

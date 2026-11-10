@@ -44,24 +44,26 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.FBM;
 public class SeamlessNoiseGenerator extends ApplicationAdapter {
 
     private static final boolean ACTUALLY_RENDER_PNG = true;
-    private static final boolean TIME_SEED = true;
+    private static final boolean TIME_SEED = false;
 
     public interface FloatToFloatFunction {
         float applyAsFloat(float f);
     }
     RawNoise[] noises =
             new RawNoise[]{
-//                    new CellularNoise(1),
-                    new CyclicNoise(1, 3),
-                    new FoamNoise(1),
-                    new HoneyNoise(1),
-//                    new OpenSimplex2FastNoise(1),
-//                    new OpenSimplex2SmoothNoise(1),
-                    new PerlinNoise(1),
-                    new PerlueNoise(1),
-                    new SimplexNoise(1),
-                    new SorbetNoise(1, 3),
-                    new ValueNoise(1),
+////                    new CellularNoise(1),
+//                    new CyclicNoise(1, 3),
+//                    new FoamNoise(1),
+//                    new HoneyNoise(1),
+////                    new OpenSimplex2FastNoise(1),
+////                    new OpenSimplex2SmoothNoise(1),
+//                    new PerlinNoise(1),
+//                    new PerlueNoise(1),
+//                    new SimplexNoise(1),
+//                    new SorbetNoise(1, 3),
+//                    new ValueNoise(1),
+
+                    new LoopyPerlinNoise(123),
             };
 
 //            Serializer.getAll().toArray();

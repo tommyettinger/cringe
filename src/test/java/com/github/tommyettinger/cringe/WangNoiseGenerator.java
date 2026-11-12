@@ -94,7 +94,7 @@ public class WangNoiseGenerator extends ApplicationAdapter {
                 Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                 for (int x = 0; x < w; x++) {
                     for (int y = 0; y < h; y++) {
-                        float color = prepare.applyAsFloat(noise.getNoise(x, y));
+                        float color = prepare.applyAsFloat(noise.getNoise(x, y, 111.111f));
                         p.setColor(color, color, color, 1f);
                         p.drawPixel(x, y);
                     }

@@ -366,6 +366,7 @@ public class WangContinuousNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, float y, int seed) {
+        wrapped.setWangTile2D(seed);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, seed);
@@ -376,6 +377,7 @@ public class WangContinuousNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, int seed) {
+        wrapped.setWangTile3D(seed);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, seed);

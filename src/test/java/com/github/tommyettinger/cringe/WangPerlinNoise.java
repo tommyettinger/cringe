@@ -156,9 +156,8 @@ public class WangPerlinNoise extends RawNoise {
     }
 
     public void setWangTile2D(int index){
-        index &= 15;
         int i = index & 3;
-        int j = index >>> 2;
+        int j = index >>> 2 & 3;
         switch (i){
             case 0: altSeeds[0] = -1234; altSeeds[1] = -1234; break;
             case 1: altSeeds[0] = -1234; altSeeds[1] = -2345; break;
@@ -174,10 +173,9 @@ public class WangPerlinNoise extends RawNoise {
     }
 
     public void setWangTile3D(int index){
-        index &= 63;
         int i = index & 3;
         int j = index >>> 2 & 3;
-        int k = index >>> 4;
+        int k = index >>> 4 & 3;
         switch (i){
             case 0: altSeeds[0] = -1234; altSeeds[1] = -1234; break;
             case 1: altSeeds[0] = -1234; altSeeds[1] = -2345; break;
@@ -214,12 +212,12 @@ public class WangPerlinNoise extends RawNoise {
                                 float xd, float yd, float zd) {
         int crossed = 0;
         if(x <= loEdges[0]) {seed = altSeeds[0]; ++crossed;}
-        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed;}
+        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed; x -= hiEdges[0];}
         if(y <= loEdges[1]) {seed = altSeeds[2]; ++crossed;}
-        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed;}
+        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed; y -= hiEdges[1];}
         if(z <= loEdges[2]) {seed = altSeeds[4]; ++crossed;}
-        else if(z >= hiEdges[2]) {seed = altSeeds[5]; ++crossed;}
-        if(crossed > 1) seed = altSeeds[0];
+        else if(z >= hiEdges[2]) {seed = altSeeds[5]; ++crossed; z -= hiEdges[2];}
+        if(crossed > 1) seed = -crossed;
 
         final int hash = PointHasher.hash256(x, y, z, seed);
         return (xd * GRADIENTS_3D[hash] + yd * GRADIENTS_3D[hash + 1] + zd * GRADIENTS_3D[hash + 2]);

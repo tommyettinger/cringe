@@ -65,7 +65,8 @@ public class MultiSeedPerlinNoise extends RawNoise {
 
     public transient final int[] altSeeds = new int[12];
 
-    public transient final float[] edges = new float[12];
+    public transient final float[] loEdges = new float[6];
+    public transient final float[] hiEdges = new float[6];
 
     public MultiSeedPerlinNoise() {
         this(0x1337BEEF);
@@ -78,7 +79,8 @@ public class MultiSeedPerlinNoise extends RawNoise {
     public MultiSeedPerlinNoise(MultiSeedPerlinNoise other) {
         this.seed = other.seed;
         System.arraycopy(other.altSeeds, 0, this.altSeeds, 0, other.altSeeds.length);
-        System.arraycopy(other.edges, 0, this.edges, 0, other.edges.length);
+        System.arraycopy(other.loEdges, 0, this.loEdges, 0, other.loEdges.length);
+        System.arraycopy(other.hiEdges, 0, this.hiEdges, 0, other.hiEdges.length);
     }
 
     /**
@@ -142,10 +144,10 @@ public class MultiSeedPerlinNoise extends RawNoise {
     }
 
     /**
-     * Creates a copy of this PerlinNoise, which should be a deep copy for any mutable state but can be shallow for immutable
+     * Creates a copy of this MultiSeedPerlinNoise, which should be a deep copy for any mutable state but can be shallow for immutable
      * types such as functions. This almost always just calls a copy constructor.
      *
-     * @return a copy of this PerlinNoise
+     * @return a copy of this MultiSeedPerlinNoise
      */
     @Override
     public MultiSeedPerlinNoise copy() {
@@ -155,10 +157,10 @@ public class MultiSeedPerlinNoise extends RawNoise {
     protected float gradCoord2D(int seed, int x, int y,
                                 float xd, float yd) {
         int crossed = 0;
-        if(x <= edges[0]) {seed = altSeeds[0]; ++crossed;}
-        else if(x >= edges[1]) {seed = altSeeds[1]; ++crossed;}
-        if(y <= edges[2]) {seed = altSeeds[2]; ++crossed;}
-        else if(y >= edges[3]) {seed = altSeeds[3]; ++crossed;}
+        if(x <= loEdges[0]) {seed = altSeeds[0]; ++crossed;}
+        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed;}
+        if(y <= loEdges[1]) {seed = altSeeds[2]; ++crossed;}
+        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed;}
         if(crossed > 1) seed = altSeeds[0];
 
         final int hash = PointHasher.hash256(x, y, seed);
@@ -167,12 +169,12 @@ public class MultiSeedPerlinNoise extends RawNoise {
     protected float gradCoord3D(int seed, int x, int y, int z,
                                 float xd, float yd, float zd) {
         int crossed = 0;
-        if(x <= edges[0]) {seed = altSeeds[0]; ++crossed;}
-        else if(x >= edges[1]) {seed = altSeeds[1]; ++crossed;}
-        if(y <= edges[2]) {seed = altSeeds[2]; ++crossed;}
-        else if(y >= edges[3]) {seed = altSeeds[3]; ++crossed;}
-        if(z <= edges[4]) {seed = altSeeds[4]; ++crossed;}
-        else if(z >= edges[5]) {seed = altSeeds[5]; ++crossed;}
+        if(x <= loEdges[0]) {seed = altSeeds[0]; ++crossed;}
+        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed;}
+        if(y <= loEdges[1]) {seed = altSeeds[2]; ++crossed;}
+        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed;}
+        if(z <= loEdges[2]) {seed = altSeeds[4]; ++crossed;}
+        else if(z >= hiEdges[2]) {seed = altSeeds[5]; ++crossed;}
         if(crossed > 1) seed = altSeeds[0];
 
         final int hash = PointHasher.hash256(x, y, z, seed);
@@ -181,14 +183,14 @@ public class MultiSeedPerlinNoise extends RawNoise {
     protected float gradCoord4D(int seed, int x, int y, int z, int w,
                                 float xd, float yd, float zd, float wd) {
         int crossed = 0;
-        if(x <= edges[0]) {seed = altSeeds[0]; ++crossed;}
-        else if(x >= edges[1]) {seed = altSeeds[1]; ++crossed;}
-        if(y <= edges[2]) {seed = altSeeds[2]; ++crossed;}
-        else if(y >= edges[3]) {seed = altSeeds[3]; ++crossed;}
-        if(z <= edges[4]) {seed = altSeeds[4]; ++crossed;}
-        else if(z >= edges[5]) {seed = altSeeds[5]; ++crossed;}
-        if(w <= edges[6]) {seed = altSeeds[6]; ++crossed;}
-        else if(w >= edges[7]) {seed = altSeeds[7]; ++crossed;}
+        if(x <= loEdges[0]) {seed = altSeeds[0]; ++crossed;}
+        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed;}
+        if(y <= loEdges[1]) {seed = altSeeds[2]; ++crossed;}
+        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed;}
+        if(z <= loEdges[2]) {seed = altSeeds[4]; ++crossed;}
+        else if(z >= hiEdges[2]) {seed = altSeeds[5]; ++crossed;}
+        if(w <= loEdges[3]) {seed = altSeeds[6]; ++crossed;}
+        else if(w >= hiEdges[3]) {seed = altSeeds[7]; ++crossed;}
         if(crossed > 1) seed = altSeeds[0];
 
         final int hash = PointHasher.hash256(x, y, z, w, seed);
@@ -197,16 +199,16 @@ public class MultiSeedPerlinNoise extends RawNoise {
     protected float gradCoord5D(int seed, int x, int y, int z, int w, int u,
                                 float xd, float yd, float zd, float wd, float ud) {
         int crossed = 0;
-        if(x <= edges[0]) {seed = altSeeds[0]; ++crossed;}
-        else if(x >= edges[1]) {seed = altSeeds[1]; ++crossed;}
-        if(y <= edges[2]) {seed = altSeeds[2]; ++crossed;}
-        else if(y >= edges[3]) {seed = altSeeds[3]; ++crossed;}
-        if(z <= edges[4]) {seed = altSeeds[4]; ++crossed;}
-        else if(z >= edges[5]) {seed = altSeeds[5]; ++crossed;}
-        if(w <= edges[6]) {seed = altSeeds[6]; ++crossed;}
-        else if(w >= edges[7]) {seed = altSeeds[7]; ++crossed;}
-        if(u <= edges[8]) {seed = altSeeds[8]; ++crossed;}
-        else if(u >= edges[9]) {seed = altSeeds[9]; ++crossed;}
+        if(x <= loEdges[0]) {seed = altSeeds[0]; ++crossed;}
+        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed;}
+        if(y <= loEdges[1]) {seed = altSeeds[2]; ++crossed;}
+        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed;}
+        if(z <= loEdges[2]) {seed = altSeeds[4]; ++crossed;}
+        else if(z >= hiEdges[2]) {seed = altSeeds[5]; ++crossed;}
+        if(w <= loEdges[3]) {seed = altSeeds[6]; ++crossed;}
+        else if(w >= hiEdges[3]) {seed = altSeeds[7]; ++crossed;}
+        if(u <= loEdges[4]) {seed = altSeeds[8]; ++crossed;}
+        else if(u >= hiEdges[4]) {seed = altSeeds[9]; ++crossed;}
         if(crossed > 1) seed = altSeeds[0];
 
         final int hash = PointHasher.hash256(x, y, z, w, u, seed);
@@ -216,18 +218,18 @@ public class MultiSeedPerlinNoise extends RawNoise {
     protected float gradCoord6D(int seed, int x, int y, int z, int w, int u, int v,
                                 float xd, float yd, float zd, float wd, float ud, float vd) {
         int crossed = 0;
-        if(x <= edges[0]) {seed = altSeeds[0]; ++crossed;}
-        else if(x >= edges[1]) {seed = altSeeds[1]; ++crossed;}
-        if(y <= edges[2]) {seed = altSeeds[2]; ++crossed;}
-        else if(y >= edges[3]) {seed = altSeeds[3]; ++crossed;}
-        if(z <= edges[4]) {seed = altSeeds[4]; ++crossed;}
-        else if(z >= edges[5]) {seed = altSeeds[5]; ++crossed;}
-        if(w <= edges[6]) {seed = altSeeds[6]; ++crossed;}
-        else if(w >= edges[7]) {seed = altSeeds[7]; ++crossed;}
-        if(u <= edges[8]) {seed = altSeeds[8]; ++crossed;}
-        else if(u >= edges[9]) {seed = altSeeds[9]; ++crossed;}
-        if(v <= edges[10]) {seed = altSeeds[10]; ++crossed;}
-        else if(v >= edges[11]) {seed = altSeeds[11]; ++crossed;}
+        if(x <= loEdges[0]) {seed = altSeeds[0]; ++crossed;}
+        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed;}
+        if(y <= loEdges[1]) {seed = altSeeds[2]; ++crossed;}
+        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed;}
+        if(z <= loEdges[2]) {seed = altSeeds[4]; ++crossed;}
+        else if(z >= hiEdges[2]) {seed = altSeeds[5]; ++crossed;}
+        if(w <= loEdges[3]) {seed = altSeeds[6]; ++crossed;}
+        else if(w >= hiEdges[3]) {seed = altSeeds[7]; ++crossed;}
+        if(u <= loEdges[4]) {seed = altSeeds[8]; ++crossed;}
+        else if(u >= hiEdges[4]) {seed = altSeeds[9]; ++crossed;}
+        if(v <= loEdges[5]) {seed = altSeeds[10]; ++crossed;}
+        else if(v >= hiEdges[5]) {seed = altSeeds[11]; ++crossed;}
         if(crossed > 1) seed = altSeeds[0];
 
         final int hash = PointHasher.hash256(x, y, z, w, u, v, seed);
@@ -660,7 +662,7 @@ public class MultiSeedPerlinNoise extends RawNoise {
     /**
      * Produces a String that describes everything needed to recreate this INoise in full. This String can be read back
      * in by {@link #stringDeserialize(String)} to reassign the described state to another INoise.
-     * @return a String that describes this PerlinNoise for serialization
+     * @return a String that describes this MultiSeedPerlinNoise for serialization
      */
     @Override
     public String stringSerialize() {
@@ -668,11 +670,11 @@ public class MultiSeedPerlinNoise extends RawNoise {
     }
 
     /**
-     * Given a serialized String produced by {@link #stringSerialize()}, reassigns this PerlinNoise to have the
-     * described state from the given String. The serialized String must have been produced by a PerlinNoise.
+     * Given a serialized String produced by {@link #stringSerialize()}, reassigns this MultiSeedPerlinNoise to have the
+     * described state from the given String. The serialized String must have been produced by a MultiSeedPerlinNoise.
      *
      * @param data a serialized String, typically produced by {@link #stringSerialize()}
-     * @return this PerlinNoise, after being modified (if possible)
+     * @return this MultiSeedPerlinNoise, after being modified (if possible)
      */
     @Override
     public MultiSeedPerlinNoise stringDeserialize(String data) {

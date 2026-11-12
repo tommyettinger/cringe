@@ -19,6 +19,7 @@ package com.github.tommyettinger.cringe;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Arrays;
 
 import static com.badlogic.gdx.math.MathUtils.floor;
 import static com.badlogic.gdx.math.MathUtils.lerp;
@@ -90,7 +91,7 @@ public class MultiSeedPerlinNoise extends RawNoise {
      */
     @Override
     public int getMinDimension() {
-        return 1;
+        return 2;
     }
 
     /**
@@ -757,5 +758,10 @@ public class MultiSeedPerlinNoise extends RawNoise {
     @Override
     public String toString() {
         return "MultiSeedPerlinNoise{seed=" + seed + '}';
+    }
+
+    public void setEdge(float edge) {
+        Arrays.fill(loEdges, 0);
+        Arrays.fill(hiEdges, edge);
     }
 }

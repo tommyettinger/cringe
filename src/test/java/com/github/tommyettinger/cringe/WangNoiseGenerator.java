@@ -22,12 +22,10 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tommyettinger.anim8.FastPNG;
 
-import static com.badlogic.gdx.math.MathUtils.PI2;
 import static com.github.tommyettinger.cringe.ContinuousNoise.FBM;
 
 /**
@@ -44,7 +42,7 @@ public class WangNoiseGenerator extends ApplicationAdapter {
     public interface FloatToFloatFunction {
         float applyAsFloat(float f);
     }
-    MultiSeedPerlinNoise raw = new MultiSeedPerlinNoise(123);
+    WangPerlinNoise raw = new WangPerlinNoise(123);
 
     int seed = 0;
     private static final float scale = 0x1p-6f;

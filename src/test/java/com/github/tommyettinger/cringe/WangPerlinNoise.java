@@ -41,8 +41,8 @@ import static com.github.tommyettinger.cringe.GradientVectors.*;
  * Perlin noise is rather fast, especially in 2D and 3D, and keeps a decent quality in higher dimensions. It tends to
  * look drastically better if you use it with 2 or more octaves than if you only use 1 octave.
  */
-public class MultiSeedPerlinNoise extends RawNoise {
-    public static final MultiSeedPerlinNoise instance = new MultiSeedPerlinNoise();
+public class WangPerlinNoise extends RawNoise {
+    public static final WangPerlinNoise instance = new WangPerlinNoise();
 
     public static final float SCALE2 = 1.41421330f;
     public static final float SCALE3 = 1.15470030f;
@@ -66,18 +66,18 @@ public class MultiSeedPerlinNoise extends RawNoise {
 
     public transient final int[] altSeeds = new int[12];
 
-    public transient final float[] loEdges = new float[6];
-    public transient final float[] hiEdges = new float[6];
+    public transient final int[] loEdges = new int[6];
+    public transient final int[] hiEdges = new int[6];
 
-    public MultiSeedPerlinNoise() {
+    public WangPerlinNoise() {
         this(0x1337BEEF);
     }
 
-    public MultiSeedPerlinNoise(final int seed) {
+    public WangPerlinNoise(final int seed) {
         this.seed = seed;
     }
 
-    public MultiSeedPerlinNoise(MultiSeedPerlinNoise other) {
+    public WangPerlinNoise(WangPerlinNoise other) {
         this.seed = other.seed;
         System.arraycopy(other.altSeeds, 0, this.altSeeds, 0, other.altSeeds.length);
         System.arraycopy(other.loEdges, 0, this.loEdges, 0, other.loEdges.length);
@@ -135,24 +135,24 @@ public class MultiSeedPerlinNoise extends RawNoise {
     }
 
     /**
-     * Returns the constant String {@code "MultiSeedPerlinNoise"} that identifies this in serialized Strings.
+     * Returns the constant String {@code "WangPerlinNoise"} that identifies this in serialized Strings.
      *
-     * @return a short String constant that identifies this INoise type, {@code "MultiSeedPerlinNoise"}
+     * @return a short String constant that identifies this INoise type, {@code "WangPerlinNoise"}
      */
     @Override
     public String getTag() {
-        return "MultiSeedPerlinNoise";
+        return "WangPerlinNoise";
     }
 
     /**
-     * Creates a copy of this MultiSeedPerlinNoise, which should be a deep copy for any mutable state but can be shallow for immutable
+     * Creates a copy of this WangPerlinNoise, which should be a deep copy for any mutable state but can be shallow for immutable
      * types such as functions. This almost always just calls a copy constructor.
      *
-     * @return a copy of this MultiSeedPerlinNoise
+     * @return a copy of this WangPerlinNoise
      */
     @Override
-    public MultiSeedPerlinNoise copy() {
-        return new MultiSeedPerlinNoise(this.seed);
+    public WangPerlinNoise copy() {
+        return new WangPerlinNoise(this.seed);
     }
 
     public void setWangTile2D(int index){
@@ -202,9 +202,9 @@ public class MultiSeedPerlinNoise extends RawNoise {
                                 float xd, float yd) {
         int crossed = 0;
         if(x <= loEdges[0]) {seed = altSeeds[0]; ++crossed;}
-        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed;}
+        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed; x -= hiEdges[0];}
         if(y <= loEdges[1]) {seed = altSeeds[2]; ++crossed;}
-        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed;}
+        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed; y -= hiEdges[1];}
         if(crossed > 1) seed = altSeeds[0];
 
         final int hash = PointHasher.hash256(x, y, seed);
@@ -706,7 +706,7 @@ public class MultiSeedPerlinNoise extends RawNoise {
     /**
      * Produces a String that describes everything needed to recreate this INoise in full. This String can be read back
      * in by {@link #stringDeserialize(String)} to reassign the described state to another INoise.
-     * @return a String that describes this MultiSeedPerlinNoise for serialization
+     * @return a String that describes this WangPerlinNoise for serialization
      */
     @Override
     public String stringSerialize() {
@@ -714,20 +714,20 @@ public class MultiSeedPerlinNoise extends RawNoise {
     }
 
     /**
-     * Given a serialized String produced by {@link #stringSerialize()}, reassigns this MultiSeedPerlinNoise to have the
-     * described state from the given String. The serialized String must have been produced by a MultiSeedPerlinNoise.
+     * Given a serialized String produced by {@link #stringSerialize()}, reassigns this WangPerlinNoise to have the
+     * described state from the given String. The serialized String must have been produced by a WangPerlinNoise.
      *
      * @param data a serialized String, typically produced by {@link #stringSerialize()}
-     * @return this MultiSeedPerlinNoise, after being modified (if possible)
+     * @return this WangPerlinNoise, after being modified (if possible)
      */
     @Override
-    public MultiSeedPerlinNoise stringDeserialize(String data) {
+    public WangPerlinNoise stringDeserialize(String data) {
         seed = MathSupport.intFromDec(data, 1, data.indexOf('`', 1));
         return this;
     }
 
-    public static MultiSeedPerlinNoise recreateFromString(String data) {
-        return new MultiSeedPerlinNoise(MathSupport.intFromDec(data, 1, data.indexOf('`', 1)));
+    public static WangPerlinNoise recreateFromString(String data) {
+        return new WangPerlinNoise(MathSupport.intFromDec(data, 1, data.indexOf('`', 1)));
     }
 
     @GwtIncompatible
@@ -745,7 +745,7 @@ public class MultiSeedPerlinNoise extends RawNoise {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MultiSeedPerlinNoise that = (MultiSeedPerlinNoise) o;
+        WangPerlinNoise that = (WangPerlinNoise) o;
 
         return (seed == that.seed);
     }
@@ -757,10 +757,10 @@ public class MultiSeedPerlinNoise extends RawNoise {
 
     @Override
     public String toString() {
-        return "MultiSeedPerlinNoise{seed=" + seed + '}';
+        return "WangPerlinNoise{seed=" + seed + '}';
     }
 
-    public void setEdge(float edge) {
+    public void setEdge(int edge) {
         Arrays.fill(loEdges, 0);
         Arrays.fill(hiEdges, edge);
     }

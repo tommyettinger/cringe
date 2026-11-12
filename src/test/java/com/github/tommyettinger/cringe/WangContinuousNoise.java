@@ -58,28 +58,29 @@ public class WangContinuousNoise extends RawNoise {
      */
     public static final String[] MODES = {"FBM", "Billow", "Ridged"};
 
-    public MultiSeedPerlinNoise wrapped;
+    public WangPerlinNoise wrapped;
     public float frequency;
     public int mode;
     protected int octaves;
     private float tileSize = 256;
 
     public WangContinuousNoise() {
-        this(new MultiSeedPerlinNoise(123), 123, 0.03125f, FBM, 1);
+        this(new WangPerlinNoise(123), 123, 0.03125f, FBM, 1);
 
     }
 
-    public WangContinuousNoise(MultiSeedPerlinNoise toWrap){
+    public WangContinuousNoise(WangPerlinNoise toWrap){
         this(toWrap, toWrap.getSeed(), 0.03125f, FBM, 1);
     }
 
-    public WangContinuousNoise(MultiSeedPerlinNoise toWrap, float frequency, int mode, int octaves){
+    public WangContinuousNoise(WangPerlinNoise toWrap, float frequency, int mode, int octaves){
         this(toWrap, toWrap.getSeed(), frequency, mode, octaves);
     }
-    public WangContinuousNoise(MultiSeedPerlinNoise toWrap, int seed, float frequency, int mode, int octaves){
+    public WangContinuousNoise(WangPerlinNoise toWrap, int seed, float frequency, int mode, int octaves){
         wrapped = toWrap;
         setSeed(seed);
         this.frequency = frequency;
+        tileSize *= frequency;
         this.mode = mode;
         this.octaves = octaves;
     }
@@ -92,11 +93,11 @@ public class WangContinuousNoise extends RawNoise {
         setFractalOctaves(other.getFractalOctaves());
     }
 
-    public MultiSeedPerlinNoise getWrapped() {
+    public WangPerlinNoise getWrapped() {
         return wrapped;
     }
 
-    public void setWrapped(MultiSeedPerlinNoise wrapped) {
+    public void setWrapped(WangPerlinNoise wrapped) {
         this.wrapped = wrapped;
     }
 
@@ -207,7 +208,7 @@ public class WangContinuousNoise extends RawNoise {
     @Override
     public WangContinuousNoise stringDeserialize(String data) {
         int pos = data.indexOf('`', data.indexOf('`', 2) + 1)+1;
-        setWrapped(new MultiSeedPerlinNoise().stringDeserialize(data.substring(data.indexOf('`', 2))));//Serializer.deserialize(data.substring(1, pos)));
+        setWrapped(new WangPerlinNoise().stringDeserialize(data.substring(data.indexOf('`', 2))));//Serializer.deserialize(data.substring(1, pos)));
         setFrequency(MathSupport.floatFromDec(data, pos+1, pos = data.indexOf('~', pos+2)));
         setMode(MathSupport.intFromDec(data, pos+1, pos = data.indexOf('~', pos+2)));
         setOctaves(MathSupport.intFromDec(data, pos+1, pos = data.indexOf('`', pos+2)));
@@ -235,7 +236,7 @@ public class WangContinuousNoise extends RawNoise {
      */
     @GwtIncompatible
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        setWrapped((MultiSeedPerlinNoise) in.readObject());
+        setWrapped((WangPerlinNoise) in.readObject());
         setFrequency(in.readFloat());
         setMode(in.readInt());
         setOctaves(in.readInt());

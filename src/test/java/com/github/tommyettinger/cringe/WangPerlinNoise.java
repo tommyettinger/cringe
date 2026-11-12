@@ -40,7 +40,7 @@ import static com.github.tommyettinger.cringe.GradientVectors.*;
  * Perlin noise is rather fast, especially in 2D and 3D, and keeps a decent quality in higher dimensions. It tends to
  * look drastically better if you use it with 2 or more octaves than if you only use 1 octave.
  */
-public class WangPerlinNoise extends RawNoise {
+public class WangPerlinNoise extends WangRawNoise {
     public static final WangPerlinNoise instance = new WangPerlinNoise();
 
     public static final float SCALE2 = 1.41421330f;

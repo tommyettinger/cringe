@@ -37,12 +37,12 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.FBM;
 public class WangNoiseGenerator extends ApplicationAdapter {
 
     private static final boolean ACTUALLY_RENDER_PNG = true;
-    private static final boolean TIME_SEED = false;
+    private static final boolean TIME_SEED = true;
 
     public interface FloatToFloatFunction {
         float applyAsFloat(float f);
     }
-    WangPerlinNoise raw = new WangPerlinNoise(123);
+    WangRawNoise raw = new WangPerlinNoise(123);
 
     int seed = 0;
     private static final float scale = 0x1p-6f;
@@ -88,14 +88,14 @@ public class WangNoiseGenerator extends ApplicationAdapter {
             FileHandle mainPngFile = Gdx.files.local("out/noiseWang/" + noise.stringSerialize().replace('`', '_') + "_Wang.png");
             Pixmap mp = new Pixmap(w * 4, h * 4, Pixmap.Format.RGBA8888);
             for (int s = 0; s < 16; s++) {
-                noise.setSeed(seed + s);
+                noise.setSeed((seed & -16) + s);
 
                 FileHandle pngFile = Gdx.files.local("out/noiseWang/" + noise.stringSerialize().replace('`', '_') + ".png");
 
                 Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                 for (int x = 0; x < w; x++) {
                     for (int y = 0; y < h; y++) {
-                        float color = prepare.applyAsFloat(noise.getNoise(x, y, 100f, 101f, 102f, 103f));
+                        float color = prepare.applyAsFloat(noise.getNoise(x, y, 100f, 101f, 102f));
                         p.setColor(color, color, color, 1f);
                         p.drawPixel(x, y);
                     }

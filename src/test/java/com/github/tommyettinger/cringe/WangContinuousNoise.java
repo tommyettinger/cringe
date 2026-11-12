@@ -184,7 +184,7 @@ public class WangContinuousNoise extends RawNoise {
 
     @Override
     public int getMaxDimension() {
-        return 3;
+        return 6;
     }
 
     @Override
@@ -290,7 +290,7 @@ public class WangContinuousNoise extends RawNoise {
     @Override
     public float getNoise(float x, float y) {
         final int seed = wrapped.getSeed();
-        wrapped.setWangTile2D(seed);
+        setWangTile2D(seed, wrapped);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, seed);
@@ -302,7 +302,7 @@ public class WangContinuousNoise extends RawNoise {
     @Override
     public float getNoise(float x, float y, float z) {
         final int seed = wrapped.getSeed();
-        wrapped.setWangTile3D(seed);
+        setWangTile3D(seed, wrapped);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, seed);
@@ -314,7 +314,7 @@ public class WangContinuousNoise extends RawNoise {
     @Override
     public float getNoise(float x, float y, float z, float w) {
         final int seed = wrapped.getSeed();
-        wrapped.setWangTile4D(seed);
+        setWangTile4D(seed, wrapped);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, seed);
@@ -326,7 +326,7 @@ public class WangContinuousNoise extends RawNoise {
     @Override
     public float getNoise(float x, float y, float z, float w, float u) {
         final int seed = wrapped.getSeed();
-        wrapped.setWangTile5D(seed);
+        setWangTile5D(seed, wrapped);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
@@ -338,7 +338,7 @@ public class WangContinuousNoise extends RawNoise {
     @Override
     public float getNoise(float x, float y, float z, float w, float u, float v) {
         final int seed = wrapped.getSeed();
-        wrapped.setWangTile6D(seed);
+        setWangTile6D(seed, wrapped);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, v * frequency, seed);
@@ -369,7 +369,7 @@ public class WangContinuousNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, float y, int seed) {
-        wrapped.setWangTile2D(seed);
+        setWangTile2D(seed, wrapped);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, seed);
@@ -380,7 +380,7 @@ public class WangContinuousNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, int seed) {
-        wrapped.setWangTile3D(seed);
+        setWangTile3D(seed, wrapped);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, seed);
@@ -391,7 +391,7 @@ public class WangContinuousNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, int seed) {
-        wrapped.setWangTile4D(seed);
+        setWangTile4D(seed, wrapped);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, seed);
@@ -402,7 +402,7 @@ public class WangContinuousNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, int seed) {
-        wrapped.setWangTile5D(seed);
+        setWangTile5D(seed, wrapped);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
@@ -413,7 +413,7 @@ public class WangContinuousNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
-        wrapped.setWangTile6D(seed);
+        setWangTile6D(seed, wrapped);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, v * frequency, seed);
@@ -743,4 +743,167 @@ public class WangContinuousNoise extends RawNoise {
         }
         return sum / correction - 1f;
     }
+
+
+
+    public static void setWangTile2D(int index, WangPerlinNoise noise){
+        final int[] altSeeds = noise.getAltSeeds();
+        int i = index & 3;
+        int j = index >>> 2 & 3;
+        switch (i){
+            case 0: altSeeds[0] = -1234; altSeeds[1] = -1234; break;
+            case 1: altSeeds[0] = -1234; altSeeds[1] = -2345; break;
+            case 2: altSeeds[0] = -2345; altSeeds[1] = -2345; break;
+            case 3: altSeeds[0] = -2345; altSeeds[1] = -1234; break;
+        }
+        switch (j){
+            case 0: altSeeds[2] = -1234; altSeeds[3] = -1234; break;
+            case 1: altSeeds[2] = -1234; altSeeds[3] = -2345; break;
+            case 2: altSeeds[2] = -2345; altSeeds[3] = -2345; break;
+            case 3: altSeeds[2] = -2345; altSeeds[3] = -1234; break;
+        }
+    }
+
+    public static void setWangTile3D(int index, WangPerlinNoise noise){
+        final int[] altSeeds = noise.getAltSeeds();
+        int i = index & 3;
+        int j = index >>> 2 & 3;
+        int k = index >>> 4 & 3;
+        switch (i){
+            case 0: altSeeds[0] = -1234; altSeeds[1] = -1234; break;
+            case 1: altSeeds[0] = -1234; altSeeds[1] = -2345; break;
+            case 2: altSeeds[0] = -2345; altSeeds[1] = -2345; break;
+            case 3: altSeeds[0] = -2345; altSeeds[1] = -1234; break;
+        }
+        switch (j){
+            case 0: altSeeds[2] = -1234; altSeeds[3] = -1234; break;
+            case 1: altSeeds[2] = -1234; altSeeds[3] = -2345; break;
+            case 2: altSeeds[2] = -2345; altSeeds[3] = -2345; break;
+            case 3: altSeeds[2] = -2345; altSeeds[3] = -1234; break;
+        }
+        switch (k){
+            case 0: altSeeds[4] = -1234; altSeeds[5] = -1234; break;
+            case 1: altSeeds[4] = -1234; altSeeds[5] = -2345; break;
+            case 2: altSeeds[4] = -2345; altSeeds[5] = -2345; break;
+            case 3: altSeeds[4] = -2345; altSeeds[5] = -1234; break;
+        }
+    }
+
+    public static void setWangTile4D(int index, WangPerlinNoise noise){
+        final int[] altSeeds = noise.getAltSeeds();
+        int i = index & 3;
+        int j = index >>> 2 & 3;
+        int k = index >>> 4 & 3;
+        int l = index >>> 6 & 3;
+        switch (i){
+            case 0: altSeeds[0] = -1234; altSeeds[1] = -1234; break;
+            case 1: altSeeds[0] = -1234; altSeeds[1] = -2345; break;
+            case 2: altSeeds[0] = -2345; altSeeds[1] = -2345; break;
+            case 3: altSeeds[0] = -2345; altSeeds[1] = -1234; break;
+        }
+        switch (j){
+            case 0: altSeeds[2] = -1234; altSeeds[3] = -1234; break;
+            case 1: altSeeds[2] = -1234; altSeeds[3] = -2345; break;
+            case 2: altSeeds[2] = -2345; altSeeds[3] = -2345; break;
+            case 3: altSeeds[2] = -2345; altSeeds[3] = -1234; break;
+        }
+        switch (k){
+            case 0: altSeeds[4] = -1234; altSeeds[5] = -1234; break;
+            case 1: altSeeds[4] = -1234; altSeeds[5] = -2345; break;
+            case 2: altSeeds[4] = -2345; altSeeds[5] = -2345; break;
+            case 3: altSeeds[4] = -2345; altSeeds[5] = -1234; break;
+        }
+        switch (l){
+            case 0: altSeeds[6] = -1234; altSeeds[7] = -1234; break;
+            case 1: altSeeds[6] = -1234; altSeeds[7] = -2345; break;
+            case 2: altSeeds[6] = -2345; altSeeds[7] = -2345; break;
+            case 3: altSeeds[6] = -2345; altSeeds[7] = -1234; break;
+        }
+    }
+
+    public static void setWangTile5D(int index, WangPerlinNoise noise){
+        final int[] altSeeds = noise.getAltSeeds();
+        int i = index & 3;
+        int j = index >>> 2 & 3;
+        int k = index >>> 4 & 3;
+        int l = index >>> 6 & 3;
+        int m = index >>> 8 & 3;
+        switch (i){
+            case 0: altSeeds[0] = -1234; altSeeds[1] = -1234; break;
+            case 1: altSeeds[0] = -1234; altSeeds[1] = -2345; break;
+            case 2: altSeeds[0] = -2345; altSeeds[1] = -2345; break;
+            case 3: altSeeds[0] = -2345; altSeeds[1] = -1234; break;
+        }
+        switch (j){
+            case 0: altSeeds[2] = -1234; altSeeds[3] = -1234; break;
+            case 1: altSeeds[2] = -1234; altSeeds[3] = -2345; break;
+            case 2: altSeeds[2] = -2345; altSeeds[3] = -2345; break;
+            case 3: altSeeds[2] = -2345; altSeeds[3] = -1234; break;
+        }
+        switch (k){
+            case 0: altSeeds[4] = -1234; altSeeds[5] = -1234; break;
+            case 1: altSeeds[4] = -1234; altSeeds[5] = -2345; break;
+            case 2: altSeeds[4] = -2345; altSeeds[5] = -2345; break;
+            case 3: altSeeds[4] = -2345; altSeeds[5] = -1234; break;
+        }
+        switch (l){
+            case 0: altSeeds[6] = -1234; altSeeds[7] = -1234; break;
+            case 1: altSeeds[6] = -1234; altSeeds[7] = -2345; break;
+            case 2: altSeeds[6] = -2345; altSeeds[7] = -2345; break;
+            case 3: altSeeds[6] = -2345; altSeeds[7] = -1234; break;
+        }
+        switch (m){
+            case 0: altSeeds[8] = -1234; altSeeds[9] = -1234; break;
+            case 1: altSeeds[8] = -1234; altSeeds[9] = -2345; break;
+            case 2: altSeeds[8] = -2345; altSeeds[9] = -2345; break;
+            case 3: altSeeds[8] = -2345; altSeeds[9] = -1234; break;
+        }
+    }
+
+    public static void setWangTile6D(int index, WangPerlinNoise noise){
+        final int[] altSeeds = noise.getAltSeeds();
+        int i = index & 3;
+        int j = index >>> 2 & 3;
+        int k = index >>> 4 & 3;
+        int l = index >>> 6 & 3;
+        int m = index >>> 8 & 3;
+        int n = index >>> 10 & 3;
+        switch (i){
+            case 0: altSeeds[0] = -1234; altSeeds[1] = -1234; break;
+            case 1: altSeeds[0] = -1234; altSeeds[1] = -2345; break;
+            case 2: altSeeds[0] = -2345; altSeeds[1] = -2345; break;
+            case 3: altSeeds[0] = -2345; altSeeds[1] = -1234; break;
+        }
+        switch (j){
+            case 0: altSeeds[2] = -1234; altSeeds[3] = -1234; break;
+            case 1: altSeeds[2] = -1234; altSeeds[3] = -2345; break;
+            case 2: altSeeds[2] = -2345; altSeeds[3] = -2345; break;
+            case 3: altSeeds[2] = -2345; altSeeds[3] = -1234; break;
+        }
+        switch (k){
+            case 0: altSeeds[4] = -1234; altSeeds[5] = -1234; break;
+            case 1: altSeeds[4] = -1234; altSeeds[5] = -2345; break;
+            case 2: altSeeds[4] = -2345; altSeeds[5] = -2345; break;
+            case 3: altSeeds[4] = -2345; altSeeds[5] = -1234; break;
+        }
+        switch (l){
+            case 0: altSeeds[6] = -1234; altSeeds[7] = -1234; break;
+            case 1: altSeeds[6] = -1234; altSeeds[7] = -2345; break;
+            case 2: altSeeds[6] = -2345; altSeeds[7] = -2345; break;
+            case 3: altSeeds[6] = -2345; altSeeds[7] = -1234; break;
+        }
+        switch (m){
+            case 0: altSeeds[8] = -1234; altSeeds[9] = -1234; break;
+            case 1: altSeeds[8] = -1234; altSeeds[9] = -2345; break;
+            case 2: altSeeds[8] = -2345; altSeeds[9] = -2345; break;
+            case 3: altSeeds[8] = -2345; altSeeds[9] = -1234; break;
+        }
+        switch (n){
+            case 0: altSeeds[10] = -1234; altSeeds[11] = -1234; break;
+            case 1: altSeeds[10] = -1234; altSeeds[11] = -2345; break;
+            case 2: altSeeds[10] = -2345; altSeeds[11] = -2345; break;
+            case 3: altSeeds[10] = -2345; altSeeds[11] = -1234; break;
+        }
+    }
+
 }

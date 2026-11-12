@@ -52,6 +52,7 @@ public abstract class WangRawNoise extends RawNoise {
             NOISE_BY_TAG.put("(NO)", null); // for classes that cannot be serialized
             // TODO: register every type of Wang raw noise generator here, alphabetically
             register(new WangPerlinNoise(1));
+            register(new WangPerlueNoise(1));
         }
 
         /**

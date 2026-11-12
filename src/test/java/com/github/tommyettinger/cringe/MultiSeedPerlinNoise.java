@@ -154,6 +154,49 @@ public class MultiSeedPerlinNoise extends RawNoise {
         return new MultiSeedPerlinNoise(this.seed);
     }
 
+    public void setWangTile2D(int index){
+        index &= 15;
+        int i = index & 3;
+        int j = index >>> 2;
+        switch (i){
+            case 0: altSeeds[0] = -1234; altSeeds[1] = -1234; break;
+            case 1: altSeeds[0] = -1234; altSeeds[1] = -2345; break;
+            case 2: altSeeds[0] = -2345; altSeeds[1] = -2345; break;
+            case 3: altSeeds[0] = -2345; altSeeds[1] = -1234; break;
+        }
+        switch (j){
+            case 0: altSeeds[2] = -1234; altSeeds[3] = -1234; break;
+            case 1: altSeeds[2] = -1234; altSeeds[3] = -2345; break;
+            case 2: altSeeds[2] = -2345; altSeeds[3] = -2345; break;
+            case 3: altSeeds[2] = -2345; altSeeds[3] = -1234; break;
+        }
+    }
+
+    public void setWangTile3D(int index){
+        index &= 63;
+        int i = index & 3;
+        int j = index >>> 2 & 3;
+        int k = index >>> 4;
+        switch (i){
+            case 0: altSeeds[0] = -1234; altSeeds[1] = -1234; break;
+            case 1: altSeeds[0] = -1234; altSeeds[1] = -2345; break;
+            case 2: altSeeds[0] = -2345; altSeeds[1] = -2345; break;
+            case 3: altSeeds[0] = -2345; altSeeds[1] = -1234; break;
+        }
+        switch (j){
+            case 0: altSeeds[2] = -1234; altSeeds[3] = -1234; break;
+            case 1: altSeeds[2] = -1234; altSeeds[3] = -2345; break;
+            case 2: altSeeds[2] = -2345; altSeeds[3] = -2345; break;
+            case 3: altSeeds[2] = -2345; altSeeds[3] = -1234; break;
+        }
+        switch (k){
+            case 0: altSeeds[4] = -1234; altSeeds[5] = -1234; break;
+            case 1: altSeeds[4] = -1234; altSeeds[5] = -2345; break;
+            case 2: altSeeds[4] = -2345; altSeeds[5] = -2345; break;
+            case 3: altSeeds[4] = -2345; altSeeds[5] = -1234; break;
+        }
+    }
+
     protected float gradCoord2D(int seed, int x, int y,
                                 float xd, float yd) {
         int crossed = 0;

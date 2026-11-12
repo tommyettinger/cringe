@@ -84,6 +84,7 @@ public class WangNoiseGenerator extends ApplicationAdapter {
         if (ACTUALLY_RENDER_PNG) {
             Gdx.files.local("out/noiseWang/").mkdirs();
             int w = width, h = height;
+            noise.setSeed(seed);
             FileHandle mainPngFile = Gdx.files.local("out/noiseWang/" + noise.stringSerialize().replace('`', '_') + "_Wang.png");
             Pixmap mp = new Pixmap(w * 4, h * 4, Pixmap.Format.RGBA8888);
             for (int s = 0; s < 16; s++) {
@@ -94,7 +95,7 @@ public class WangNoiseGenerator extends ApplicationAdapter {
                 Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                 for (int x = 0; x < w; x++) {
                     for (int y = 0; y < h; y++) {
-                        float color = prepare.applyAsFloat(noise.getNoise(x, y, 111.111f));
+                        float color = prepare.applyAsFloat(noise.getNoise(x, y, 100f, 101f, 102f, 103f));
                         p.setColor(color, color, color, 1f);
                         p.drawPixel(x, y);
                     }

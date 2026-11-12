@@ -196,6 +196,120 @@ public class WangPerlinNoise extends RawNoise {
         }
     }
 
+    public void setWangTile4D(int index){
+        int i = index & 3;
+        int j = index >>> 2 & 3;
+        int k = index >>> 4 & 3;
+        int l = index >>> 6 & 3;
+        switch (i){
+            case 0: altSeeds[0] = -1234; altSeeds[1] = -1234; break;
+            case 1: altSeeds[0] = -1234; altSeeds[1] = -2345; break;
+            case 2: altSeeds[0] = -2345; altSeeds[1] = -2345; break;
+            case 3: altSeeds[0] = -2345; altSeeds[1] = -1234; break;
+        }
+        switch (j){
+            case 0: altSeeds[2] = -1234; altSeeds[3] = -1234; break;
+            case 1: altSeeds[2] = -1234; altSeeds[3] = -2345; break;
+            case 2: altSeeds[2] = -2345; altSeeds[3] = -2345; break;
+            case 3: altSeeds[2] = -2345; altSeeds[3] = -1234; break;
+        }
+        switch (k){
+            case 0: altSeeds[4] = -1234; altSeeds[5] = -1234; break;
+            case 1: altSeeds[4] = -1234; altSeeds[5] = -2345; break;
+            case 2: altSeeds[4] = -2345; altSeeds[5] = -2345; break;
+            case 3: altSeeds[4] = -2345; altSeeds[5] = -1234; break;
+        }
+        switch (l){
+            case 0: altSeeds[6] = -1234; altSeeds[7] = -1234; break;
+            case 1: altSeeds[6] = -1234; altSeeds[7] = -2345; break;
+            case 2: altSeeds[6] = -2345; altSeeds[7] = -2345; break;
+            case 3: altSeeds[6] = -2345; altSeeds[7] = -1234; break;
+        }
+    }
+
+    public void setWangTile5D(int index){
+        int i = index & 3;
+        int j = index >>> 2 & 3;
+        int k = index >>> 4 & 3;
+        int l = index >>> 6 & 3;
+        int m = index >>> 8 & 3;
+        switch (i){
+            case 0: altSeeds[0] = -1234; altSeeds[1] = -1234; break;
+            case 1: altSeeds[0] = -1234; altSeeds[1] = -2345; break;
+            case 2: altSeeds[0] = -2345; altSeeds[1] = -2345; break;
+            case 3: altSeeds[0] = -2345; altSeeds[1] = -1234; break;
+        }
+        switch (j){
+            case 0: altSeeds[2] = -1234; altSeeds[3] = -1234; break;
+            case 1: altSeeds[2] = -1234; altSeeds[3] = -2345; break;
+            case 2: altSeeds[2] = -2345; altSeeds[3] = -2345; break;
+            case 3: altSeeds[2] = -2345; altSeeds[3] = -1234; break;
+        }
+        switch (k){
+            case 0: altSeeds[4] = -1234; altSeeds[5] = -1234; break;
+            case 1: altSeeds[4] = -1234; altSeeds[5] = -2345; break;
+            case 2: altSeeds[4] = -2345; altSeeds[5] = -2345; break;
+            case 3: altSeeds[4] = -2345; altSeeds[5] = -1234; break;
+        }
+        switch (l){
+            case 0: altSeeds[6] = -1234; altSeeds[7] = -1234; break;
+            case 1: altSeeds[6] = -1234; altSeeds[7] = -2345; break;
+            case 2: altSeeds[6] = -2345; altSeeds[7] = -2345; break;
+            case 3: altSeeds[6] = -2345; altSeeds[7] = -1234; break;
+        }
+        switch (m){
+            case 0: altSeeds[8] = -1234; altSeeds[9] = -1234; break;
+            case 1: altSeeds[8] = -1234; altSeeds[9] = -2345; break;
+            case 2: altSeeds[8] = -2345; altSeeds[9] = -2345; break;
+            case 3: altSeeds[8] = -2345; altSeeds[9] = -1234; break;
+        }
+    }
+
+    public void setWangTile6D(int index){
+        int i = index & 3;
+        int j = index >>> 2 & 3;
+        int k = index >>> 4 & 3;
+        int l = index >>> 6 & 3;
+        int m = index >>> 8 & 3;
+        int n = index >>> 10 & 3;
+        switch (i){
+            case 0: altSeeds[0] = -1234; altSeeds[1] = -1234; break;
+            case 1: altSeeds[0] = -1234; altSeeds[1] = -2345; break;
+            case 2: altSeeds[0] = -2345; altSeeds[1] = -2345; break;
+            case 3: altSeeds[0] = -2345; altSeeds[1] = -1234; break;
+        }
+        switch (j){
+            case 0: altSeeds[2] = -1234; altSeeds[3] = -1234; break;
+            case 1: altSeeds[2] = -1234; altSeeds[3] = -2345; break;
+            case 2: altSeeds[2] = -2345; altSeeds[3] = -2345; break;
+            case 3: altSeeds[2] = -2345; altSeeds[3] = -1234; break;
+        }
+        switch (k){
+            case 0: altSeeds[4] = -1234; altSeeds[5] = -1234; break;
+            case 1: altSeeds[4] = -1234; altSeeds[5] = -2345; break;
+            case 2: altSeeds[4] = -2345; altSeeds[5] = -2345; break;
+            case 3: altSeeds[4] = -2345; altSeeds[5] = -1234; break;
+        }
+        switch (l){
+            case 0: altSeeds[6] = -1234; altSeeds[7] = -1234; break;
+            case 1: altSeeds[6] = -1234; altSeeds[7] = -2345; break;
+            case 2: altSeeds[6] = -2345; altSeeds[7] = -2345; break;
+            case 3: altSeeds[6] = -2345; altSeeds[7] = -1234; break;
+        }
+        switch (m){
+            case 0: altSeeds[8] = -1234; altSeeds[9] = -1234; break;
+            case 1: altSeeds[8] = -1234; altSeeds[9] = -2345; break;
+            case 2: altSeeds[8] = -2345; altSeeds[9] = -2345; break;
+            case 3: altSeeds[8] = -2345; altSeeds[9] = -1234; break;
+        }
+        switch (n){
+            case 0: altSeeds[10] = -1234; altSeeds[11] = -1234; break;
+            case 1: altSeeds[10] = -1234; altSeeds[11] = -2345; break;
+            case 2: altSeeds[10] = -2345; altSeeds[11] = -2345; break;
+            case 3: altSeeds[10] = -2345; altSeeds[11] = -1234; break;
+        }
+    }
+
     protected float gradCoord2D(int seed, int x, int y,
                                 float xd, float yd) {
         int crossed = 0;
@@ -226,14 +340,14 @@ public class WangPerlinNoise extends RawNoise {
                                 float xd, float yd, float zd, float wd) {
         int crossed = 0;
         if(x <= loEdges[0]) {seed = altSeeds[0]; ++crossed;}
-        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed;}
+        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed; x -= hiEdges[0];}
         if(y <= loEdges[1]) {seed = altSeeds[2]; ++crossed;}
-        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed;}
+        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed; y -= hiEdges[1];}
         if(z <= loEdges[2]) {seed = altSeeds[4]; ++crossed;}
-        else if(z >= hiEdges[2]) {seed = altSeeds[5]; ++crossed;}
+        else if(z >= hiEdges[2]) {seed = altSeeds[5]; ++crossed; z -= hiEdges[2];}
         if(w <= loEdges[3]) {seed = altSeeds[6]; ++crossed;}
-        else if(w >= hiEdges[3]) {seed = altSeeds[7]; ++crossed;}
-        if(crossed > 1) seed = altSeeds[0];
+        else if(w >= hiEdges[3]) {seed = altSeeds[7]; ++crossed; w -= hiEdges[3];}
+        if(crossed > 1) seed = -crossed;
 
         final int hash = PointHasher.hash256(x, y, z, w, seed);
         return xd * GRADIENTS_4D[hash] + yd * GRADIENTS_4D[hash + 1] + zd * GRADIENTS_4D[hash + 2] + wd * GRADIENTS_4D[hash + 3];
@@ -242,16 +356,16 @@ public class WangPerlinNoise extends RawNoise {
                                 float xd, float yd, float zd, float wd, float ud) {
         int crossed = 0;
         if(x <= loEdges[0]) {seed = altSeeds[0]; ++crossed;}
-        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed;}
+        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed; x -= hiEdges[0];}
         if(y <= loEdges[1]) {seed = altSeeds[2]; ++crossed;}
-        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed;}
+        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed; y -= hiEdges[1];}
         if(z <= loEdges[2]) {seed = altSeeds[4]; ++crossed;}
-        else if(z >= hiEdges[2]) {seed = altSeeds[5]; ++crossed;}
+        else if(z >= hiEdges[2]) {seed = altSeeds[5]; ++crossed; z -= hiEdges[2];}
         if(w <= loEdges[3]) {seed = altSeeds[6]; ++crossed;}
-        else if(w >= hiEdges[3]) {seed = altSeeds[7]; ++crossed;}
+        else if(w >= hiEdges[3]) {seed = altSeeds[7]; ++crossed; w -= hiEdges[3];}
         if(u <= loEdges[4]) {seed = altSeeds[8]; ++crossed;}
-        else if(u >= hiEdges[4]) {seed = altSeeds[9]; ++crossed;}
-        if(crossed > 1) seed = altSeeds[0];
+        else if(u >= hiEdges[4]) {seed = altSeeds[9]; ++crossed; u -= hiEdges[4];}
+        if(crossed > 1) seed = -crossed;
 
         final int hash = PointHasher.hash256(x, y, z, w, u, seed);
         return xd * GRADIENTS_5D[hash] + yd * GRADIENTS_5D[hash + 1] + zd * GRADIENTS_5D[hash + 2]
@@ -261,18 +375,18 @@ public class WangPerlinNoise extends RawNoise {
                                 float xd, float yd, float zd, float wd, float ud, float vd) {
         int crossed = 0;
         if(x <= loEdges[0]) {seed = altSeeds[0]; ++crossed;}
-        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed;}
+        else if(x >= hiEdges[0]) {seed = altSeeds[1]; ++crossed; x -= hiEdges[0];}
         if(y <= loEdges[1]) {seed = altSeeds[2]; ++crossed;}
-        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed;}
+        else if(y >= hiEdges[1]) {seed = altSeeds[3]; ++crossed; y -= hiEdges[1];}
         if(z <= loEdges[2]) {seed = altSeeds[4]; ++crossed;}
-        else if(z >= hiEdges[2]) {seed = altSeeds[5]; ++crossed;}
+        else if(z >= hiEdges[2]) {seed = altSeeds[5]; ++crossed; z -= hiEdges[2];}
         if(w <= loEdges[3]) {seed = altSeeds[6]; ++crossed;}
-        else if(w >= hiEdges[3]) {seed = altSeeds[7]; ++crossed;}
+        else if(w >= hiEdges[3]) {seed = altSeeds[7]; ++crossed; w -= hiEdges[3];}
         if(u <= loEdges[4]) {seed = altSeeds[8]; ++crossed;}
-        else if(u >= hiEdges[4]) {seed = altSeeds[9]; ++crossed;}
+        else if(u >= hiEdges[4]) {seed = altSeeds[9]; ++crossed; u -= hiEdges[4];}
         if(v <= loEdges[5]) {seed = altSeeds[10]; ++crossed;}
-        else if(v >= hiEdges[5]) {seed = altSeeds[11]; ++crossed;}
-        if(crossed > 1) seed = altSeeds[0];
+        else if(v >= hiEdges[5]) {seed = altSeeds[11]; ++crossed; v -= hiEdges[5];}
+        if(crossed > 1) seed = -crossed;
 
         final int hash = PointHasher.hash256(x, y, z, w, u, v, seed);
         return xd * GRADIENTS_6D[hash] + yd * GRADIENTS_6D[hash + 1] + zd * GRADIENTS_6D[hash + 2]

@@ -314,6 +314,7 @@ public class WangContinuousNoise extends RawNoise {
     @Override
     public float getNoise(float x, float y, float z, float w) {
         final int seed = wrapped.getSeed();
+        wrapped.setWangTile4D(seed);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, seed);
@@ -325,6 +326,7 @@ public class WangContinuousNoise extends RawNoise {
     @Override
     public float getNoise(float x, float y, float z, float w, float u) {
         final int seed = wrapped.getSeed();
+        wrapped.setWangTile5D(seed);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
@@ -336,6 +338,7 @@ public class WangContinuousNoise extends RawNoise {
     @Override
     public float getNoise(float x, float y, float z, float w, float u, float v) {
         final int seed = wrapped.getSeed();
+        wrapped.setWangTile6D(seed);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, v * frequency, seed);
@@ -388,6 +391,7 @@ public class WangContinuousNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, int seed) {
+        wrapped.setWangTile4D(seed);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, seed);
@@ -398,6 +402,7 @@ public class WangContinuousNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, int seed) {
+        wrapped.setWangTile5D(seed);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, seed);
@@ -408,6 +413,7 @@ public class WangContinuousNoise extends RawNoise {
 
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
+        wrapped.setWangTile6D(seed);
         switch (mode) {
             default:
             case 0: return fbm(x * frequency, y * frequency, z * frequency, w * frequency, u * frequency, v * frequency, seed);

@@ -23,16 +23,11 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.github.tommyettinger.anim8.AnimatedGif;
-import com.github.tommyettinger.anim8.Dithered;
 import com.github.tommyettinger.anim8.FastPNG;
-import com.github.tommyettinger.anim8.PaletteReducer;
 
 import static com.badlogic.gdx.math.MathUtils.PI2;
-import static com.github.tommyettinger.cringe.ContinuousNoise.EXO;
 import static com.github.tommyettinger.cringe.ContinuousNoise.FBM;
 
 /**
@@ -44,7 +39,7 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.FBM;
 public class SeamlessNoiseGenerator extends ApplicationAdapter {
 
     private static final boolean ACTUALLY_RENDER_PNG = true;
-    private static final boolean TIME_SEED = false;
+    private static final boolean TIME_SEED = true;
 
     public interface FloatToFloatFunction {
         float applyAsFloat(float f);
@@ -96,7 +91,6 @@ public class SeamlessNoiseGenerator extends ApplicationAdapter {
         int seed = (TIME_SEED) ? (int)Scramblers.scramble(System.nanoTime()) : 1;
 
 //        for(RawNoise rn : noises) {
-        raw.edge = MathUtils.floor(scale);
         noise.setWrapped(raw);
             for (int m = 0; m < ContinuousNoise.WARP; m++) {
                 noise.setMode(m);

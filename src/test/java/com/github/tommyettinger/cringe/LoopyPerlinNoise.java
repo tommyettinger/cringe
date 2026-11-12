@@ -63,7 +63,7 @@ public class LoopyPerlinNoise extends RawNoise {
 
     public int seed;
 
-    public float edge = 1;
+    private float edge = 1;
 
     public LoopyPerlinNoise() {
         this(0x1337BEEF);
@@ -139,37 +139,37 @@ public class LoopyPerlinNoise extends RawNoise {
     }
 
     /**
-     * Creates a copy of this PerlinNoise, which should be a deep copy for any mutable state but can be shallow for immutable
+     * Creates a copy of this LoopyPerlinNoise, which should be a deep copy for any mutable state but can be shallow for immutable
      * types such as functions. This almost always just calls a copy constructor.
      *
-     * @return a copy of this PerlinNoise
+     * @return a copy of this LoopyPerlinNoise
      */
     @Override
     public LoopyPerlinNoise copy() {
         return new LoopyPerlinNoise(this.seed);
     }
 
-    protected float gradCoord2D(int seed, int x, int y,
+    private float gradCoord2D(int seed, int x, int y,
                                         float xd, float yd) {
         final int hash = hash256(x, y, seed);
         return xd * GRADIENTS_2D[hash] + yd * GRADIENTS_2D[hash + 1];
     }
-    protected float gradCoord3D(int seed, int x, int y, int z, float xd, float yd, float zd) {
+    private float gradCoord3D(int seed, int x, int y, int z, float xd, float yd, float zd) {
         final int hash = hash256(x, y, z, seed);
         return (xd * GRADIENTS_3D[hash] + yd * GRADIENTS_3D[hash + 1] + zd * GRADIENTS_3D[hash + 2]);
     }
-    protected float gradCoord4D(int seed, int x, int y, int z, int w,
+    private float gradCoord4D(int seed, int x, int y, int z, int w,
                                         float xd, float yd, float zd, float wd) {
         final int hash = PointHasher.hash256(x, y, z, w, (x >= edge || z >= edge) ? -1111 : seed);
         return xd * GRADIENTS_4D[hash] + yd * GRADIENTS_4D[hash + 1] + zd * GRADIENTS_4D[hash + 2] + wd * GRADIENTS_4D[hash + 3];
     }
-    protected float gradCoord5D(int seed, int x, int y, int z, int w, int u,
+    private float gradCoord5D(int seed, int x, int y, int z, int w, int u,
                                         float xd, float yd, float zd, float wd, float ud) {
         final int hash = PointHasher.hash256(x, y, z, w, u, (x >= edge || z >= edge) ? -1111 : seed);
         return xd * GRADIENTS_5D[hash] + yd * GRADIENTS_5D[hash + 1] + zd * GRADIENTS_5D[hash + 2]
                 + wd * GRADIENTS_5D[hash + 3] + ud * GRADIENTS_5D[hash + 4];
     }
-    protected float gradCoord6D(int seed, int x, int y, int z, int w, int u, int v,
+    private float gradCoord6D(int seed, int x, int y, int z, int w, int u, int v,
                                         float xd, float yd, float zd, float wd, float ud, float vd) {
         final int hash = PointHasher.hash256(x, y, z, w, u, v, (x >= edge || z >= edge) ? -1111 : seed);
         return xd * GRADIENTS_6D[hash] + yd * GRADIENTS_6D[hash + 1] + zd * GRADIENTS_6D[hash + 2]
@@ -599,7 +599,7 @@ public class LoopyPerlinNoise extends RawNoise {
     /**
      * Produces a String that describes everything needed to recreate this INoise in full. This String can be read back
      * in by {@link #stringDeserialize(String)} to reassign the described state to another INoise.
-     * @return a String that describes this PerlinNoise for serialization
+     * @return a String that describes this LoopyPerlinNoise for serialization
      */
     @Override
     public String stringSerialize() {
@@ -607,11 +607,11 @@ public class LoopyPerlinNoise extends RawNoise {
     }
 
     /**
-     * Given a serialized String produced by {@link #stringSerialize()}, reassigns this PerlinNoise to have the
-     * described state from the given String. The serialized String must have been produced by a PerlinNoise.
+     * Given a serialized String produced by {@link #stringSerialize()}, reassigns this LoopyPerlinNoise to have the
+     * described state from the given String. The serialized String must have been produced by a LoopyPerlinNoise.
      *
      * @param data a serialized String, typically produced by {@link #stringSerialize()}
-     * @return this PerlinNoise, after being modified (if possible)
+     * @return this LoopyPerlinNoise, after being modified (if possible)
      */
     @Override
     public LoopyPerlinNoise stringDeserialize(String data) {
@@ -650,7 +650,7 @@ public class LoopyPerlinNoise extends RawNoise {
 
     @Override
     public String toString() {
-        return "PerlinNoise{seed=" + seed + '}';
+        return "LoopyPerlinNoise{seed=" + seed + '}';
     }
 
     /**
@@ -732,4 +732,11 @@ public class LoopyPerlinNoise extends RawNoise {
     private static final int X_5 = 0x1C3361, Y_5 = 0x18DA39, Z_5 = 0x15E6DB, W_5 = 0x134D29, U_5 = 0x110281;
     private static final int X_6 = 0x1CC1C5, Y_6 = 0x19D7AF, Z_6 = 0x173935, W_6 = 0x14DEAF, U_6 = 0x12C139, V_6 = 0x10DAA3;
 
+    public float getEdge() {
+        return edge;
+    }
+
+    public void setEdge(float edge) {
+        this.edge = edge;
+    }
 }

@@ -16,8 +16,6 @@
 
 package com.github.tommyettinger.cringe;
 
-import com.badlogic.gdx.math.MathUtils;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -548,7 +546,7 @@ public class LoopyContinuousNoise extends RawNoise {
     // 4D
     
     protected float fbm(float x, float y, float z, float w, int seed) {
-        wrapped.edge = (int)frequency;
+        wrapped.setEdge((int)frequency);
         float sum = wrapped.getNoiseWithSeed(x, y, z, w, seed);
         if(octaves <= 1) return sum;
 
@@ -560,14 +558,14 @@ public class LoopyContinuousNoise extends RawNoise {
             z *= 2f;
             w *= 2f;
             amp *= 0.5f;
-            wrapped.edge = (int)(frequency * (1 << i));
+            wrapped.setEdge((int)(frequency * (1 << i)));
             sum += wrapped.getNoiseWithSeed(x, y, z, w, seed + i) * amp;
         }
 
         return sum / (amp * ((1 << octaves) - 1));
     }
     protected float billow(float x, float y, float z, float w, int seed) {
-        wrapped.edge = (int)frequency;
+        wrapped.setEdge((int)frequency);
         float sum = Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, seed)) * 2 - 1;
         float amp = 1;
 
@@ -578,7 +576,7 @@ public class LoopyContinuousNoise extends RawNoise {
             w *= 2f;
 
             amp *= 0.5f;
-            wrapped.edge = (int)(frequency * (1 << i));
+            wrapped.setEdge((int)(frequency * (1 << i)));
             sum += (Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, seed + i)) * 2 - 1) * amp;
         }
 
@@ -588,7 +586,7 @@ public class LoopyContinuousNoise extends RawNoise {
     protected float ridged(float x, float y, float z, float w, int seed) {
         float sum = 0f, exp = 1f, correction = 0f, spike;
         for (int i = 0; i < octaves; i++) {
-            wrapped.edge = (int)(frequency * (1 << i));
+            wrapped.setEdge((int)(frequency * (1 << i)));
             spike = 1f - Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, seed + i));
             sum += spike * exp;
             correction += (exp *= 0.5f);
@@ -603,7 +601,7 @@ public class LoopyContinuousNoise extends RawNoise {
     // 5D
 
     protected float fbm(float x, float y, float z, float w, float u, int seed) {
-        wrapped.edge = (int)frequency;
+        wrapped.setEdge((int)frequency);
         float sum = wrapped.getNoiseWithSeed(x, y, z, w, u, seed);
         if(octaves <= 1) return sum;
 
@@ -617,14 +615,14 @@ public class LoopyContinuousNoise extends RawNoise {
             u *= 2f;
 
             amp *= 0.5f;
-            wrapped.edge = (int)(frequency * (1 << i));
+            wrapped.setEdge((int)(frequency * (1 << i)));
             sum += wrapped.getNoiseWithSeed(x, y, z, w, u, seed + i) * amp;
         }
 
         return sum / (amp * ((1 << octaves) - 1));
     }
     protected float billow(float x, float y, float z, float w, float u, int seed) {
-        wrapped.edge = (int)frequency;
+        wrapped.setEdge((int)frequency);
         float sum = Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, u, seed)) * 2 - 1;
         float amp = 1;
 
@@ -636,7 +634,7 @@ public class LoopyContinuousNoise extends RawNoise {
             u *= 2f;
 
             amp *= 0.5f;
-            wrapped.edge = (int)(frequency * (1 << i));
+            wrapped.setEdge((int)(frequency * (1 << i)));
             sum += (Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, u, seed + i)) * 2 - 1) * amp;
         }
 
@@ -646,7 +644,7 @@ public class LoopyContinuousNoise extends RawNoise {
     protected float ridged(float x, float y, float z, float w, float u, int seed) {
         float sum = 0f, exp = 1f, correction = 0f, spike;
         for (int i = 0; i < octaves; i++) {
-            wrapped.edge = (int)(frequency * (1 << i));
+            wrapped.setEdge((int)(frequency * (1 << i)));
             spike = 1f - Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, u, seed + i));
             sum += spike * exp;
             correction += (exp *= 0.5f);
@@ -662,7 +660,7 @@ public class LoopyContinuousNoise extends RawNoise {
     // 6D
 
     protected float fbm(float x, float y, float z, float w, float u, float v, int seed) {
-        wrapped.edge = (int)frequency;
+        wrapped.setEdge((int)frequency);
         float sum = wrapped.getNoiseWithSeed(x, y, z, w, u, v, seed);
         if(octaves <= 1) return sum;
 
@@ -677,14 +675,14 @@ public class LoopyContinuousNoise extends RawNoise {
             v *= 2f;
 
             amp *= 0.5f;
-            wrapped.edge = (int)(frequency * (1 << i));
+            wrapped.setEdge((int)(frequency * (1 << i)));
             sum += wrapped.getNoiseWithSeed(x, y, z, w, u, v, seed + i) * amp;
         }
 
         return sum / (amp * ((1 << octaves) - 1));
     }
     protected float billow(float x, float y, float z, float w, float u, float v, int seed) {
-        wrapped.edge = (int)frequency;
+        wrapped.setEdge((int)frequency);
         float sum = Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, u, v, seed)) * 2 - 1;
         float amp = 1;
 
@@ -697,7 +695,7 @@ public class LoopyContinuousNoise extends RawNoise {
             v *= 2f;
 
             amp *= 0.5f;
-            wrapped.edge = (int)(frequency * (1 << i));
+            wrapped.setEdge((int)(frequency * (1 << i)));
             sum += (Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, u, v, seed + i)) * 2 - 1) * amp;
         }
 
@@ -707,7 +705,7 @@ public class LoopyContinuousNoise extends RawNoise {
     protected float ridged(float x, float y, float z, float w, float u, float v, int seed) {
         float sum = 0f, exp = 1f, correction = 0f, spike;
         for (int i = 0; i < octaves; i++) {
-            wrapped.edge = (int)(frequency * (1 << i));
+            wrapped.setEdge((int)(frequency * (1 << i)));
             spike = 1f - Math.abs(wrapped.getNoiseWithSeed(x, y, z, w, u, v, seed + i));
             sum += spike * exp;
             correction += (exp *= 0.5f);

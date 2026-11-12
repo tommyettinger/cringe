@@ -42,14 +42,20 @@ public class WangNoiseGenerator extends ApplicationAdapter {
     public interface FloatToFloatFunction {
         float applyAsFloat(float f);
     }
-    WangRawNoise raw = new WangPerlueNoise(123);
+    WangRawNoise[] noises = {
+            new WangPerlinNoise(123),
+            new WangPerlueNoise(123)
+    };
+
+    int noiseIndex = 0;
 
     int seed = 0;
-    private static final float scale = 0x1p-6f;
-    private final WangContinuousNoise noise = new WangContinuousNoise(raw, seed, scale, FBM, 1);
+    private static final float scale = 0x1p-4f;
+    private final WangContinuousNoise noise = new WangContinuousNoise(noises[noiseIndex], seed, scale, FBM, 1);
 
 //    private static final int width = 512, height = 512;
-    private static final int width = 256, height = 256;
+//    private static final int width = 256, height = 256;
+    private static final int width = 128, height = 128;
 
     private Viewport view;
 
@@ -68,7 +74,9 @@ public class WangNoiseGenerator extends ApplicationAdapter {
 
         png = new FastPNG();
         seed = (TIME_SEED) ? (int)Math.abs(Scramblers.scramble(System.nanoTime())) : 0;
-        noise.setWrapped(raw);
+        noise.setTileSize(width);
+        for (noiseIndex = 0; noiseIndex < noises.length; noiseIndex++) {
+            noise.setWrapped(noises[noiseIndex]);
             for (int m = 0; m <= WangContinuousNoise.RIDGED; m++) {
                 noise.setMode(m);
                 for (int o = 1; o <= 3; o++) {
@@ -76,7 +84,7 @@ public class WangNoiseGenerator extends ApplicationAdapter {
                     putMap();
                 }
             }
-
+        }
         Gdx.app.exit();
     }
 
@@ -95,7 +103,7 @@ public class WangNoiseGenerator extends ApplicationAdapter {
                 Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                 for (int x = 0; x < w; x++) {
                     for (int y = 0; y < h; y++) {
-                        float color = prepare.applyAsFloat(noise.getNoise(x, y, 100f));
+                        float color = prepare.applyAsFloat(noise.getNoise(x, y, width * 0.35f));
                         p.setColor(color, color, color, 1f);
                         p.drawPixel(x, y);
                     }

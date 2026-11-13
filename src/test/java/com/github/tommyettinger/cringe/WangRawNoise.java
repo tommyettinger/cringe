@@ -53,6 +53,7 @@ public abstract class WangRawNoise extends RawNoise {
             // TODO: register every type of Wang raw noise generator here, alphabetically
             register(new WangPerlinNoise(1));
             register(new WangPerlueNoise(1));
+            register(new WangValueNoise(1));
         }
 
         /**

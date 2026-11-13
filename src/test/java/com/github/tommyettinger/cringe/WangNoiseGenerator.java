@@ -37,8 +37,8 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.FBM;
 public class WangNoiseGenerator extends ApplicationAdapter {
 
     private static final boolean ACTUALLY_RENDER_PNG = true;
-    private static final boolean TIME_SEED = false;
-    private static final boolean SINGLE_EDGE = true;
+    private static final boolean TIME_SEED = true;
+    private static final boolean SINGLE_EDGE = false;
     private static final String TYPE_NAME = SINGLE_EDGE ? "Omni" : "Wang";
 
     public interface FloatToFloatFunction {
@@ -46,7 +46,8 @@ public class WangNoiseGenerator extends ApplicationAdapter {
     }
     WangRawNoise[] noises = {
             new WangPerlinNoise(123),
-            new WangPerlueNoise(123)
+            new WangPerlueNoise(123),
+            new WangValueNoise(123),
     };
 
     int noiseIndex = 0;

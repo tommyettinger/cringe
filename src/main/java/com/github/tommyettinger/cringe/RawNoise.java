@@ -30,6 +30,8 @@ import java.io.ObjectOutput;
 /**
  * Defines the core operations to generate continuous noise with a specific algorithm, and declares what properties of
  * noise are supported by that algorithm.
+ * <br>
+ * Also has a {@link Serializer} that knows how to serialize and deserialize RawNoise values into their actual types.
  */
 public abstract class RawNoise implements Json.Serializable, Externalizable {
     /**

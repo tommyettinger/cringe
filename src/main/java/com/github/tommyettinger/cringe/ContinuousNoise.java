@@ -22,6 +22,22 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
+/**
+ * The main way of wrapping around a {@link RawNoise} algorithm to allow changing its frequency, octaves, and mode.
+ * You can set the various parameters in the constructor, later with setters, or via deserialization.
+ * <ul>
+ * <li>The frequency affects how rapidly details change in the returned noise.</li>
+ * <li>Each octave is an extra layered noise call with a different frequency, that contributes a varying amount to the
+ * complete result.</li>
+ * <li>The mode determines how octaves are combined, and sometimes changes even one octave.</li>
+ * <br>
+ * The main mode for cloudy-looking noise is {@link #FBM}. To get ribbons of low values, use {@link #BILLOW}.
+ * To get ribbons of high values, use {@link #RIDGED}. To get a rippling or organic look, use 2 or more octaves
+ * with {@link #WARP}. To get jagged, alien-planet-inspired noise, use {@link #EXO}.
+ * <br>
+ * This allows getting noise from 1D up to 6D, assuming the {@link #getWrapped() wrapped RawNoise} supports
+ * the requested dimension.
+ */
 public class ContinuousNoise extends RawNoise {
 
     /**

@@ -21,6 +21,7 @@ import com.badlogic.gdx.math.MathUtils;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Arrays;
 
 public class WangContinuousNoise extends RawNoise {
 
@@ -63,6 +64,7 @@ public class WangContinuousNoise extends RawNoise {
     public int mode;
     protected int octaves;
     private float tileSize = 256;
+    public boolean singleEdge = false;
 
     public WangContinuousNoise() {
         this(new WangPerlinNoise(123), 123, 0.03125f, FBM, 1);
@@ -175,6 +177,14 @@ public class WangContinuousNoise extends RawNoise {
 
     public void setTileSize(int tileSize) {
         this.tileSize = tileSize * this.frequency;
+    }
+
+    public boolean isSingleEdge() {
+        return singleEdge;
+    }
+
+    public void setSingleEdge(boolean singleEdge) {
+        this.singleEdge = singleEdge;
     }
 
     @Override
@@ -746,8 +756,12 @@ public class WangContinuousNoise extends RawNoise {
 
 
 
-    public static void setWangTile2D(int index, WangRawNoise noise){
+    public void setWangTile2D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
+        if(singleEdge){
+            Arrays.fill(altSeeds, ~index);
+            return;
+        }
         int seedA = (index & -1 << 4) ^ -4321;
         int seedB = (index & -1 << 4) ^ -5432;
         int i = index & 3;
@@ -766,8 +780,12 @@ public class WangContinuousNoise extends RawNoise {
         }
     }
 
-    public static void setWangTile3D(int index, WangRawNoise noise){
+    public void setWangTile3D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
+        if(singleEdge){
+            Arrays.fill(altSeeds, ~index);
+            return;
+        }
         int seedA = (index & -1 << 6) ^ -4321;
         int seedB = (index & -1 << 6) ^ -5432;
         int i = index & 3;
@@ -793,8 +811,12 @@ public class WangContinuousNoise extends RawNoise {
         }
     }
 
-    public static void setWangTile4D(int index, WangRawNoise noise){
+    public void setWangTile4D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
+        if(singleEdge){
+            Arrays.fill(altSeeds, ~index);
+            return;
+        }
         int seedA = (index & -1 << 8) ^ -4321;
         int seedB = (index & -1 << 8) ^ -5432;
         int i = index & 3;
@@ -827,8 +849,12 @@ public class WangContinuousNoise extends RawNoise {
         }
     }
 
-    public static void setWangTile5D(int index, WangRawNoise noise){
+    public void setWangTile5D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
+        if(singleEdge){
+            Arrays.fill(altSeeds, ~index);
+            return;
+        }
         int seedA = (index & -1 << 10) ^ -4321;
         int seedB = (index & -1 << 10) ^ -5432;
         int i = index & 3;
@@ -868,8 +894,12 @@ public class WangContinuousNoise extends RawNoise {
         }
     }
 
-    public static void setWangTile6D(int index, WangRawNoise noise){
+    public void setWangTile6D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
+        if(singleEdge){
+            Arrays.fill(altSeeds, ~index);
+            return;
+        }
         int seedA = (index & -1 << 12) ^ -4321;
         int seedB = (index & -1 << 12) ^ -5432;
         int i = index & 3;

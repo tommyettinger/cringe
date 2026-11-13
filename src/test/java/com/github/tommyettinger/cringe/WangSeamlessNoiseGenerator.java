@@ -33,10 +33,8 @@ import static com.badlogic.gdx.math.MathUtils.sin;
 import static com.github.tommyettinger.cringe.ContinuousNoise.FBM;
 
 /**
- * {@code cd out/noise/}
- * {@code oxipng -o 6 -s *.png}
- * {@code cd ../gif/}
- * {@code gifsicle -O=99 --use-colormap gray --resize 128x128 -b *.gif}
+ * You probably don't want this one, it doesn't work very well.
+ * @see WangNoiseGenerator This other generator does work well.
  */
 public class WangSeamlessNoiseGenerator extends ApplicationAdapter {
 

@@ -158,7 +158,7 @@ public class WangPerlinNoise extends WangRawNoise {
         else if(x >= edge) {seed = altSeeds[1]; ++crossed; x -= edge;}
         if(y <= 0) {seed = altSeeds[2]; ++crossed;}
         else if(y >= edge) {seed = altSeeds[3]; ++crossed; y -= edge;}
-        if(crossed > 1) seed = altSeeds[0];
+        if(crossed > 1) seed = -crossed;
 
         final int hash = PointHasher.hash256(x, y, seed);
         return xd * GRADIENTS_2D[hash] + yd * GRADIENTS_2D[hash + 1];

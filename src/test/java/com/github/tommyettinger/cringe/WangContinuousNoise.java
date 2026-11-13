@@ -758,11 +758,11 @@ public class WangContinuousNoise extends RawNoise {
 
     public void setWangTile2D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
+        int seedA = (index & -1 << 4) ^ -4321;
         if(singleEdge){
-            Arrays.fill(altSeeds, ~index);
+            Arrays.fill(altSeeds, seedA);
             return;
         }
-        int seedA = (index & -1 << 4) ^ -4321;
         int seedB = (index & -1 << 4) ^ -5432;
         int i = index & 3;
         int j = index >>> 2 & 3;
@@ -782,11 +782,11 @@ public class WangContinuousNoise extends RawNoise {
 
     public void setWangTile3D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
+        int seedA = (index & -1 << 6) ^ -4321;
         if(singleEdge){
-            Arrays.fill(altSeeds, ~index);
+            Arrays.fill(altSeeds, seedA);
             return;
         }
-        int seedA = (index & -1 << 6) ^ -4321;
         int seedB = (index & -1 << 6) ^ -5432;
         int i = index & 3;
         int j = index >>> 2 & 3;
@@ -813,11 +813,11 @@ public class WangContinuousNoise extends RawNoise {
 
     public void setWangTile4D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
+        int seedA = (index & -1 << 8) ^ -4321;
         if(singleEdge){
-            Arrays.fill(altSeeds, ~index);
+            Arrays.fill(altSeeds, seedA);
             return;
         }
-        int seedA = (index & -1 << 8) ^ -4321;
         int seedB = (index & -1 << 8) ^ -5432;
         int i = index & 3;
         int j = index >>> 2 & 3;
@@ -851,11 +851,11 @@ public class WangContinuousNoise extends RawNoise {
 
     public void setWangTile5D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
+        int seedA = (index & -1 << 10) ^ -4321;
         if(singleEdge){
-            Arrays.fill(altSeeds, ~index);
+            Arrays.fill(altSeeds, seedA);
             return;
         }
-        int seedA = (index & -1 << 10) ^ -4321;
         int seedB = (index & -1 << 10) ^ -5432;
         int i = index & 3;
         int j = index >>> 2 & 3;
@@ -896,11 +896,11 @@ public class WangContinuousNoise extends RawNoise {
 
     public void setWangTile6D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
+        int seedA = (index & -1 << 12) ^ -4321;
         if(singleEdge){
-            Arrays.fill(altSeeds, ~index);
+            Arrays.fill(altSeeds, seedA);
             return;
         }
-        int seedA = (index & -1 << 12) ^ -4321;
         int seedB = (index & -1 << 12) ^ -5432;
         int i = index & 3;
         int j = index >>> 2 & 3;

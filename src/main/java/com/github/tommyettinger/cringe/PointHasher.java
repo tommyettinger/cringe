@@ -130,10 +130,38 @@ public final class PointHasher {
      * The prime constant 0x10DAAD . Multiply v by this in 6 dimensions for "hashPrimed" methods.
      */
     public static final int V6 = 0x10DAAD;
+    /**
+     * The prime constant 0x1D2BCD . Multiply x by this in 7 dimensions for "hashPrimed" methods.
+     */
+    public static final int X7 = 0x1D2BCD;
+    /**
+     * The prime constant 0x1A97A1 . Multiply y by this in 7 dimensions for "hashPrimed" methods.
+     */
+    public static final int Y7 = 0x1A97A1;
+    /**
+     * The prime constant 0x183DB7 . Multiply z by this in 7 dimensions for "hashPrimed" methods.
+     */
+    public static final int Z7 = 0x183DB7;
+    /**
+     * The prime constant 0x16191B . Multiply w by this in 7 dimensions for "hashPrimed" methods.
+     */
+    public static final int W7 = 0x16191B;
+    /**
+     * The prime constant 0x1424F5 . Multiply u by this in 7 dimensions for "hashPrimed" methods.
+     */
+    public static final int U7 = 0x1424F5;
+    /**
+     * The prime constant 0x125D0B . Multiply v by this in 7 dimensions for "hashPrimed" methods.
+     */
+    public static final int V7 = 0x125D0B;
+    /**
+     * The prime constant 0x10BD79 . Multiply m by this in 7 dimensions for "hashPrimed" methods.
+     */
+    public static final int M7 = 0x10BD79;
 
     /**
      * The prime constants declared in this class as {@link #X2}, {@link #Z3}, and so on, but organized so they are in
-     * arrays from 1D to 6D, with 1 item in the 1D array up to 6 items in the 6D array. This array should not be
+     * arrays from 1D to 7D, with 1 item in the 1D array up to 7 items in the 7D array. This array should not be
      * modified, but it isn't currently used internally, so nothing would break in this library if you did change it.
      */
     public static final int[][] HARMONIOUS_PRIMES = new int[][]{
@@ -143,6 +171,7 @@ public final class PointHasher {
             new int[]{X4, Y4, Z4, W4},
             new int[]{X5, Y5, Z5, W5, U5},
             new int[]{X6, Y6, Z6, W6, U6, V6},
+            new int[]{X7, Y7, Z7, W7, U7, V7, M7},
     };
 
     /**
@@ -257,6 +286,29 @@ public final class PointHasher {
     }
 
     /**
+     * A 32-bit point hash that smashes x, y, z, w, u, v, and m into s using XOR and multiplications by harmonious
+     * numbers, then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
+     * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
+     * hash used here has been stripped down heavily, both for speed and because unless points are selected
+     * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
+     * rrxmrrxmsx_0 has.
+     * @param x x position, as an int
+     * @param y y position, as an int
+     * @param z z position, as an int
+     * @param w w position, as an int
+     * @param u u position, as an int
+     * @param v v position, as an int
+     * @param m m position, as an int
+     * @param s any int, a seed to be able to produce many hashes for a given point 
+     * @return 32-bit hash of the x,y,z,w,u,v,m point with the given state s
+     */
+    public static int hashAll(int x, int y, int z, int w, int u, int v, int m, int s) {
+        s ^= x * X7 ^ y * Y7 ^ z * Z7 ^ w * W7 ^ u * U7 ^ v * V7 ^ m * M7;
+        return (s = (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493) ^ s >>> 11;
+    }
+
+    /**
      * An 8-bit point hash that smashes x into s using XOR and multiplications by harmonious numbers,
      * then runs a simple unary hash on s and returns it.
      * GWT-optimized. Inspired by Pelle Evensen's
@@ -363,6 +415,29 @@ public final class PointHasher {
      */
     public static int hash256(int x, int y, int z, int w, int u, int v, int s) {
         s ^= x * X6 ^ y * Y6 ^ z * Z6 ^ w * W6 ^ u * U6 ^ v * V6;
+        return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493 >>> 24;
+    }
+
+    /**
+     * An 8-bit point hash that smashes x, y, z, w, u, v, and m into s using XOR and multiplications by harmonious
+     * numbers, then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
+     * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
+     * hash used here has been stripped down heavily, both for speed and because unless points are selected
+     * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
+     * rrxmrrxmsx_0 has.
+     * @param x x position, as an int
+     * @param y y position, as an int
+     * @param z z position, as an int
+     * @param w w position, as an int
+     * @param u u position, as an int
+     * @param v v position, as an int
+     * @param m m position, as an int
+     * @param s any int, a seed to be able to produce many hashes for a given point
+     * @return 8-bit hash of the x,y,z,w,u,v,m point with the given state s
+     */
+    public static int hash256(int x, int y, int z, int w, int u, int v, int m, int s) {
+        s ^= x * X7 ^ y * Y7 ^ z * Z7 ^ w * W7 ^ u * U7 ^ v * V7 ^ m * M7;
         return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493 >>> 24;
     }
 
@@ -478,6 +553,29 @@ public final class PointHasher {
     }
 
     /**
+     * A 5-bit point hash that smashes x, y, z, w, u, v, and m into s using XOR and multiplications by harmonious
+     * numbers, then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
+     * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
+     * hash used here has been stripped down heavily, both for speed and because unless points are selected
+     * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
+     * rrxmrrxmsx_0 has.
+     * @param x x position, as an int
+     * @param y y position, as an int
+     * @param z z position, as an int
+     * @param w w position, as an int
+     * @param u u position, as an int
+     * @param v v position, as an int
+     * @param m m position, as an int
+     * @param s any int, a seed to be able to produce many hashes for a given point
+     * @return 5-bit hash of the x,y,z,w,u,v,m point with the given state s
+     */
+    public static int hash32(int x, int y, int z, int w, int u, int v, int m, int s) {
+        s ^= x * X7 ^ y * Y7 ^ z * Z7 ^ w * W7 ^ u * U7 ^ v * V7 ^ m * M7;
+        return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493 >>> 27;
+    }
+
+    /**
      * A 32-bit point hash that smashes pre-multiplied x into s using XOR,
      * then runs a simple unary hash on s and returns it.
      * GWT-optimized. Inspired by Pelle Evensen's
@@ -585,6 +683,29 @@ public final class PointHasher {
      */
     public static int hashPrimedAll(int x, int y, int z, int w, int u, int v, int s) {
         s ^= x ^ y ^ z ^ w ^ u ^ v;
+        return (s = (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493) ^ s >>> 11;
+    }
+
+    /**
+     * A 32-bit point hash that smashes pre-multiplied x, y, z, w, u, v, and m into s using XOR,
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
+     * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
+     * hash used here has been stripped down heavily, both for speed and because unless points are selected
+     * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
+     * rrxmrrxmsx_0 has.
+     * @param x x position, as an int, pre-multiplied by {@link #X7}
+     * @param y y position, as an int, pre-multiplied by {@link #Y7}
+     * @param z z position, as an int, pre-multiplied by {@link #Z7}
+     * @param w w position, as an int, pre-multiplied by {@link #W7}
+     * @param u u position, as an int, pre-multiplied by {@link #U7}
+     * @param v v position, as an int, pre-multiplied by {@link #V7}
+     * @param m m position, as an int, pre-multiplied by {@link #M7}
+     * @param s any int, a seed to be able to produce many hashes for a given point
+     * @return 32-bit hash of the x,y,z,w,u,v,m point with the given state s
+     */
+    public static int hashPrimedAll(int x, int y, int z, int w, int u, int v, int m, int s) {
+        s ^= x ^ y ^ z ^ w ^ u ^ v ^ m;
         return (s = (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493) ^ s >>> 11;
     }
 
@@ -699,6 +820,29 @@ public final class PointHasher {
     }
 
     /**
+     * An 8-bit point hash that smashes pre-multiplied x, y, z, w, u, v, and m into s using XOR,
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
+     * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
+     * hash used here has been stripped down heavily, both for speed and because unless points are selected
+     * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
+     * rrxmrrxmsx_0 has.
+     * @param x x position, as an int, pre-multiplied by {@link #X7}
+     * @param y y position, as an int, pre-multiplied by {@link #Y7}
+     * @param z z position, as an int, pre-multiplied by {@link #Z7}
+     * @param w w position, as an int, pre-multiplied by {@link #W7}
+     * @param u u position, as an int, pre-multiplied by {@link #U7}
+     * @param v v position, as an int, pre-multiplied by {@link #V7}
+     * @param m m position, as an int, pre-multiplied by {@link #M7}
+     * @param s any int, a seed to be able to produce many hashes for a given point
+     * @return 8-bit hash of the x,y,z,w,u,v,m point with the given state s
+     */
+    public static int hashPrimed256(int x, int y, int z, int w, int u, int v, int m, int s) {
+        s ^= x ^ y ^ z ^ w ^ u ^ v ^ m;
+        return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493 >>> 24;
+    }
+
+    /**
      * A 5-bit point hash that smashes pre-multiplied x into s using XOR,
      * then runs a simple unary hash on s and returns it.
      * GWT-optimized. Inspired by Pelle Evensen's
@@ -806,6 +950,29 @@ public final class PointHasher {
      */
     public static int hashPrimed32(int x, int y, int z, int w, int u, int v, int s) {
         s ^= x ^ y ^ z ^ w ^ u ^ v;
+        return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493 >>> 27;
+    }
+
+    /**
+     * A 5-bit point hash that smashes pre-multiplied x, y, z, w, u, v, and m into s using XOR,
+     * then runs a simple unary hash on s and returns it.
+     * GWT-optimized. Inspired by
+     * Pelle Evensen's rrxmrrxmsx_0 unary hash, though this doesn't use its code or its full algorithm. The unary
+     * hash used here has been stripped down heavily, both for speed and because unless points are selected
+     * specifically to target flaws in the hash, it doesn't need the intense resistance to bad inputs that
+     * rrxmrrxmsx_0 has.
+     * @param x x position, as an int, pre-multiplied by {@link #X7}
+     * @param y y position, as an int, pre-multiplied by {@link #Y7}
+     * @param z z position, as an int, pre-multiplied by {@link #Z7}
+     * @param w w position, as an int, pre-multiplied by {@link #W7}
+     * @param u u position, as an int, pre-multiplied by {@link #U7}
+     * @param v v position, as an int, pre-multiplied by {@link #V7}
+     * @param m m position, as an int, pre-multiplied by {@link #M7}
+     * @param s any int, a seed to be able to produce many hashes for a given point
+     * @return 5-bit hash of the x,y,z,w,u,v,m point with the given state s
+     */
+    public static int hashPrimed32(int x, int y, int z, int w, int u, int v, int m, int s) {
+        s ^= x ^ y ^ z ^ w ^ u ^ v ^ m;
         return (s ^ (s << 19 | s >>> 13) ^ (s << 5 | s >>> 27) ^ 0xD1B54A35) * 0x125493 >>> 27;
     }
 }

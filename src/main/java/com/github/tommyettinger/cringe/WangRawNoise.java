@@ -3,6 +3,14 @@ package com.github.tommyettinger.cringe;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 
+/**
+ * The abstract parent of all Wang-tiling-capable RawNoise varieties.
+ * This extends RawNoise with a few things needed for tiling, like the alternate seeds to use for Wang tiles
+ * and the current edge distance.
+ * <br>
+ * This also holds a {@link Serializer} for WangRawNoise types, which aren't stored
+ * with RawNoise types.
+ */
 public abstract class WangRawNoise extends RawNoise {
 
     public abstract int getEdge();

@@ -26,17 +26,27 @@ import static com.github.tommyettinger.cringe.GradientVectors.*;
 import static com.github.tommyettinger.cringe.PointHasher.*;
 
 /**
- * A mix of "Classic" Perlin noise, written by Ken Perlin before he created Simplex Noise, with value noise calculated
- * at the same time. This uses cubic interpolation throughout (instead of the quintic interpolation used in Simplex
- * Noise, because cubic looks a little smoother and doesn't alternate as badly between sharp change and low change), and
- * has a single {@code int} seed. Perlue Noise can have significant grid-aligned and 45-degree-diagonal artifacts when
- * too few octaves are used, but sometimes this is irrelevant, such as when sampling 3D noise on the surface of a
- * sphere. These artifacts sometimes manifest as "waves" of quickly-changing and then slowly-changing noise, when 3D
- * noise uses time as the z axis.
+ * {@link PerlueNoise Perlue Noise}, adapted to use compatible edges for a Wang tiling or omni-tiling. Perlue is a mix
+ * of {@link PerlinNoise "Classic" Perlin noise}, written by Ken Perlin before he created Simplex Noise, with value
+ * noise calculated at the same time.
+ * This should be used with {@link WangContinuousNoise}, not the regular {@link ContinuousNoise}. This only creates
+ * tiling areas that are squares, cubes, or hypercubes; it can't make other tiling shapes.
  * <br>
- * This tends to look fairly different from vanilla PerlinNoise or ValueNoise; it is capable of more chaotic
- * arrangements of high and low values than either of those, but it still tends to have clusters of values of a specific
- * size more often than clusters with very different sizes.
+ * You can request a set of 16 2D Wang tiles by giving this 16 sequential seeds and filling the
+ * {@link WangContinuousNoise#getTileSize()} with 2D noise. You can use 3D noise or higher dimensions for this
+ * case as well, as long as the extra dimensions aren't too close to 0 or the tile size (which would make them use
+ * the same pattern for every texture). Unlike most Wang-tiling solutions, you can also request Wang-tiling cubes,
+ * where the inside of each cube is very different but the faces are compatible with each other. You could even,
+ * for some reason, request Wang hypercubes up to 6D. That would need 4096 6D cubes, though.
+ * <br>
+ * An alternative is to use omni-tiling or single-edge mode, with {@link WangContinuousNoise#setSingleEdge(boolean)}.
+ * You can request up to 16 omni-tiling squares that all have compatible edges if you use 2D, up to 64 omni-tiling
+ * cubes if you use 3D, and so on. You can also just get a 2D slice of the 3D cubes by using the same value for z
+ * in every call (again, not too close to 0 or tileSize).
+ * <br>
+ * Internally, this works by changing the seed to an alternate one when the noise is close to an edge.
+ * That makes the gradient/value used for edges at a specific position always the same (the alternate seed doesn't
+ * change), unless it's a Wang tile edge that should be different.
  */
 public class WangPerlueNoise extends WangRawNoise {
     public static final WangPerlueNoise instance = new WangPerlueNoise();

@@ -23,6 +23,24 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Arrays;
 
+/**
+ * A variant on {@link ContinuousNoise} that can handle tiling {@link WangRawNoise} types in 2D through 6D.
+ * <br>
+ * <br>
+ * You can request a set of 16 2D Wang tiles by giving this 16 sequential seeds and filling the
+ * {@link #getTileSize()} with 2D noise. You can use 3D noise or higher dimensions for this
+ * case as well, as long as the extra dimensions aren't too close to 0 or the tile size (which would make them use
+ * the same pattern for every texture). Unlike most Wang-tiling solutions, you can also request Wang-tiling cubes,
+ * where the inside of each cube is very different but the faces are compatible with each other. You could even,
+ * for some reason, request Wang hypercubes up to 6D. That would need 4096 6D cubes, though.
+ * <br>
+ * An alternative is to use omni-tiling or single-edge mode, with {@link #setSingleEdge(boolean)}.
+ * You can request up to 16 omni-tiling squares that all have compatible edges if you use 2D, up to 64 omni-tiling
+ * cubes if you use 3D, and so on. You can also just get a 2D slice of the 3D cubes by using the same value for z
+ * in every call (again, not too close to 0 or tileSize).
+ * <br>
+ * There isn't code yet to line up Wang-tiled textures, but you can use omni-tiling textures in any order.
+ */
 public class WangContinuousNoise extends RawNoise {
 
     /**

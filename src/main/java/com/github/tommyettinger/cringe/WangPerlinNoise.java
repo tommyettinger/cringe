@@ -25,20 +25,25 @@ import static com.badlogic.gdx.math.MathUtils.lerp;
 import static com.github.tommyettinger.cringe.GradientVectors.*;
 
 /**
- * "Classic" Perlin noise, written by Ken Perlin before he created Simplex Noise, with minor
- * adjustments. This uses quintic interpolation throughout (which was an improvement found in Simplex Noise), and has a
- * single {@code long} seed. Perlin Noise can have significant grid-aligned and 45-degree-diagonal artifacts when too
- * few octaves are used, but sometimes this is irrelevant, such as when sampling 3D noise on the surface of a sphere.
+ * {@link PerlinNoise "Classic" Perlin noise} adapted to use compatible edges for a Wang tiling or omni-tiling.
+ * This should be used with {@link WangContinuousNoise}, not the regular {@link ContinuousNoise}. This only creates
+ * tiling areas that are squares, cubes, or hypercubes; it can't make other tiling shapes.
  * <br>
- * This variant also uses different {@link GradientVectors gradient vectors} than the
- * ones used in "Improved Perlin Noise." Here all the gradient vectors are unit vectors, like in the original Perlin
- * Noise, which makes some calculations regarding the range the functions can return easier... in theory. In practice,
- * the somewhat-flawed gradient vectors used in earlier iterations of this PerlinNoise permitted a very different range
- * calculation, and so this class uses a carefully-crafted sigmoid function to move around the most frequent values to
- * roughly match earlier Perlin Noise results, but without risking going out-of-range.
+ * You can request a set of 16 2D Wang tiles by giving this 16 sequential seeds and filling the
+ * {@link WangContinuousNoise#getTileSize()} with 2D noise. You can use 3D noise or higher dimensions for this
+ * case as well, as long as the extra dimensions aren't too close to 0 or the tile size (which would make them use
+ * the same pattern for every texture). Unlike most Wang-tiling solutions, you can also request Wang-tiling cubes,
+ * where the inside of each cube is very different but the faces are compatible with each other. You could even,
+ * for some reason, request Wang hypercubes up to 6D. That would need 4096 6D cubes, though.
  * <br>
- * Perlin noise is rather fast, especially in 2D and 3D, and keeps a decent quality in higher dimensions. It tends to
- * look drastically better if you use it with 2 or more octaves than if you only use 1 octave.
+ * An alternative is to use omni-tiling or single-edge mode, with {@link WangContinuousNoise#setSingleEdge(boolean)}.
+ * You can request up to 16 omni-tiling squares that all have compatible edges if you use 2D, up to 64 omni-tiling
+ * cubes if you use 3D, and so on. You can also just get a 2D slice of the 3D cubes by using the same value for z
+ * in every call (again, not too close to 0 or tileSize).
+ * <br>
+ * Internally, this works by changing the seed to an alternate one when the noise is close to an edge.
+ * That makes the gradient selected for edges at a specific position always the same (the alternate seed doesn't
+ * change), unless it's a Wang tile edge that should be different.
  */
 public class WangPerlinNoise extends WangRawNoise {
     public static final WangPerlinNoise instance = new WangPerlinNoise();

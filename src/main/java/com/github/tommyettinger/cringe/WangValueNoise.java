@@ -25,10 +25,25 @@ import java.io.ObjectOutput;
 import static com.github.tommyettinger.cringe.PointHasher.*;
 
 /**
- * A RawNoise type that produces blocky noise from 1D to 7D. Value noise is really only meant to be used as a building
- * block for better noise, be that with multiple octaves of value noise (and it takes more, typically, to get good
- * results), or by doing what things like {@link HoneyNoise} and {@link FoamNoise} do, mixing value noise with a
- * different algorithm or in a complex way. It is, however, quite fast, especially in low dimensions.
+ * {@link ValueNoise Value Noise} adapted to use compatible edges for a Wang tiling or omni-tiling.
+ * This should be used with {@link WangContinuousNoise}, not the regular {@link ContinuousNoise}. This only creates
+ * tiling areas that are squares, cubes, or hypercubes; it can't make other tiling shapes.
+ * <br>
+ * You can request a set of 16 2D Wang tiles by giving this 16 sequential seeds and filling the
+ * {@link WangContinuousNoise#getTileSize()} with 2D noise. You can use 3D noise or higher dimensions for this
+ * case as well, as long as the extra dimensions aren't too close to 0 or the tile size (which would make them use
+ * the same pattern for every texture). Unlike most Wang-tiling solutions, you can also request Wang-tiling cubes,
+ * where the inside of each cube is very different but the faces are compatible with each other. You could even,
+ * for some reason, request Wang hypercubes up to 6D. That would need 4096 6D cubes, though.
+ * <br>
+ * An alternative is to use omni-tiling or single-edge mode, with {@link WangContinuousNoise#setSingleEdge(boolean)}.
+ * You can request up to 16 omni-tiling squares that all have compatible edges if you use 2D, up to 64 omni-tiling
+ * cubes if you use 3D, and so on. You can also just get a 2D slice of the 3D cubes by using the same value for z
+ * in every call (again, not too close to 0 or tileSize).
+ * <br>
+ * Internally, this works by changing the seed to an alternate one when the noise is close to an edge.
+ * That makes the value used for edges at a specific position always the same (the alternate seed doesn't
+ * change), unless it's a Wang tile edge that should be different.
  */
 public class WangValueNoise extends WangRawNoise {
 

@@ -206,8 +206,8 @@ public class PerlueNoise extends RawNoise {
                 yi = floor(y), y0 = yi * Y2;
         final float xf = x - xi, yf = y - yi;
 
-        final float xa = xf * xf * (1 - xf - xf + 2);//* xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
-        final float ya = yf * yf * (1 - yf - yf + 2);//* yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
+        final float xa = xf * xf * (3 - (xf + xf));//* xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
+        final float ya = yf * yf * (3 - (yf + yf));//* yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
         return
                 equalize(lerp(lerp(gradCoord2D(seed, x0, y0, xf, yf), gradCoord2D(seed, x0+ X2, y0, xf - 1, yf), xa),
                                 lerp(gradCoord2D(seed, x0, y0+ Y2, xf, yf-1), gradCoord2D(seed, x0+ X2, y0+ Y2, xf - 1, yf - 1), xa),
@@ -227,9 +227,9 @@ public class PerlueNoise extends RawNoise {
                 zi = floor(z), z0 = zi * Z3;
         final float xf = x - xi, yf = y - yi, zf = z - zi;
 
-        final float xa = xf * xf * (1 - xf - xf + 2);//* xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
-        final float ya = yf * yf * (1 - yf - yf + 2);//* yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
-        final float za = zf * zf * (1 - zf - zf + 2);//* zf * (zf * (zf * 6.0f - 15.0f) + 9.999998f);
+        final float xa = xf * xf * (3 - (xf + xf));//* xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
+        final float ya = yf * yf * (3 - (yf + yf));//* yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
+        final float za = zf * zf * (3 - (zf + zf));//* zf * (zf * (zf * 6.0f - 15.0f) + 9.999998f);
          return
                  equalize(
                          lerp(
@@ -270,10 +270,10 @@ public class PerlueNoise extends RawNoise {
                 wi = floor(w), w0 = wi * W4;
         final float xf = x - xi, yf = y - yi, zf = z - zi, wf = w - wi;
 
-        final float xa = xf * xf * (1 - xf - xf + 2);//* xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
-        final float ya = yf * yf * (1 - yf - yf + 2);//* yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
-        final float za = zf * zf * (1 - zf - zf + 2);//* zf * (zf * (zf * 6.0f - 15.0f) + 9.999998f);
-        final float wa = wf * wf * (1 - wf - wf + 2);//* wf * (wf * (wf * 6.0f - 15.0f) + 9.999998f);
+        final float xa = xf * xf * (3 - (xf + xf));//* xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
+        final float ya = yf * yf * (3 - (yf + yf));//* yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
+        final float za = zf * zf * (3 - (zf + zf));//* zf * (zf * (zf * 6.0f - 15.0f) + 9.999998f);
+        final float wa = wf * wf * (3 - (wf + wf));//* wf * (wf * (wf * 6.0f - 15.0f) + 9.999998f);
         return
                 equalize(
                         lerp(
@@ -340,11 +340,11 @@ public class PerlueNoise extends RawNoise {
                 ui = floor(u), u0 = ui * U5;
         final float xf = x - xi, yf = y - yi, zf = z - zi, wf = w - wi, uf = u - ui;
 
-        final float xa = xf * xf * (1 - xf - xf + 2);// * xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
-        final float ya = yf * yf * (1 - yf - yf + 2);// * yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
-        final float za = zf * zf * (1 - zf - zf + 2);// * zf * (zf * (zf * 6.0f - 15.0f) + 9.999998f);
-        final float wa = wf * wf * (1 - wf - wf + 2);// * wf * (wf * (wf * 6.0f - 15.0f) + 9.999998f);
-        final float ua = uf * uf * (1 - uf - uf + 2);// * uf * (uf * (uf * 6.0f - 15.0f) + 9.999998f);
+        final float xa = xf * xf * (3 - (xf + xf));// * xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
+        final float ya = yf * yf * (3 - (yf + yf));// * yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
+        final float za = zf * zf * (3 - (zf + zf));// * zf * (zf * (zf * 6.0f - 15.0f) + 9.999998f);
+        final float wa = wf * wf * (3 - (wf + wf));// * wf * (wf * (wf * 6.0f - 15.0f) + 9.999998f);
+        final float ua = uf * uf * (3 - (uf + uf));// * uf * (uf * (uf * 6.0f - 15.0f) + 9.999998f);
         return
                 equalize(
                 lerp(lerp(
@@ -425,12 +425,12 @@ public class PerlueNoise extends RawNoise {
                 ui = floor(u), u0 = ui * U6,
                 vi = floor(v), v0 = vi * V6;
         final float xf = x - xi, yf = y - yi, zf = z - zi, wf = w - wi, uf = u - ui, vf = v - vi;
-        final float xa = xf * xf * (1 - xf - xf + 2);// * xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
-        final float ya = yf * yf * (1 - yf - yf + 2);// * yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
-        final float za = zf * zf * (1 - zf - zf + 2);// * zf * (zf * (zf * 6.0f - 15.0f) + 9.999998f);
-        final float wa = wf * wf * (1 - wf - wf + 2);// * wf * (wf * (wf * 6.0f - 15.0f) + 9.999998f);
-        final float ua = uf * uf * (1 - uf - uf + 2);// * uf * (uf * (uf * 6.0f - 15.0f) + 9.999998f);
-        final float va = vf * vf * (1 - vf - vf + 2);// * vf * (vf * (vf * 6.0f - 15.0f) + 9.999998f);
+        final float xa = xf * xf * (3 - (xf + xf));// * xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
+        final float ya = yf * yf * (3 - (yf + yf));// * yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
+        final float za = zf * zf * (3 - (zf + zf));// * zf * (zf * (zf * 6.0f - 15.0f) + 9.999998f);
+        final float wa = wf * wf * (3 - (wf + wf));// * wf * (wf * (wf * 6.0f - 15.0f) + 9.999998f);
+        final float ua = uf * uf * (3 - (uf + uf));// * uf * (uf * (uf * 6.0f - 15.0f) + 9.999998f);
+        final float va = vf * vf * (3 - (vf + vf));// * vf * (vf * (vf * 6.0f - 15.0f) + 9.999998f);
         return equalize(
                 lerp(
                         lerp(

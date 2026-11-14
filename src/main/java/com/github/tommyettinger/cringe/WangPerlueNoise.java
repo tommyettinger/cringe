@@ -278,8 +278,8 @@ public class WangPerlueNoise extends WangRawNoise {
 
         final float xf = x - x0, yf = y - y0;
 
-        final float xa = xf * xf * xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
-        final float ya = yf * yf * yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
+        final float xa = xf * xf * (3 - (xf + xf));
+        final float ya = yf * yf * (3 - (yf + yf));
         return
                 equalize(lerp(lerp(gradCoord2D(seed, x0, y0, xf, yf), gradCoord2D(seed, x0+1, y0, xf - 1, yf), xa),
                         lerp(gradCoord2D(seed, x0, y0+1, xf, yf-1), gradCoord2D(seed, x0+1, y0+1, xf - 1, yf - 1), xa),
@@ -300,9 +300,9 @@ public class WangPerlueNoise extends WangRawNoise {
 
         final float xf = x - x0, yf = y - y0, zf = z - z0;
 
-        final float xa = xf * xf * xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
-        final float ya = yf * yf * yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
-        final float za = zf * zf * zf * (zf * (zf * 6.0f - 15.0f) + 9.999998f);
+        final float xa = xf * xf * (3 - (xf + xf));
+        final float ya = yf * yf * (3 - (yf + yf));
+        final float za = zf * zf * (3 - (zf + zf));
         return
                 equalize(
                         lerp(
@@ -344,10 +344,10 @@ public class WangPerlueNoise extends WangRawNoise {
 
         final float xf = x - x0, yf = y - y0, zf = z - z0, wf = w - w0;
 
-        final float xa = xf * xf * xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
-        final float ya = yf * yf * yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
-        final float za = zf * zf * zf * (zf * (zf * 6.0f - 15.0f) + 9.999998f);
-        final float wa = wf * wf * wf * (wf * (wf * 6.0f - 15.0f) + 9.999998f);
+        final float xa = xf * xf * (3 - (xf + xf));
+        final float ya = yf * yf * (3 - (yf + yf));
+        final float za = zf * zf * (3 - (zf + zf));
+        final float wa = wf * wf * (3 - (wf + wf));
         return
                 equalize(
                         lerp(
@@ -415,11 +415,11 @@ public class WangPerlueNoise extends WangRawNoise {
 
         final float xf = x - x0, yf = y - y0, zf = z - z0, wf = w - w0, uf = u - u0;
 
-        final float xa = xf * xf * xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
-        final float ya = yf * yf * yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
-        final float za = zf * zf * zf * (zf * (zf * 6.0f - 15.0f) + 9.999998f);
-        final float wa = wf * wf * wf * (wf * (wf * 6.0f - 15.0f) + 9.999998f);
-        final float ua = uf * uf * uf * (uf * (uf * 6.0f - 15.0f) + 9.999998f);
+        final float xa = xf * xf * (3 - (xf + xf));
+        final float ya = yf * yf * (3 - (yf + yf));
+        final float za = zf * zf * (3 - (zf + zf));
+        final float wa = wf * wf * (3 - (wf + wf));
+        final float ua = uf * uf * (3 - (uf + uf));
         return
                 equalize(
                         lerp(
@@ -534,12 +534,12 @@ public class WangPerlueNoise extends WangRawNoise {
                 v0 = floor(v);
 
         final float xf = x - x0, yf = y - y0, zf = z - z0, wf = w - w0, uf = u - u0, vf = v - v0;
-        final float xa = xf * xf * xf * (xf * (xf * 6.0f - 15.0f) + 9.999998f);
-        final float ya = yf * yf * yf * (yf * (yf * 6.0f - 15.0f) + 9.999998f);
-        final float za = zf * zf * zf * (zf * (zf * 6.0f - 15.0f) + 9.999998f);
-        final float wa = wf * wf * wf * (wf * (wf * 6.0f - 15.0f) + 9.999998f);
-        final float ua = uf * uf * uf * (uf * (uf * 6.0f - 15.0f) + 9.999998f);
-        final float va = vf * vf * vf * (vf * (vf * 6.0f - 15.0f) + 9.999998f);
+        final float xa = xf * xf * (3 - (xf + xf));
+        final float ya = yf * yf * (3 - (yf + yf));
+        final float za = zf * zf * (3 - (zf + zf));
+        final float wa = wf * wf * (3 - (wf + wf));
+        final float ua = uf * uf * (3 - (uf + uf));
+        final float va = vf * vf * (3 - (vf + vf));
         return equalize(
                 lerp(
                         lerp(

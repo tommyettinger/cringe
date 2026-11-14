@@ -28,7 +28,7 @@ public final class WangTiler {
         int s = PointHasher.hashAll(x, y - 1, seed) + 4 & 8;
         int n = PointHasher.hashAll(x, y + 1, seed) & 8;
 
-        return w | s | (w & e) >>> 1 | (n & s) >>> 1;
+        return w | s | (w ^ e) >>> 1 | (n ^ s) >>> 1;
     }
 
     /**
@@ -53,6 +53,6 @@ public final class WangTiler {
         int d = PointHasher.hashAll(x, y, z - 1, seed) + 16 & 32;
         int u = PointHasher.hashAll(x, y, z + 1, seed) & 32;
 
-        return w | s | d | (w & e) >>> 1 | (n & s) >>> 1 | (u & d) >>> 1;
+        return w | s | d | (w ^ e) >>> 1 | (n ^ s) >>> 1 | (u ^ d) >>> 1;
     }
 }

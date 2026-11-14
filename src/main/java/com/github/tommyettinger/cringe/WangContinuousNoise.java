@@ -43,7 +43,7 @@ import java.util.Arrays;
  * {@link #setWangTile6D(int, WangRawNoise)} if you want more information about how to use this. In the tests for this
  * library, you can see WangNoiseGenerator, which produces seamlessly-tiling textures.
  * <br>
- * You can use omni-tiling textures in any order. To line up Wang-tiling textures, you can use {@link WangTiler}.
+ * You can use omni-tiling noise textures in any order. To line up Wang-tiling noise, you can use {@link WangTiler}.
  */
 public class WangContinuousNoise extends RawNoise {
 

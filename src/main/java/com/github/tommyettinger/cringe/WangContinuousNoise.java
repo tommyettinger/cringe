@@ -39,6 +39,10 @@ import java.util.Arrays;
  * cubes if you use 3D, and so on. You can also just get a 2D slice of the 3D cubes by using the same value for z
  * in every call (again, not too close to 0 or tileSize).
  * <br>
+ * You can see the documentation for {@link #setWangTile2D(int, WangRawNoise)} through
+ * {@link #setWangTile6D(int, WangRawNoise)} if you want more information about how to use this. In the tests for this
+ * library, you can see WangNoiseGenerator, which produces seamlessly-tiling textures.
+ * <br>
  * There isn't code yet to line up Wang-tiled textures, but you can use omni-tiling textures in any order.
  */
 public class WangContinuousNoise extends RawNoise {
@@ -772,8 +776,20 @@ public class WangContinuousNoise extends RawNoise {
         return sum / correction - 1f;
     }
 
-
-
+    /**
+     * Allows creating 16 different 2D noise textures that follow a Wang tiling pattern (or an omni-tiling pattern, if
+     * {@link #isSingleEdge()} is true). You should give this 16 sequential {@code index} values to get working tiles.
+     * You may provide fewer index values if you don't need tiling on later axes or are using omni-tiling. This modifies
+     * the given WangRawNoise {@code noise} in-place. In order for the tiles to line up, they should be exactly
+     * {@link #getTileSize()} units (such as pixels) on each axis, and the noise should always be requested with
+     * non-negative coordinates starting at 0.
+     * <br>
+     * This is called automatically by {@link #getNoise(float, float)} and
+     * {@link #getNoiseWithSeed(float, float, int)}.
+     *
+     * @param index should be passed up to 16 sequential ints; the upper bits can be anything but should usually be non-negative
+     * @param noise a WangRawNoise instance that will have its "alt seeds" adjusted at the edges
+     */
     public void setWangTile2D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
         int seedA = (index & -1 << 4) ^ -4321;
@@ -798,6 +814,20 @@ public class WangContinuousNoise extends RawNoise {
         }
     }
 
+    /**
+     * Allows creating 64 different 3D noise textures that follow a Wang tiling pattern (or an omni-tiling pattern, if
+     * {@link #isSingleEdge()} is true). You should give this 64 sequential {@code index} values to get working tiles.
+     * You may provide fewer index values if you don't need tiling on later axes or are using omni-tiling. This modifies
+     * the given WangRawNoise {@code noise} in-place. In order for the tiles to line up, they should be exactly
+     * {@link #getTileSize()} units (such as pixels) on each axis, and the noise should always be requested with
+     * non-negative coordinates starting at 0.
+     * <br>
+     * This is called automatically by {@link #getNoise(float, float, float)} and
+     * {@link #getNoiseWithSeed(float, float, float, int)}.
+     *
+     * @param index should be passed up to 64 sequential ints; the upper bits can be anything but should usually be non-negative
+     * @param noise a WangRawNoise instance that will have its "alt seeds" adjusted at the edges
+     */
     public void setWangTile3D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
         int seedA = (index & -1 << 6) ^ -4321;
@@ -829,6 +859,20 @@ public class WangContinuousNoise extends RawNoise {
         }
     }
 
+    /**
+     * Allows creating 256 different 4D noise textures that follow a Wang tiling pattern (or an omni-tiling pattern, if
+     * {@link #isSingleEdge()} is true). You should give this 256 sequential {@code index} values to get working tiles.
+     * You may provide fewer index values if you don't need tiling on later axes or are using omni-tiling. This modifies
+     * the given WangRawNoise {@code noise} in-place. In order for the tiles to line up, they should be exactly
+     * {@link #getTileSize()} units (such as pixels) on each axis, and the noise should always be requested with
+     * non-negative coordinates starting at 0.
+     * <br>
+     * This is called automatically by {@link #getNoise(float, float, float, float)} and
+     * {@link #getNoiseWithSeed(float, float, float, float, int)}.
+     *
+     * @param index should be passed up to 256 sequential ints; the upper bits can be anything but should usually be non-negative
+     * @param noise a WangRawNoise instance that will have its "alt seeds" adjusted at the edges
+     */
     public void setWangTile4D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
         int seedA = (index & -1 << 8) ^ -4321;
@@ -867,6 +911,20 @@ public class WangContinuousNoise extends RawNoise {
         }
     }
 
+    /**
+     * Allows creating 1024 different 5D noise textures that follow a Wang tiling pattern (or an omni-tiling pattern, if
+     * {@link #isSingleEdge()} is true). You should give this 1024 sequential {@code index} values to get working tiles.
+     * You may provide fewer index values if you don't need tiling on later axes or are using omni-tiling. This modifies
+     * the given WangRawNoise {@code noise} in-place. In order for the tiles to line up, they should be exactly
+     * {@link #getTileSize()} units (such as pixels) on each axis, and the noise should always be requested with
+     * non-negative coordinates starting at 0.
+     * <br>
+     * This is called automatically by {@link #getNoise(float, float, float, float, float)} and
+     * {@link #getNoiseWithSeed(float, float, float, float, float, int)}.
+     *
+     * @param index should be passed up to 1024 sequential ints; the upper bits can be anything but should usually be non-negative
+     * @param noise a WangRawNoise instance that will have its "alt seeds" adjusted at the edges
+     */
     public void setWangTile5D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
         int seedA = (index & -1 << 10) ^ -4321;
@@ -912,6 +970,20 @@ public class WangContinuousNoise extends RawNoise {
         }
     }
 
+    /**
+     * Allows creating 4096 different 6D noise textures that follow a Wang tiling pattern (or an omni-tiling pattern, if
+     * {@link #isSingleEdge()} is true). You should give this 4096 sequential {@code index} values to get working tiles.
+     * You may provide fewer index values if you don't need tiling on later axes or are using omni-tiling. This modifies
+     * the given WangRawNoise {@code noise} in-place. In order for the tiles to line up, they should be exactly
+     * {@link #getTileSize()} units (such as pixels) on each axis, and the noise should always be requested with
+     * non-negative coordinates starting at 0.
+     * <br>
+     * This is called automatically by {@link #getNoise(float, float, float, float, float, float)} and
+     * {@link #getNoiseWithSeed(float, float, float, float, float, float, int)}.
+     *
+     * @param index should be passed up to 4096 sequential ints; the upper bits can be anything but should usually be non-negative
+     * @param noise a WangRawNoise instance that will have its "alt seeds" adjusted at the edges
+     */
     public void setWangTile6D(int index, WangRawNoise noise){
         final int[] altSeeds = noise.getAltSeeds();
         int seedA = (index & -1 << 12) ^ -4321;

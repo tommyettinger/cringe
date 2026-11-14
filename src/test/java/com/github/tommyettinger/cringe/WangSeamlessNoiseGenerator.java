@@ -34,8 +34,12 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.FBM;
 
 /**
  * You probably don't want this one, it doesn't work very well.
- * @see WangNoiseGenerator This other generator does work well.
+ * This attempted a geometric solution to requesting looping textures, but that had mirroring problems in some of the
+ * Wang tiles.
+ *
+ * @deprecated Prefer {@link WangNoiseGenerator}; it does work well.
  */
+@Deprecated
 public class WangSeamlessNoiseGenerator extends ApplicationAdapter {
 
     private static final boolean ACTUALLY_RENDER_PNG = true;

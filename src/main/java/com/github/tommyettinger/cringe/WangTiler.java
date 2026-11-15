@@ -12,10 +12,10 @@ public final class WangTiler {
      * Allows determining which index in a Wang-tiling set of squares, from 0 to 15 inclusive, to place at a given
      * point on a grid with a configurable seed. This expects the noise indices to match what WangNoiseGenerator uses,
      * that is, what {@link WangContinuousNoise#setWangTile2D(int, WangRawNoise)} uses as well. This considers positive
-     * x to be a movement to the east (rightward), and positive y to be a movement to the north (upward).
+     * x to be a movement to the east (rightward), and positive y to be a movement to the south (downward).
      *
      * @param x horizontal grid position to place a Wang-tiling square
-     * @param y vertical grid position to place a Wang-tiling square
+     * @param y vertical grid position to place a Wang-tiling square; uses y-down by default
      * @param seed can be any int, but should be the same for a single tiling space
      * @return an index between 0 and 15, inclusive, referring to what index does in {@link WangContinuousNoise#setWangTile2D(int, WangRawNoise)}
      */

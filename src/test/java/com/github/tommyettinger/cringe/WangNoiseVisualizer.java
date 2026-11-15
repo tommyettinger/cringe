@@ -168,7 +168,7 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
         renderer.begin();
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 6; y++) {
-                int index = WangTiler.select(x, ~y, seed);
+                int index = WangTiler.select(x, -y, seed);
                 renderer.draw(tiles[noiseIndex][octaves][fractalMode][index], x * 128f, y * 128f);
             }
         }

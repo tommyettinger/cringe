@@ -167,7 +167,15 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
         if (omni) {
             for (int x = 0; x < 8; x++) {
                 for (int y = 0; y < 6; y++) {
-                    renderer.draw(omniTiles[noiseIndex][octaves][fractalMode][PointHasher.hashAll(x, y, seed) & 63], x * 128f, y * 128f);
+                    // Using Cantor's pairing function means the same two values won't occur next to each other for
+                    // a very long time. It forms right triangles of expanding numbers, and wraps when it hits 64.
+                    int cantor = y + (Compatibility.imul(x + y, x + y + 1) >> 1);
+                    // We can sort-of include the seed's lower 12 bits like this. 4096 total seeds is fine.
+                    cantor ^= seed ^ seed >>> 6;
+                    renderer.draw(omniTiles[noiseIndex][octaves][fractalMode][cantor & 63], x * 128f, y * 128f);
+                    // This is an alternative that doesn't keep the same values away from each other.
+                    // Repeats will happen.
+//                    renderer.draw(omniTiles[noiseIndex][octaves][fractalMode][PointHasher.hashAll(x, y, seed) & 63], x * 128f, y * 128f);
                 }
             }
         }

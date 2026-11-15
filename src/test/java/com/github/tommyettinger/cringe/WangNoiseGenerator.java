@@ -29,13 +29,14 @@ import com.github.tommyettinger.anim8.FastPNG;
 import static com.github.tommyettinger.cringe.ContinuousNoise.FBM;
 
 /**
- * Generates 16 Wang-tiling (or omni-tiling) noise textures using a variety of {@link WangRawNoise} types and modes.
+ * Generates 16 Wang-tiling (or 64 omni-tiling) noise textures using a variety of {@link WangRawNoise} types and modes.
  * This has several options that can be changed at the start of the code:
  * <ul>
  *     <li>If DRY_RUN is true, this will only set up the rendering, but won't save any files.</li>
+ *     <li>If SINGLE_EDGE is true, this will only make omni-tiling noise; otherwise, it makes Wang tiles. When
+ *     generating omni-tiling noise, this generates 64 tiles instead of 16.</li>
  *     <li>If TIME_SEED is true, the seed will be changed based on the current time in milliseconds. If it is false, the
- *     seeds will simply range from 0 to 15, inclusive.</li>
- *     <li>If SINGLE_EDGE is true, this will only make omni-tiling noise; otherwise, it makes Wang tiles.</li>
+ *     seeds will simply range from 0 to 15 (or 63 for omni-tiling), inclusive.</li>
  *     <li>If CANON is true, this will name the noise textures differently and make them suitable for use in a
  *     TextureAtlas. This is meant to generate the noise textures in docs/noiseWang/ and docs/noiseOmni/ .</li>
  *     <li>The SIZE is the pixel width and pixel height of each tile of noise. It should usually be a power of two, but
@@ -49,11 +50,13 @@ public class WangNoiseGenerator extends ApplicationAdapter {
 
     public static final boolean DRY_RUN = false;
     public static final boolean TIME_SEED = false;
-    public static final boolean SINGLE_EDGE = false;
+    public static final boolean SINGLE_EDGE = true;
     public static final boolean CANON = true;
     public static final int SIZE = 128;
     public static final float SCALE = 0x1p-4f;
 
+    public static final int AMOUNT_ROOT = SINGLE_EDGE ? 8 : 4;
+    public static final int LIMIT = AMOUNT_ROOT * AMOUNT_ROOT;
     private static final String TYPE_NAME = SINGLE_EDGE ? "Omni" : "Wang";
     private static final String OUTPUT_FOLDER = CANON ? "out/canon"+SIZE+"/" : "out/";
 
@@ -113,9 +116,9 @@ public class WangNoiseGenerator extends ApplicationAdapter {
             FileHandle mainPngFile = Gdx.files.local(CANON
                     ? OUTPUT_FOLDER+"noise"+TYPE_NAME+"/"+noise.getWrapped().getTag()+"_"+noise.octaves+"_"+WangContinuousNoise.MODES[noise.mode]+"_"+TYPE_NAME+".png"
                     : OUTPUT_FOLDER+"noise"+TYPE_NAME+"/" + noise.stringSerialize().replace('`', '_') + TYPE_NAME+".png");
-            Pixmap mp = new Pixmap(w * 4, h * 4, Pixmap.Format.RGBA8888);
-            for (int s = 0; s < 16; s++) {
-                noise.setSeed((seed & -16) + s);
+            Pixmap mp = new Pixmap(w * AMOUNT_ROOT, h * AMOUNT_ROOT, Pixmap.Format.RGBA8888);
+            for (int s = 0; s < LIMIT; s++) {
+                noise.setSeed((seed & -LIMIT) + s);
 
                 FileHandle pngFile = Gdx.files.local(
                         CANON
@@ -131,7 +134,7 @@ public class WangNoiseGenerator extends ApplicationAdapter {
                         p.drawPixel(x, y);
                     }
                 }
-                mp.drawPixmap(p, (s & 3) * w, (s >>> 2) * h);
+                mp.drawPixmap(p, (s % AMOUNT_ROOT) * w, (s / AMOUNT_ROOT) * h);
                 png.write(pngFile, p);
 
                 p.dispose();

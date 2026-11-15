@@ -55,7 +55,7 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
     private int octaves = 0; // starts at 0, goes up to 2 max
 
     private final TextureRegion[][][][] wangTiles = new TextureRegion[3][3][3][16];
-    private final TextureRegion[][][][] omniTiles = new TextureRegion[3][3][3][16];
+    private final TextureRegion[][][][] omniTiles = new TextureRegion[3][3][3][64];
     private SpriteBatch renderer;
 
     private static final int width = 1024, height = 768;
@@ -80,7 +80,9 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
                     Texture omni = new Texture(Gdx.files.local("docs/noiseOmni/" + type + "_" + oct + "_" + mode + "_Omni.png"));
                     for (int l = 0; l < 16; l++) {
                         wangTiles[i][j][k][l] = new TextureRegion(wang, (l & 3) << 7, (l >>> 2 & 3) << 7, 128, 128);
-                        omniTiles[i][j][k][l] = new TextureRegion(omni, (l & 3) << 7, (l >>> 2 & 3) << 7, 128, 128);
+                    }
+                    for (int l = 0; l < 64; l++) {
+                        omniTiles[i][j][k][l] = new TextureRegion(omni, (l & 7) << 7, (l >>> 3 & 7) << 7, 128, 128);
                     }
                 }
             }
@@ -165,7 +167,7 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
         if (omni) {
             for (int x = 0; x < 8; x++) {
                 for (int y = 0; y < 6; y++) {
-                    renderer.draw(omniTiles[noiseIndex][octaves][fractalMode][PointHasher.hashAll(x, y, seed) & 15], x * 128f, y * 128f);
+                    renderer.draw(omniTiles[noiseIndex][octaves][fractalMode][PointHasher.hashAll(x, y, seed) & 63], x * 128f, y * 128f);
                 }
             }
         }

@@ -23,25 +23,15 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.github.tommyettinger.anim8.AnimatedGif;
-import com.github.tommyettinger.anim8.Dithered;
-import com.github.tommyettinger.anim8.PaletteReducer;
 
 import static com.badlogic.gdx.Input.Keys.*;
-import static com.badlogic.gdx.graphics.GL20.GL_POINTS;
-import static com.github.tommyettinger.cringe.ColorSupport.*;
-import static com.github.tommyettinger.cringe.ContinuousNoise.*;
 
 /**
  */
@@ -64,7 +54,8 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
 
     private int octaves = 0; // starts at 0, goes up to 2 max
 
-    private TextureRegion[][][][] tiles = new TextureRegion[3][3][3][16];
+    private final TextureRegion[][][][] wangTiles = new TextureRegion[3][3][3][16];
+    private final TextureRegion[][][][] omniTiles = new TextureRegion[3][3][3][16];
     private SpriteBatch renderer;
 
     private static final int width = 1024, height = 768;
@@ -72,9 +63,7 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
     private Viewport view;
     private float ctr = -256;
     private boolean keepGoing = true;
-
-    private final Color color = new Color(Color.WHITE);//new Color(Color.LIME);
-    private final Color tempColor = new Color(Color.WHITE);
+    private boolean omni = false;
 
     @Override
     public void create() {
@@ -87,9 +76,11 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
                 int oct = j + 1;
                 for (int k = 0; k < 3; k++) {
                     String mode = WangContinuousNoise.MODES[k];
-                    Texture master = new Texture(Gdx.files.local("docs/noiseWang/" + type + "_" + oct + "_" + mode + "_Wang.png"));
+                    Texture wang = new Texture(Gdx.files.local("docs/noiseWang/" + type + "_" + oct + "_" + mode + "_Wang.png"));
+                    Texture omni = new Texture(Gdx.files.local("docs/noiseOmni/" + type + "_" + oct + "_" + mode + "_Omni.png"));
                     for (int l = 0; l < 16; l++) {
-                        tiles[i][j][k][l] = new TextureRegion(master, (l & 3) << 7, (l >>> 2 & 3) << 7, 128, 128);
+                        wangTiles[i][j][k][l] = new TextureRegion(wang, (l & 3) << 7, (l >>> 2 & 3) << 7, 128, 128);
+                        omniTiles[i][j][k][l] = new TextureRegion(omni, (l & 3) << 7, (l >>> 2 & 3) << 7, 128, 128);
                     }
                 }
             }
@@ -122,6 +113,11 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
                     case SLASH:
                         seed = Scramblers.scrambleInt(seed);
                         System.out.println("Seed is now " + seed);
+                        break;
+                    case O:
+                        omni = !omni;
+                        if(omni) System.out.println("Using omni-tiling mode.");
+                        else  System.out.println("Using Wang-tiling mode.");
                         break;
                     case N: // noise type
                     case EQUALS: // (also plus)
@@ -166,10 +162,19 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
 
     public void putMap() {
         renderer.begin();
-        for (int x = 0; x < 8; x++) {
-            for (int y = 0; y < 6; y++) {
-                int index = WangTiler.select(x, -y, seed);
-                renderer.draw(tiles[noiseIndex][octaves][fractalMode][index], x * 128f, y * 128f);
+        if (omni) {
+            for (int x = 0; x < 8; x++) {
+                for (int y = 0; y < 6; y++) {
+                    renderer.draw(omniTiles[noiseIndex][octaves][fractalMode][PointHasher.hashAll(x, y, seed) & 15], x * 128f, y * 128f);
+                }
+            }
+        }
+        else {
+            for (int x = 0; x < 8; x++) {
+                for (int y = 0; y < 6; y++) {
+                    int index = WangTiler.select(x, -y, seed);
+                    renderer.draw(wangTiles[noiseIndex][octaves][fractalMode][index], x * 128f, y * 128f);
+                }
             }
         }
         renderer.end();

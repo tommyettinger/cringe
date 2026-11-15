@@ -67,7 +67,7 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
     private TextureRegion[][][][] tiles = new TextureRegion[3][3][3][16];
     private SpriteBatch renderer;
 
-    private static final int width = 1024, height = 1024;
+    private static final int width = 1024, height = 768;
 
     private Viewport view;
     private float ctr = -256;
@@ -167,8 +167,8 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
     public void putMap() {
         renderer.begin();
         for (int x = 0; x < 8; x++) {
-            for (int y = 0; y < 8; y++) {
-                int index = WangTiler.select(x, y, seed);
+            for (int y = 0; y < 6; y++) {
+                int index = WangTiler.select(x, ~y, seed);
                 renderer.draw(tiles[noiseIndex][octaves][fractalMode][index], x * 128f, y * 128f);
             }
         }

@@ -37,9 +37,11 @@ import static com.github.tommyettinger.cringe.ContinuousNoise.FBM;
 public class WangNoiseGenerator extends ApplicationAdapter {
 
     private static final boolean ACTUALLY_RENDER_PNG = true;
-    private static final boolean TIME_SEED = true;
-    private static final boolean SINGLE_EDGE = false;
+    private static final boolean TIME_SEED = false;
+    private static final boolean SINGLE_EDGE = true;
     private static final String TYPE_NAME = SINGLE_EDGE ? "Omni" : "Wang";
+    private static final boolean CANON = true;
+    private static final String OUTPUT_FOLDER = CANON ? "out/canon/" : "out/";
 
     public interface FloatToFloatFunction {
         float applyAsFloat(float f);
@@ -76,6 +78,7 @@ public class WangNoiseGenerator extends ApplicationAdapter {
         view = new ScreenViewport();
 
         png = new FastPNG();
+//        png.setFlipY(true); // already the default
         seed = (TIME_SEED) ? (int)Math.abs(Scramblers.scramble(System.nanoTime())) : 0;
         noise.setTileSize(width);
         noise.setSingleEdge(SINGLE_EDGE);
@@ -95,15 +98,21 @@ public class WangNoiseGenerator extends ApplicationAdapter {
 
     public void putMap() {
         if (ACTUALLY_RENDER_PNG) {
-            Gdx.files.local("out/noise"+TYPE_NAME+"/").mkdirs();
+            Gdx.files.local(OUTPUT_FOLDER+"noise"+TYPE_NAME+"/").mkdirs();
             int w = width, h = height;
             noise.setSeed(seed);
-            FileHandle mainPngFile = Gdx.files.local("out/noise"+TYPE_NAME+"/" + noise.stringSerialize().replace('`', '_') + "_"+TYPE_NAME+".png");
+            FileHandle mainPngFile = Gdx.files.local(CANON
+                    ? OUTPUT_FOLDER+"noise"+TYPE_NAME+"/"+noise.getWrapped().getTag()+"_"+noise.octaves+"_"+WangContinuousNoise.MODES[noise.mode]+"_"+TYPE_NAME+".png"
+                    : OUTPUT_FOLDER+"noise"+TYPE_NAME+"/" + noise.stringSerialize().replace('`', '_') + TYPE_NAME+".png");
             Pixmap mp = new Pixmap(w * 4, h * 4, Pixmap.Format.RGBA8888);
             for (int s = 0; s < 16; s++) {
                 noise.setSeed((seed & -16) + s);
 
-                FileHandle pngFile = Gdx.files.local("out/noise"+TYPE_NAME+"/" + noise.stringSerialize().replace('`', '_') + ".png");
+                FileHandle pngFile = Gdx.files.local(
+                        CANON
+                                ? OUTPUT_FOLDER+"noise"+TYPE_NAME+"/"+noise.getWrapped().getTag()+"_"+noise.octaves+"_"+WangContinuousNoise.MODES[noise.mode]+"_"+s+".png"
+                                : OUTPUT_FOLDER+"noise"+TYPE_NAME+"/"+noise.stringSerialize().replace('`', '_') + ".png"
+                );
 
                 Pixmap p = new Pixmap(w, h, Pixmap.Format.RGBA8888);
                 for (int x = 0; x < w; x++) {

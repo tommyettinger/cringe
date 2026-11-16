@@ -69,7 +69,7 @@ public class Vector6 implements Vector<Vector6>, Json.Serializable, Externalizab
      */
     public final static Vector6 Zero = new Vector6(0, 0, 0, 0, 0, 0);
 
-    /** Constructs a vector at (0,0,0,0,0,0) */
+    /** Constructs a vector at (0,0,0,0,0,0). */
     public Vector6() {
     }
 

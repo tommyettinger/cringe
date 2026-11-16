@@ -244,7 +244,9 @@
 <img src="noiseOmni/WangPerlueNoise_1_Ridged_Omni.png" alt="Merged 1-Octave Ridged Noise" />
 <p>
     You can use the PointHasher class to get seeded pseudo-random indices for the 64 tiles here, which can be
-    connected in any order. <code>PointHasher.hashAll(x, y, seed) &amp; 63</code> will get a valid index.
+    connected in any order. <code>PointHasher.hash256(x, y, seed) &amp; 63</code> will get a valid index.
+    You can also use WangTiler.selectSingleEdge(), which is the same as above, or WangTiler.selectSingleEdgeSeparated(),
+    which won't repeat as often in medium-sized grids.
 </p>
 </body>
 </html>

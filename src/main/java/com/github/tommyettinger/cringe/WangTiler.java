@@ -55,4 +55,31 @@ public final class WangTiler {
 
         return w | s | d | (w ^ e) >>> 1 | (n ^ s) >>> 1 | (u ^ d) >>> 1;
     }
+    /**
+     * Gets a pseudo-random index from 0 to 63, inclusive, for single-edge (omni-tiling) noise.
+     * This is likely to choose some index more than once given 9 or more tiles.
+     * @param x horizontal grid position to place a Wang-tiling square
+     * @param y vertical grid position to place a Wang-tiling square; y-up or y-down doesn't matter here
+     * @param seed all bits are used; should be the same for a single tiling space
+     * @return an index between 0 and 63, inclusive
+     */
+    public static int selectSingleEdge(int x, int y, int seed) {
+        return PointHasher.hash256(x, y, seed) & 63;
+    }
+
+    /**
+     * Gets a less-random index from 0 to 63, inclusive, for single-edge (omni-tiling) noise.
+     * This won't repeat in the first 8x8 grid of tiles, which can be useful to reduce the appearance
+     * of duplicates. This only can take x and y from 0 to 65535 meaningfully.
+     * @param x non-negative horizontal grid position to place a Wang-tiling square
+     * @param y non-negative vertical grid position to place a Wang-tiling square; y-up or y-down doesn't matter here
+     * @param seed only the low 12 bits are used; should be the same for a single tiling space
+     * @return an index between 0 and 63, inclusive
+     */
+    public static int selectSingleEdgeSeparated(int x, int y, int seed){
+        x &= 0xFFFF;
+        y &= 0xFFFF;
+        final int m = Math.max(x, y);
+        return (m * m + m + y - x ^ seed ^ seed >>> 6) & 63;
+    }
 }

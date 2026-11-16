@@ -29,14 +29,16 @@ import static com.github.tommyettinger.cringe.Compatibility.imul;
  * then interpolate between the hash results. Some of these work on angles (so they wrap like a line around a circle)
  * instead of normal lines.
  * <br>
- * The wobble methods that take a seed and a distance along a line as a value are:
+ * The wobble methods that take a distance along a line and an int seed are:
  * <ul>
  *     <li>{@link #wobble(float, int)} is straightforward; it uses a hermite spline to interpolate two points.</li>
- *     <li>{@link #bicubicWobble(float, long)} uses bicubic interpolation on 4 points, and tends to be smooth.</li>
+ *     <li>{@link #bicubicWobble(float, int)} uses bicubic interpolation on 4 points, and tends to be smooth.</li>
  *     <li>{@link #splineWobble(float, int)} can be much more sharp or smooth, varying randomly over its length.</li>
- *     <li>splineWobble() also can take a long seed.</li>
  *     <li>{@link #trigWobble(float, int)} is a trigonometric wobble, using sine to smoothly transition.</li>
+ *     <li>{@link #smoothWobble(float, int)} is like bicubicWobble() but tends to go closer to the min and max.</li>
  * </ul>
+ * Several of those also allow long seeds.
+ * <br>
  * There are also some methods to get a wobbling angle, smoothly wrapping around the angle 0:
  * <ul>
  *     <li>{@link #wobbleAngle(float, int)} is a simple wobble with output in radians.</li>
@@ -45,8 +47,8 @@ import static com.github.tommyettinger.cringe.Compatibility.imul;
  *     <li>{@link #splineWobbleAngle(float, int)} is a more-random wobble with output in radians.</li>
  *     <li>{@link #splineWobbleAngleDeg(float, int)} is a more-random wobble with output in degrees.</li>
  *     <li>{@link #splineWobbleAngleTurns(float, int)} is a more-random wobble with output in turns (1 turn == 360 degrees).</li>
- *     <li>Each of the splineWobbleAngle() methods also can take a long seed.</li>
  * </ul>
+ * The splineWobbleAngle methods also allow long seeds.
  */
 public final class LineWobble {
     /**
@@ -499,7 +501,10 @@ public final class LineWobble {
         return (start - (int)start);
     }
 
-
+    /**
+     * 1D RawNoise that wraps {@link #wobble(float, int)}.
+     * This can be used with {@link ContinuousNoise} to change the frequency and octaves of the noise.
+     */
     public static class WobbleNoise extends RawWobbleNoise {
 
         public WobbleNoise() {
@@ -524,7 +529,11 @@ public final class LineWobble {
             return "WobbleNoise";
         }
     }
-    
+
+    /**
+     * 1D RawNoise that wraps {@link #bicubicWobble(float, int)}.
+     * This can be used with {@link ContinuousNoise} to change the frequency and octaves of the noise.
+     */
     public static class BicubicWobbleNoise extends RawWobbleNoise {
 
         public BicubicWobbleNoise() {
@@ -550,6 +559,10 @@ public final class LineWobble {
         }
     }
 
+    /**
+     * 1D RawNoise that wraps {@link #smoothWobble(float, int)}.
+     * This can be used with {@link ContinuousNoise} to change the frequency and octaves of the noise.
+     */
     public static class SmoothWobbleNoise extends RawWobbleNoise {
 
         public SmoothWobbleNoise() {
@@ -575,6 +588,10 @@ public final class LineWobble {
         }
     }
 
+    /**
+     * 1D RawNoise that wraps {@link #splineWobble(float, int)}.
+     * This can be used with {@link ContinuousNoise} to change the frequency and octaves of the noise.
+     */
     public static class SplineWobbleNoise extends RawWobbleNoise {
 
         public SplineWobbleNoise() {
@@ -600,6 +617,10 @@ public final class LineWobble {
         }
     }
 
+    /**
+     * 1D RawNoise that wraps {@link #trigWobble(float, int)}.
+     * This can be used with {@link ContinuousNoise} to change the frequency and octaves of the noise.
+     */
     public static class TrigWobbleNoise extends RawWobbleNoise {
 
         public TrigWobbleNoise() {

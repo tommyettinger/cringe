@@ -24,9 +24,16 @@ import java.io.ObjectOutput;
 
 /**
  * An INoise implementation that divides space up into cells, and has configurable ways to get values from cells.
+ * This offers a variety of possible {@link NoiseType}s that determine how the values inside cells are calculated.
+ * This offers cellular noise in dimensions 2, 3, and 4, and defaults to {@link LineWobble#bicubicWobble(float, int)}
+ * for 1D noise.
  */
 public class CellularNoise extends RawNoise {
 
+    /**
+     * Defines the different ways this can calculate the values inside cells. The way these look will likely need
+     * experimentation to figure out which one you want.
+     */
     public enum NoiseType {
         CELL_VALUE, NOISE_LOOKUP,
         DISTANCE, DISTANCE_2,
@@ -121,14 +128,33 @@ public class CellularNoise extends RawNoise {
         return getNoiseWithSeed(x, y, z, w, seed);
     }
 
+    /**
+     * Not supported.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @param z z position; can be any finite float
+     * @param w w position; can be any finite float
+     * @param u u position; can be any finite float
+     * @return 0.0f
+     */
     @Override
     public float getNoise(float x, float y, float z, float w, float u) {
-        return getNoiseWithSeed(x, y, z, w, u, seed);
+        return 0f;
     }
 
+    /**
+     * Not supported.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @param z z position; can be any finite float
+     * @param w w position; can be any finite float
+     * @param u u position; can be any finite float
+     * @param v v position; can be any finite float
+     * @return 0.0f
+     */
     @Override
     public float getNoise(float x, float y, float z, float w, float u, float v) {
-        return getNoiseWithSeed(x, y, z, w, u, v, seed);
+        return 0f;
     }
 
     @Override
@@ -528,11 +554,32 @@ public class CellularNoise extends RawNoise {
         }
     }
 
+    /**
+     * Not supported.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @param z z position; can be any finite float
+     * @param w w position; can be any finite float
+     * @param u u position; can be any finite float
+     * @param seed any int; must be the same between calls for the noise to be continuous
+     * @return 0.0f
+     */
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, int seed) {
         return 0f;
     }
 
+    /**
+     * Not supported.
+     * @param x x position; can be any finite float
+     * @param y y position; can be any finite float
+     * @param z z position; can be any finite float
+     * @param w w position; can be any finite float
+     * @param u u position; can be any finite float
+     * @param v v position; can be any finite float
+     * @param seed any int; must be the same between calls for the noise to be continuous
+     * @return 0.0f
+     */
     @Override
     public float getNoiseWithSeed(float x, float y, float z, float w, float u, float v, int seed) {
         return 0f;

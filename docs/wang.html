@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Cringe Wang Tiling Noise</title>
+</head>
+<body>
+<h1>Wang Tiling Noise</h1>
+<p>
+    A newer feature in Cringe is support for generating Wang tiles of seamless noise. This library also provides some
+    pre-made noise textures in the folder
+    <a href="https://github.com/tommyettinger/cringe/blob/main/docs/noiseWang">docs/noiseWang/</a>.
+    This page shows how they work.
+</p>
+<p>
+    There are two kinds of vertical seam between noise textures in a Wang tiling, and two kinds of horizontal seam. Any
+    edge with the same type of seam is compatible with the 8 textures that share that seam on the opposite edge. Here,
+    we'll call the two types of seams "cyan" and "orange," with cyan horizontal seams different from cyan vertical ones
+    and the same for orange. The index for a noise texture is written below that texture.
+    All the examples here use Perlue noise, but Perlin and Value noise are also provided.
+</p>
+<table>
+    <thead>
+    <tr>
+    <th style="background-color: orange">&nbsp;</th><th>&nbsp;</th>
+    <th style="background-color: orange">&nbsp;</th><th>&nbsp;</th>
+    <th style="background-color: orange">&nbsp;</th><th>&nbsp;</th>
+    <th style="background-color: orange">&nbsp;</th><th>&nbsp;</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_0.png" alt="Noise 0" /></td><td style="background-color: orange">&nbsp;</td>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_1.png" alt="Noise 1" /></td><td style="background-color: cyan">&nbsp;</td>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_2.png" alt="Noise 2" /></td><td style="background-color: cyan">&nbsp;</td>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_3.png" alt="Noise 3" /></td><td style="background-color: orange">&nbsp;</td>
+    </tr>
+    <tr>
+    <td style="background-color: orange">Noise 0</td><td></td>
+    <td style="background-color: orange">Noise 1</td><td></td>
+    <td style="background-color: orange">Noise 2</td><td></td>
+    <td style="background-color: orange">Noise 3</td><td></td>
+    </tr>
+    <tr>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_4.png" alt="Noise 4" /></td><td style="background-color: orange">&nbsp;</td>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_5.png" alt="Noise 5" /></td><td style="background-color: cyan">&nbsp;</td>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_6.png" alt="Noise 6" /></td><td style="background-color: cyan">&nbsp;</td>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_7.png" alt="Noise 7" /></td><td style="background-color: orange">&nbsp;</td>
+    </tr>
+    <tr>
+    <td style="background-color: cyan">Noise 4</td><td></td>
+    <td style="background-color: cyan">Noise 5</td><td></td>
+    <td style="background-color: cyan">Noise 6</td><td></td>
+    <td style="background-color: cyan">Noise 7</td><td></td>
+    </tr>
+    <tr>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_8.png"  alt="Noise 8"  /></td><td style="background-color: orange">&nbsp;</td>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_9.png"  alt="Noise 9"  /></td><td style="background-color: cyan">&nbsp;</td>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_10.png" alt="Noise 10" /></td><td style="background-color: cyan">&nbsp;</td>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_11.png" alt="Noise 11" /></td><td style="background-color: orange">&nbsp;</td>
+    </tr>
+    <tr>
+    <td style="background-color: cyan">Noise 8</td><td></td>
+    <td style="background-color: cyan">Noise 9</td><td></td>
+    <td style="background-color: cyan">Noise 10</td><td></td>
+    <td style="background-color: cyan">Noise 11</td><td></td>
+    </tr>
+    <tr>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_12.png" alt="Noise 12" /></td><td style="background-color: orange">&nbsp;</td>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_13.png" alt="Noise 13" /></td><td style="background-color: cyan">&nbsp;</td>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_14.png" alt="Noise 14" /></td><td style="background-color: cyan">&nbsp;</td>
+    <td><img src="noiseWang/WangPerlueNoise_1_FBM_15.png" alt="Noise 15" /></td><td style="background-color: orange">&nbsp;</td>
+    </tr>
+    <tr>
+    <td style="background-color: orange">Noise 12</td><td></td>
+    <td style="background-color: orange">Noise 13</td><td></td>
+    <td style="background-color: orange">Noise 14</td><td></td>
+    <td style="background-color: orange">Noise 15</td><td></td>
+    </tr>
+    </tbody>
+</table>
+<p>
+    Here are the above textures as one merged image, which can be split up into TextureRegions:
+</p>
+<img src="noiseWang/WangPerlueNoise_1_FBM_Wang.png" alt="Merged Noise" />
+<p>
+    The images are provided with up to 3 octaves; here's FBM with 3 octaves, for a cloudy look:
+</p>
+<img src="noiseWang/WangPerlueNoise_3_FBM_Wang.png" alt="Merged 3-Octave FBM Noise" />
+<p>
+    There are also 3 modes provided; FBM looks cloudy, Billow has dark lines, and Ridged has light lines.
+</p>
+<p>
+    Here's Billow with 2 octaves:
+</p>
+<img src="noiseWang/WangPerlueNoise_2_Billow_Wang.png" alt="Merged 2-Octave Billow Noise" />
+<p>
+    Here's Ridged with 1 octave:
+</p>
+<img src="noiseWang/WangPerlueNoise_1_Ridged_Wang.png" alt="Merged 1-Octave Ridged Noise" />
+<p>
+    You can use the WangTiler class to get seeded pseudo-random indices for noise tiles, in the same order the
+    indices are given here, for positions on a grid. Note that this expects the y-positions to be like they are here,
+    with the lower y-positions at the top and higher y at the bottom (the order you would read a paragraph in).
+    If you see seams between rows, try passing -y instead of y to WangTiler.select().
+</p>
+</body>
+</html>

@@ -2338,6 +2338,8 @@ public abstract class GdxRandom extends Random implements Json.Serializable, Ext
 	 * extremely unlikely with RandomDistinct64, but it is (theoretically) possible.
 	 * <br>
 	 * You can also consider {@link UniqueIdentifier}, which is GWT-compatible and only supports random IDs.
+	 * There is {@link #nextUniqueIdentifier()} if you want to use a GdxRandom to get a UniqueIdentifier, but using
+	 * {@link UniqueIdentifier#next()} is preferred because it guarantees uniqueness for a huge amount of identifiers.
 	 *
 	 * @see UniqueIdentifier
 	 * @return a new random {@link UUID}
@@ -2350,6 +2352,21 @@ public abstract class GdxRandom extends Random implements Json.Serializable, Ext
 		lsb &= 0xFFFFFFFFFFFFFF3FL;
 		lsb |= 0x0000000000000080L;
 		return new UUID(msb, lsb);
+	}
+
+	/**
+	 * Obtains a random {@link UniqueIdentifier} and returns it.
+	 * This calls {@link #nextLong()} twice and passes that to {@link UniqueIdentifier#UniqueIdentifier(long, long)}.
+	 * This is not guaranteed to be unique like using {@link UniqueIdentifier#next()}! While this is extremely likely to
+	 * be unique, using UniqueIdentifier.next() should almost always be preferred to obtain unique identifiers.
+	 * <br>
+	 * If you need JDK UUID instances, you can use nextUUID() instead, but UUID isn't compatible with GWT.
+	 *
+	 * @return a random {@link UniqueIdentifier}
+	 * @see UniqueIdentifier#next() Prefer the next() static method on UniqueIdentifier to obtain objects of that type.
+	 */
+	public UniqueIdentifier nextUniqueIdentifier() {
+		return new UniqueIdentifier(nextLong(), nextLong());
 	}
 
 	// Serialization and deserialization to String

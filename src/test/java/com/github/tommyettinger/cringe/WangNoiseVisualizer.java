@@ -26,6 +26,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -164,9 +165,10 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
 
     public void putMap() {
         renderer.begin();
+        int offsetPx = (int)(ctr), offsetGrid = offsetPx >> 7;
         if (omni) {
-            for (int x = 0; x < 8; x++) {
-                for (int y = 0; y < 6; y++) {
+            for (int x = 0; x < 10; x++) {
+                for (int y = 0; y < 8; y++) {
                     // Using Cantor's pairing function means the same two values won't occur next to each other for
                     // a very long time. It forms right triangles of expanding numbers, and wraps when it hits 64.
 //                    int cantor = y + (Compatibility.imul(x + y, x + y + 1) >> 1);
@@ -174,20 +176,18 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
 //                    cantor ^= seed ^ seed >>> 6;
 //                    renderer.draw(omniTiles[noiseIndex][octaves][fractalMode][cantor & 63], x * 128f, y * 128f);
                     // Rosenberg-Strong pairing function, an alternative to Cantor, defined for non-negative x and y.
-                    int max = Math.max(x, y);
-                    int rs = Compatibility.imul(max, max) + max + x - y ^ seed ^ seed >>> 6;
-                    renderer.draw(omniTiles[noiseIndex][octaves][fractalMode][rs & 63], x * 128f, y * 128f);
+                    renderer.draw(omniTiles[noiseIndex][octaves][fractalMode][WangTiler.selectSingleEdgeSeparated(x + offsetGrid, y + offsetGrid, seed)], x * 128f - 128f - (offsetPx & 127), y * 128f - 128f - (offsetPx & 127));
                     // This is an alternative that doesn't keep the same values away from each other.
                     // Repeats will happen.
-//                    renderer.draw(omniTiles[noiseIndex][octaves][fractalMode][PointHasher.hashAll(x, y, seed) & 63], x * 128f, y * 128f);
+//                    renderer.draw(omniTiles[noiseIndex][octaves][fractalMode][PointHasher.hash256(x, y, seed) & 63], x * 128f, y * 128f);
                 }
             }
         }
         else {
-            for (int x = 0; x < 8; x++) {
-                for (int y = 0; y < 6; y++) {
-                    int index = WangTiler.select(x, -y, seed);
-                    renderer.draw(wangTiles[noiseIndex][octaves][fractalMode][index], x * 128f, y * 128f);
+            for (int x = 0; x < 10; x++) {
+                for (int y = 0; y < 8; y++) {
+                    int index = WangTiler.select(x + offsetGrid, -y - offsetGrid, seed);
+                    renderer.draw(wangTiles[noiseIndex][octaves][fractalMode][index], x * 128f - 128f - (offsetPx & 127), y * 128f - 128f - (offsetPx & 127));
                 }
             }
         }
@@ -199,7 +199,7 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
         Gdx.graphics.setTitle(String.valueOf(Gdx.graphics.getFramesPerSecond()));
         if (keepGoing) {
             ScreenUtils.clear(Color.BLACK);
-            ctr += Gdx.graphics.getDeltaTime();
+            ctr += Gdx.graphics.getDeltaTime() * 30f;
             putMap();
         }
     }

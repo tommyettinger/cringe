@@ -71,6 +71,10 @@ public final class WangTiler {
      * Gets a less-random index from 0 to 63, inclusive, for single-edge (omni-tiling) noise.
      * This won't repeat in the first 8x8 grid of tiles, which can be useful to reduce the appearance
      * of duplicates. This only can take x and y from 0 to 65535 meaningfully.
+     * Only the low 12 bits of seed are used, so seeds from 0 to 4095 will all work, but higher ones will be duplicates.
+     * This uses the Rosenberg-Strong pairing function, which lines up indices in concentric squares.
+     * <a href="https://hbfs.wordpress.com/2018/08/07/moeud-deux/">See Steven Pigeon's blog</a> for more on that.
+     *
      * @param x non-negative horizontal grid position to place a Wang-tiling square
      * @param y non-negative vertical grid position to place a Wang-tiling square; y-up or y-down doesn't matter here
      * @param seed only the low 12 bits are used; should be the same for a single tiling space
@@ -81,5 +85,24 @@ public final class WangTiler {
         y &= 0xFFFF;
         final int m = Math.max(x, y);
         return (m * m + m + y - x ^ seed ^ seed >>> 6) & 63;
+    }
+
+    /**
+     * Gets a less-random index from 0 to 63, inclusive, for single-edge (omni-tiling) noise.
+     * This shouldn't repeat in the first 6x6 grid of tiles, which can be useful to reduce the appearance
+     * of duplicates. This only can take x and y from 0 to 65535 meaningfully.
+     * Only the low 12 bits of seed are used, so seeds from 0 to 4095 will all work, but higher ones will be duplicates.
+     * This uses the Cantor pairing function, which lines up indices in right-triangle shapes.
+     * <a href="https://hbfs.wordpress.com/2018/07/31/moeud/">See Steven Pigeon's blog</a> for more on that.
+     *
+     * @param x non-negative horizontal grid position to place a Wang-tiling square
+     * @param y non-negative vertical grid position to place a Wang-tiling square; y-up or y-down doesn't matter here
+     * @param seed only the low 12 bits are used; should be the same for a single tiling space
+     * @return an index between 0 and 63, inclusive
+     */
+    public static int selectSingleEdgeAlternate(int x, int y, int seed){
+        x &= 0xFFFF;
+        y &= 0xFFFF;
+        return (y + ((x + y) * (x + y + 1) >>> 1) ^ seed ^ seed >>> 6) & 63;
     }
 }

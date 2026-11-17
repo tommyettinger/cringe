@@ -89,7 +89,7 @@ public class WangContinuousNoise extends RawNoise {
     public boolean singleEdge = false;
 
     public WangContinuousNoise() {
-        this(new WangPerlinNoise(123), 123, 0.03125f, FBM, 1);
+        this(new WangPerlueNoise(123), 123, 0.03125f, FBM, 1);
 
     }
 
@@ -264,11 +264,11 @@ public class WangContinuousNoise extends RawNoise {
      * Requires the type of the noise generator ({@link #wrapped}) that is used by {@code in} to be registered.
      * @param in the stream to read data from in order to restore the object
      * @throws IOException It probably shouldn't???
-     * @throws ClassNotFoundException if the {@link RawNoise} subclass used by {@code in} is not registered
+     * @throws ClassNotFoundException if the {@link WangRawNoise} subclass used by {@code in} is not registered
      */
     @GwtIncompatible
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        setWrapped((WangPerlinNoise) in.readObject());
+        setWrapped((WangRawNoise) in.readObject());
         setFrequency(in.readFloat());
         setMode(in.readInt());
         setOctaves(in.readInt());

@@ -171,9 +171,9 @@ public class WangNoiseVisualizer extends ApplicationAdapter {
                 for (int y = 0; y < 8; y++) {
                     // Using Cantor's pairing function means the same two values won't occur next to each other for
                     // a very long time. It forms right triangles of expanding numbers, and wraps when it hits 64.
-                    int index = WangTiler.selectSingleEdgeAlternate(x + offsetGrid, y + offsetGrid, seed);
+//                    int index = WangTiler.selectSingleEdgeAlternate(x + offsetGrid, y + offsetGrid, seed);
                     // Rosenberg-Strong pairing function, an alternative to Cantor, defined for non-negative x and y.
-//                    int index = WangTiler.selectSingleEdgeSeparated(x + offsetGrid, y + offsetGrid, seed);
+                    int index = WangTiler.selectSingleEdgeSeparated(x + offsetGrid, y + offsetGrid, seed);
                     renderer.draw(omniTiles[noiseIndex][octaves][fractalMode][index], x * 128f - 128f - (offsetPx & 127), y * 128f - 128f - (offsetPx & 127));
                     // This is an alternative that doesn't keep the same values away from each other.
                     // Repeats will happen.

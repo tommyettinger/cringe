@@ -56,7 +56,7 @@ public final class WangTiler {
         return w | s | d | (w ^ e) >>> 1 | (n ^ s) >>> 1 | (u ^ d) >>> 1;
     }
     /**
-     * Gets a pseudo-random index from 0 to 63, inclusive, for single-edge (omni-tiling) noise.
+     * Gets a pseudo-random index from 0 to 63, inclusive, for single-edge (omni-tiling) 2D noise.
      * This is likely to choose some index more than once given 9 or more tiles.
      * @param x horizontal grid position to place a Wang-tiling square
      * @param y vertical grid position to place a Wang-tiling square; y-up or y-down doesn't matter here
@@ -65,6 +65,64 @@ public final class WangTiler {
      */
     public static int selectSingleEdge(int x, int y, int seed) {
         return PointHasher.hash256(x, y, seed) & 63;
+    }
+
+    /**
+     * Gets a pseudo-random index from 0 to 63, inclusive, for single-edge (omni-tiling) 3D noise.
+     * This is likely to choose some index more than once given 9 or more tiles.
+     * @param x x grid position to place a Wang-tiling square
+     * @param y y grid position to place a Wang-tiling square
+     * @param z z grid position to place a Wang-tiling square
+     * @param seed all bits are used; should be the same for a single tiling space
+     * @return an index between 0 and 63, inclusive
+     */
+    public static int selectSingleEdge(int x, int y, int z, int seed) {
+        return PointHasher.hash256(x, y, z, seed) & 63;
+    }
+
+    /**
+     * Gets a pseudo-random index from 0 to 255, inclusive, for single-edge (omni-tiling) 4D noise.
+     * This is likely to choose some index more than once given 17 or more tiles.
+     * @param x x grid position to place a Wang-tiling square
+     * @param y y grid position to place a Wang-tiling square
+     * @param z z grid position to place a Wang-tiling square
+     * @param w w grid position to place a Wang-tiling square
+     * @param seed all bits are used; should be the same for a single tiling space
+     * @return an index between 0 and 255, inclusive
+     */
+    public static int selectSingleEdge(int x, int y, int z, int w, int seed) {
+        return PointHasher.hash256(x, y, z, w, seed);
+    }
+
+    /**
+     * Gets a pseudo-random index from 0 to 1023, inclusive, for single-edge (omni-tiling) 5D noise.
+     * This is likely to choose some index more than once given 33 or more tiles.
+     * @param x x grid position to place a Wang-tiling square
+     * @param y y grid position to place a Wang-tiling square
+     * @param z z grid position to place a Wang-tiling square
+     * @param w w grid position to place a Wang-tiling square
+     * @param u u grid position to place a Wang-tiling square
+     * @param seed all bits are used; should be the same for a single tiling space
+     * @return an index between 0 and 1023, inclusive
+     */
+    public static int selectSingleEdge(int x, int y, int z, int w, int u, int seed) {
+        return PointHasher.hashAll(x, y, z, w, u, seed) & 1023;
+    }
+
+    /**
+     * Gets a pseudo-random index from 0 to 4095, inclusive, for single-edge (omni-tiling) 6D noise.
+     * This is likely to choose some index more than once given 65 or more tiles.
+     * @param x x grid position to place a Wang-tiling square
+     * @param y y grid position to place a Wang-tiling square
+     * @param z z grid position to place a Wang-tiling square
+     * @param w w grid position to place a Wang-tiling square
+     * @param u u grid position to place a Wang-tiling square
+     * @param v v grid position to place a Wang-tiling square
+     * @param seed all bits are used; should be the same for a single tiling space
+     * @return an index between 0 and 4095, inclusive
+     */
+    public static int selectSingleEdge(int x, int y, int z, int w, int u, int v, int seed) {
+        return PointHasher.hashAll(x, y, z, w, u, v, seed) & 4095;
     }
 
     /**

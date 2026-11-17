@@ -39,6 +39,12 @@ u get the picture
 
 [docz boyee](https://tommyettinger.github.io/cringe/apidocs/)
 
+theres like all teh docz all teh tiem
+
+their liek written good tho
+
+some nerd wrote thems
+
 # o yeh
 
 theres this other stuff now
@@ -61,7 +67,13 @@ o and theres `Scramblers` 2 take a number and make it like wiggly jiggly or smth
 
 now there like all these like um `RawNoise` types
 
+their good 4 makin height fieldz n texturez
+
+not liek sound kinda noise tho
+
 each 1 has liek a diff flavor i guess?
+
+[u can preview them here](docs/Noise.md)!!!1
 
 `PerlinNoise` is all squarey but also liek blobby
 
@@ -96,6 +108,20 @@ these r all liek `Json.Serializable` so u can liek saev and laod stuf
 it liek um gose upp an dowwn wit a um wiglgy wbobly waev but theres different waevs i thikn
 
 wut even is `GradientVectors`??? dont use it lol i gess???
+
+n now theres [wang tilez](https://web.archive.org/web/20180310230056/https://www.pathofexile.com/forum/view-thread/55091) of noise!!!1
+
+named after hao wang teh math wizard
+
+[u can see how they look here](docs/wang.html)!!!111
+
+but also theres liek omni tiling noisies
+
+those dont need nothing special 4 matchin edgez
+
+all teh edges match!!1
+
+[u can see those liek here](docs/omni.html)!!!11
 
 # even moar!!!!!!11!!!
 
@@ -169,11 +195,11 @@ You can depend on the library as a whole, using it as a normal Gradle or Maven d
 repository. JitPack.io is added by default in gdx-liftoff projects, and it's easy to add to other projects; see
 [their documentation](https://jitpack.io/#tommyettinger/cringe).
 
-`api "com.github.tommyettinger:cringe:0.3.1"`
+`api "com.github.tommyettinger:cringe:0.3.2"`
 
 If you use GWT, then your GWT module needs to depend on:
 
-`implementation "com.github.tommyettinger:cringe:0.3.1:sources"`
+`implementation "com.github.tommyettinger:cringe:0.3.2:sources"`
 
 GWT also needs this `inherits` line added to your `GdxDefinition.gwt.xml` file, with the other inherits lines:
 
@@ -198,7 +224,7 @@ results that can be produced before the sequence repeats. In practice, a game wi
 exhausting an entire period and actually seeing the sequence repeat. However, far enough along through the actual period
 of a generator, it becomes possible for an adversary (typically a player) to notice and exploit patterns. The shortest
 I believe this could happen predictably is in `RandomDistinct64`, after over 4 billion random numbers are generated (2
-to the 32). It can theoretically happen earlier in `RandomChop128`, which has a minimum guaranteed period of 2 to the 64
+to the 32). It can theoretically happen earlier in `RandomChop128`, which has a minimum guaranteed period of 2 to the 32
 calls to `nextInt()`, but in practice, encountering a period shorter than 2 to the 40-something is vanishingly unlikely
 (buy a lottery ticket if you encounter it, why not), putting the closest point that might be predictable at over a
 million generated `int`s. For `RandomXMX256`, the earliest point should be 2 to the 128, which just means it isn't going
@@ -266,6 +292,25 @@ and there's lots of other connections. More noise classes have been added more r
 To use the noise, you should probably have a dependency on all of `cringe`.
 [You can preview all noise types in 1D and 2D here.](https://github.com/tommyettinger/cringe/blob/main/docs/Noise.md)
 That page also links to 3D previews as animated GIFs (2D with time as the third dimension).
+
+Wang-tiling and omni-tiling noise are supported by the `WangContinuousNoise` class. In a simple form, it generates
+groups of 16 squares of noise that each have one of two types of edge, with all edges of the same type compatible for
+seamless tiling. You can get existing tiles of 128x128 pixel noise in the [noiseWang/](docs/noiseWang/) folder. You can
+lay out those tiles using the `WangTiler` class. It may help a lot to see how the edges work in
+[the Wang tiling page in this repo](docs/wang.html).
+
+There's also a simpler form where all edges are compatible with all edges; this is enabled with
+`WangContinuouNoise.setSingleEdge(true)`. This actually looks a lot better than it would seem at first! There are 64
+existing tiles of 128x128 pixel noise in a variety of types in the [noiseOmni/](docs/noiseOmni) folder. They are much
+simpler to use than Wang tiles, but you can still use `WangTiler` to lay them out in a less-obvious way with
+`WangTiler.selectSingleEdgeSeparated()`, for 2D tilings. It may help somewhat to see how the edges are seamless in
+[the omni-tiling page in this repo](docs/omni.html).
+
+`WangContinuousNoise` wraps around one of `WangPerlueNoise` (the default),`WangPerlinNoise`, or `WangValueNoise`, and
+allows changing the tile size, frequency, seed, octave count, and fractal mode. If you aren't limited to existing
+textures, you can actually generate 3D and higher-dimensional Wang-tiling or omni-tiling cubes, hypercubes, and so on.
+Using omni-tiling is probably the best way here, but Wang tiling still works and there's 3D-6D layouts in `WangTiler`
+for both omni-tiling and Wang-tiling cubes or hypercubes.
 
 This also adds `Vector5` and `Vector6` to the `Vector2` through `Vector4` libGDX provides, and the `PointSequence`
 class' implementations can generate the appropriate type of Vector for a given dimension. `PointSequence` produces

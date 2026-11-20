@@ -193,7 +193,7 @@ public class WangContinuousNoise extends RawNoise {
         this.octaves = Math.max(1, octaves);
     }
 
-    public float getTileSize() {
+    public int getTileSize() {
         return MathUtils.roundPositive(tileSize / frequency);
     }
 
